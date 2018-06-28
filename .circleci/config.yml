@@ -10,3 +10,4 @@ jobs:
         chmod +x ./architect
         ./architect version
     - run: ./architect build
+    - run: ./architect publish --pipeline=false --channels=${CIRCLE_SHA1}
