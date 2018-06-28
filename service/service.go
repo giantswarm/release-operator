@@ -16,13 +16,6 @@ import (
 	"github.com/giantswarm/release-operator/service/healthz"
 )
 
-const (
-	apiServerIPLastOctet = 1
-
-	defaultCNRAddress      = "https://quay.io"
-	defaultCNROrganization = "giantswarm"
-)
-
 // Config represents the configuration used to create a new service.
 type Config struct {
 	Logger micrologger.Logger
