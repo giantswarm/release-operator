@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: release-operator
+  namespace: giantswarm
+  labels:
+    app: release-operator
+  annotations:
+    prometheus.io/scrape: "true"
+spec:
+  ports:
+  - port: 8000
+  selector:
+    app: release-operator

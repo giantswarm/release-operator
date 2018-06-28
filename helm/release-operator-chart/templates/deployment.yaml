@@ -1,0 +1,63 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: release-operator
+  namespace: giantswarm
+  labels:
+    app: release-operator
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: release-operator
+      annotations:
+        releasetime: {{ $.Release.Time }}
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - release-operator
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+      volumes:
+      - name: release-operator-configmap
+        configMap:
+          name: release-operator-configmap
+          items:
+          - key: config.yml
+            path: config.yml
+      serviceAccountName: release-operator
+      containers:
+      - name: release-operator
+        image: quay.io/giantswarm/release-operator:[[ .SHA ]]
+        args:
+        - daemon
+        - --config.dirs=/var/run/release-operator/configmap/
+        - --config.files=config
+        volumeMounts:
+        - name: release-operator-configmap
+          mountPath: /var/run/release-operator/configmap/
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8000
+          initialDelaySeconds: 30
+          timeoutSeconds: 1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 150Mi
+          limits:
+            cpu: 100m
+            memory: 150Mi
+      imagePullSecrets:
+      - name: release-operator-pull-secret
