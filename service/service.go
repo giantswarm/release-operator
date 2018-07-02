@@ -13,6 +13,7 @@ import (
 	"k8s.io/client-go/rest"
 
 	"github.com/giantswarm/release-operator/flag"
+	"github.com/giantswarm/release-operator/service/controller"
 	"github.com/giantswarm/release-operator/service/healthz"
 )
 
@@ -34,7 +35,8 @@ type Service struct {
 	Healthz *healthz.Service
 	Version *version.Service
 
-	bootOnce sync.Once
+	bootOnce          sync.Once
+	releaseController *controller.Release
 }
 
 // New creates a new service with given configuration.
@@ -110,11 +112,27 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
+	var releaseController *controller.Release
+	{
+		c := controller.ReleaseConfig{
+			Logger:    config.Logger,
+			K8sClient: k8sClient,
+
+			ProjectName: config.ProjectName,
+		}
+
+		releaseController, err = controller.NewRelease(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	s := &Service{
 		Healthz: healthzService,
 		Version: versionService,
 
-		bootOnce: sync.Once{},
+		bootOnce:          sync.Once{},
+		releaseController: releaseController,
 	}
 
 	return s, nil
@@ -123,5 +141,6 @@ func New(config Config) (*Service, error) {
 // Boot starts top level service implementation.
 func (s *Service) Boot() {
 	s.bootOnce.Do(func() {
+		go s.releaseController.Boot()
 	})
 }
