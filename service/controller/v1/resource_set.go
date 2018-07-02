@@ -18,8 +18,6 @@ const (
 	ResourceRetries uint64 = 3
 )
 
-// ResourceSetConfig contains necessary dependencies and settings for
-// ChartConfig controller ResourceSet configuration.
 type ResourceSetConfig struct {
 	// Dependencies.
 	K8sClient kubernetes.Interface
@@ -29,7 +27,6 @@ type ResourceSetConfig struct {
 	ProjectName string
 }
 
-// NewResourceSet returns a configured ChartConfig controller ResourceSet.
 func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 	var err error
 
@@ -46,7 +43,9 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 		return nil, microerror.Maskf(invalidConfigError, "%T.ProjectName must not be empty", config)
 	}
 
-	resources := []controller.Resource{}
+	resources := []controller.Resource{
+	// TODO: implement configmap resource
+	}
 
 	{
 		c := retryresource.WrapConfig{
