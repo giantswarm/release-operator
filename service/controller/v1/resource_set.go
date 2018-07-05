@@ -3,19 +3,12 @@ package v1
 import (
 	"context"
 
-	"github.com/cenkalti/backoff"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/operatorkit/controller/resource/metricsresource"
 	"github.com/giantswarm/operatorkit/controller/resource/retryresource"
 	"k8s.io/client-go/kubernetes"
-)
-
-const (
-	// ResourceRetries presents number of retries for failed Resource
-	// operation before giving up.
-	ResourceRetries uint64 = 3
 )
 
 type ResourceSetConfig struct {
@@ -30,26 +23,12 @@ type ResourceSetConfig struct {
 func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 	var err error
 
-	// Dependencies.
-	if config.K8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
-	}
-	if config.Logger == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
-	}
-
-	// Settings.
-	if config.ProjectName == "" {
-		return nil, microerror.Maskf(invalidConfigError, "%T.ProjectName must not be empty", config)
-	}
-
-	// TODO: implement configmap resource
+	// TODO: implement configmap,secret,chartConfig resource
 	resources := []controller.Resource{}
 
 	{
 		c := retryresource.WrapConfig{
-			BackOffFactory: func() backoff.BackOff { return backoff.WithMaxTries(backoff.NewExponentialBackOff(), ResourceRetries) },
-			Logger:         config.Logger,
+			Logger: config.Logger,
 		}
 
 		resources, err = retryresource.Wrap(resources, c)

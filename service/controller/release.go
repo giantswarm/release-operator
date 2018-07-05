@@ -33,7 +33,7 @@ func NewRelease(config ReleaseConfig) (*Release, error) {
 		c := informer.Config{
 			Logger: config.Logger,
 
-			Watcher: config.K8sClient.CoreV1().ConfigMaps("draughtsman"),
+			Watcher: config.K8sClient.CoreV1().ConfigMaps("release-operator"),
 		}
 
 		newInformer, err = informer.New(c)
