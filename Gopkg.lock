@@ -8,10 +8,22 @@
   revision = "3a771d992973f24aa725d07868b467d1ddfceafb"
 
 [[projects]]
+  name = "github.com/cenkalti/backoff"
+  packages = ["."]
+  revision = "61153c768f31ee5f130071d08fc82b85208528de"
+  version = "v1.1.0"
+
+[[projects]]
   name = "github.com/coreos/go-semver"
   packages = ["semver"]
   revision = "8ab6407b697782a06568d4b7f1db25550ec2e4c6"
   version = "v0.2.0"
+
+[[projects]]
+  name = "github.com/davecgh/go-spew"
+  packages = ["spew"]
+  revision = "346938d642f2ec3594ed81d874461961cd0faa76"
+  version = "v1.1.0"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -79,7 +91,20 @@
 [[projects]]
   branch = "master"
   name = "github.com/giantswarm/operatorkit"
-  packages = ["client/k8srestconfig"]
+  packages = [
+    "client/k8scrdclient",
+    "client/k8srestconfig",
+    "controller",
+    "controller/context/finalizerskeptcontext",
+    "controller/context/reconciliationcanceledcontext",
+    "controller/context/resourcecanceledcontext",
+    "controller/context/updateallowedcontext",
+    "controller/context/updatenecessarycontext",
+    "controller/resource/internal",
+    "controller/resource/metricsresource",
+    "controller/resource/retryresource",
+    "informer"
+  ]
   revision = "d80fdea79511051e5f7fbd585a98b5919671ea45"
 
 [[projects]]
@@ -170,6 +195,15 @@
   packages = ["."]
   revision = "e3702bed27f0d39777b0b37b664b6280e8ef8fbf"
   version = "v1.6.2"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/hashicorp/golang-lru"
+  packages = [
+    ".",
+    "simplelru"
+  ]
+  revision = "0fb14efe8c47ae851c0034ed7a448854d3d34cf3"
 
 [[projects]]
   branch = "master"
@@ -432,11 +466,24 @@
   revision = "8b7507fac302640dd5f1efbf9643199952cc58db"
 
 [[projects]]
+  name = "k8s.io/apiextensions-apiserver"
+  packages = [
+    "pkg/apis/apiextensions",
+    "pkg/apis/apiextensions/v1beta1",
+    "pkg/client/clientset/clientset",
+    "pkg/client/clientset/clientset/scheme",
+    "pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
+  ]
+  revision = "8e7f43002fec5394a8d96ebca781aa9d4b37aaef"
+  version = "kubernetes-1.10.4"
+
+[[projects]]
   name = "k8s.io/apimachinery"
   packages = [
     "pkg/api/errors",
     "pkg/api/meta",
     "pkg/api/resource",
+    "pkg/apis/meta/internalversion",
     "pkg/apis/meta/v1",
     "pkg/apis/meta/v1/unstructured",
     "pkg/apis/meta/v1beta1",
@@ -454,7 +501,9 @@
     "pkg/runtime/serializer/versioning",
     "pkg/selection",
     "pkg/types",
+    "pkg/util/cache",
     "pkg/util/clock",
+    "pkg/util/diff",
     "pkg/util/errors",
     "pkg/util/framer",
     "pkg/util/intstr",
@@ -513,13 +562,17 @@
     "plugin/pkg/client/auth/exec",
     "rest",
     "rest/watch",
+    "tools/cache",
     "tools/clientcmd/api",
     "tools/metrics",
+    "tools/pager",
     "tools/reference",
     "transport",
+    "util/buffer",
     "util/cert",
     "util/flowcontrol",
-    "util/integer"
+    "util/integer",
+    "util/retry"
   ]
   revision = "26a26f55b28aa1b338fbaf6fbbe0bcd76aed05e0"
   version = "kubernetes-1.10.4"
@@ -527,6 +580,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "75384bd3e876b96291c0fb6309bf41d46595cbf5efc03fa6add9ec6fb019257a"
+  inputs-digest = "1687d6476984ff2e8103868ef7a736855ffe1c5d18dc182cbc3e118a34d902d5"
   solver-name = "gps-cdcl"
   solver-version = 1
