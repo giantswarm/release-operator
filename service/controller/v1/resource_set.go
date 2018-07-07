@@ -9,6 +9,8 @@ import (
 	"github.com/giantswarm/operatorkit/controller/resource/metricsresource"
 	"github.com/giantswarm/operatorkit/controller/resource/retryresource"
 	"k8s.io/client-go/kubernetes"
+
+	"github.com/giantswarm/release-operator/service/controller/v1/resource/configmap"
 )
 
 type ResourceSetConfig struct {
@@ -23,8 +25,28 @@ type ResourceSetConfig struct {
 func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 	var err error
 
-	// TODO: implement configmap,secret,chartConfig resource
-	resources := []controller.Resource{}
+	var configmapResource controller.Resource
+	{
+		c := configmap.Config{
+			K8sClient: config.K8sClient,
+			Logger:    config.Logger,
+		}
+
+		ops, err := configmap.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		configmapResource, err = toCRUDResource(config.Logger, ops)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	// TODO: implement secret,chartConfig resource
+	resources := []controller.Resource{
+		configmapResource,
+	}
 
 	{
 		c := retryresource.WrapConfig{
