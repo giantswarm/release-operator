@@ -9,7 +9,8 @@ import (
 	"github.com/giantswarm/operatorkit/controller/resource/metricsresource"
 	"github.com/giantswarm/operatorkit/controller/resource/retryresource"
 	"k8s.io/client-go/kubernetes"
-
+  
+  "github.com/giantswarm/release-operator/service/controller/v1/key"
 	"github.com/giantswarm/release-operator/service/controller/v1/resource/configmap"
 )
 
@@ -75,7 +76,10 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 	}
 
 	handlesFunc := func(obj interface{}) bool {
-		// TODO: implement key package
+		_, err := key.ToIndexReleases(obj)
+		if err != nil {
+			return false
+		}
 
 		return true
 	}
