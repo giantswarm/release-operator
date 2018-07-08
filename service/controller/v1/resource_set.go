@@ -9,8 +9,8 @@ import (
 	"github.com/giantswarm/operatorkit/controller/resource/metricsresource"
 	"github.com/giantswarm/operatorkit/controller/resource/retryresource"
 	"k8s.io/client-go/kubernetes"
-  
-  "github.com/giantswarm/release-operator/service/controller/v1/key"
+
+	"github.com/giantswarm/release-operator/service/controller/v1/key"
 	"github.com/giantswarm/release-operator/service/controller/v1/resource/configmap"
 )
 
