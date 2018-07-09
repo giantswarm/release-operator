@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microendpoint/service/version"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -78,6 +79,11 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
+	g8sClient, err := versioned.NewForConfig(restConfig)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
 	k8sClient, err := kubernetes.NewForConfig(restConfig)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -116,6 +122,7 @@ func New(config Config) (*Service, error) {
 	{
 		c := controller.ReleaseConfig{
 			Logger:    config.Logger,
+			G8sClient: g8sClient,
 			K8sClient: k8sClient,
 
 			ProjectName: config.ProjectName,
