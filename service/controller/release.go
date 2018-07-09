@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
@@ -11,6 +12,7 @@ import (
 )
 
 type ReleaseConfig struct {
+	G8sClient versioned.Interface
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
 
@@ -45,6 +47,7 @@ func NewRelease(config ReleaseConfig) (*Release, error) {
 	var v1ResourceSet *controller.ResourceSet
 	{
 		c := v1.ResourceSetConfig{
+			G8sClient:   config.G8sClient,
 			K8sClient:   config.K8sClient,
 			Logger:      config.Logger,
 			ProjectName: config.ProjectName,

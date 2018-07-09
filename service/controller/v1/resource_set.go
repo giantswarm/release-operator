@@ -3,6 +3,7 @@ package v1
 import (
 	"context"
 
+	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
@@ -11,11 +12,13 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/release-operator/service/controller/v1/key"
+	"github.com/giantswarm/release-operator/service/controller/v1/resource/chartconfig"
 	"github.com/giantswarm/release-operator/service/controller/v1/resource/configmap"
 )
 
 type ResourceSetConfig struct {
 	// Dependencies.
+	G8sClient versioned.Interface
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
 
@@ -25,6 +28,25 @@ type ResourceSetConfig struct {
 
 func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 	var err error
+
+	var chartconfigResource controller.Resource
+	{
+		c := chartconfig.Config{
+			G8sClient: config.G8sClient,
+			K8sClient: config.K8sClient,
+			Logger:    config.Logger,
+		}
+
+		ops, err := chartconfig.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		chartconfigResource, err = toCRUDResource(config.Logger, ops)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
 
 	var configmapResource controller.Resource
 	{
@@ -46,6 +68,7 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 
 	// TODO: implement secret,chartConfig resource
 	resources := []controller.Resource{
+		chartconfigResource,
 		configmapResource,
 	}
 

@@ -39,6 +39,21 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/giantswarm/apiextensions"
+  packages = [
+    "pkg/apis/core/v1alpha1",
+    "pkg/apis/example/v1alpha1",
+    "pkg/apis/provider/v1alpha1",
+    "pkg/clientset/versioned",
+    "pkg/clientset/versioned/scheme",
+    "pkg/clientset/versioned/typed/core/v1alpha1",
+    "pkg/clientset/versioned/typed/example/v1alpha1",
+    "pkg/clientset/versioned/typed/provider/v1alpha1"
+  ]
+  revision = "384d9ad387472ec2fb6a6cbc3c3b77cc84d7837a"
+
+[[projects]]
+  branch = "master"
   name = "github.com/giantswarm/k8shealthz"
   packages = ["."]
   revision = "9abe467ab9085610b261319dfe875c6d13537b06"
@@ -580,6 +595,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "1687d6476984ff2e8103868ef7a736855ffe1c5d18dc182cbc3e118a34d902d5"
+  inputs-digest = "38bad2e490b5266eb47f0315ae19aacb6aa4d2db0cf968954c19c61579c47bac"
   solver-name = "gps-cdcl"
   solver-version = 1
