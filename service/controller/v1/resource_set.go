@@ -85,7 +85,6 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 		}
 	}
 
-	// TODO: implement secret,chartConfig resource
 	resources := []controller.Resource{
 		chartconfigResource,
 		configmapResource,
