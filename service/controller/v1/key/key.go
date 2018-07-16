@@ -1,11 +1,33 @@
 package key
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/versionbundle"
 	yaml "gopkg.in/yaml.v2"
 	apiv1 "k8s.io/api/core/v1"
 )
+
+const (
+	ChartConfigAPIVersion           = "core.giantswarm.io"
+	ChartConfigKind                 = "ChartConfig"
+	ChartConfigVersionbundleVersion = "0.2.0"
+)
+
+func ChartChannel(version, operatorname string) string {
+	channelversion := strings.Replace(version, ".", "-", -1)
+	return fmt.Sprintf("%s-%s", operatorname, channelversion)
+}
+
+func ChartConfigName(operatorname string) string {
+	return fmt.Sprintf("%s-chartconfig", operatorname)
+}
+
+func ChartName(operatorname string) string {
+	return fmt.Sprintf("%s-chart", operatorname)
+}
 
 func ToConfigMap(v interface{}) (apiv1.ConfigMap, error) {
 	customObjectPointer, ok := v.(*apiv1.ConfigMap)

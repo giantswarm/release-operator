@@ -1,6 +1,9 @@
 package chartconfig
 
 import (
+	"reflect"
+
+	"github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -53,4 +56,50 @@ func New(config Config) (*Resource, error) {
 
 func (r *Resource) Name() string {
 	return Name
+}
+
+func containsChartConfig(list []*v1alpha1.ChartConfig, item *v1alpha1.ChartConfig) bool {
+	for _, l := range list {
+		if reflect.DeepEqual(item, l) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func getChartConfigByName(list []*v1alpha1.ChartConfig, name string) (*v1alpha1.ChartConfig, error) {
+	for _, l := range list {
+		if l.Name == name {
+			return l, nil
+		}
+	}
+
+	return nil, microerror.Mask(notFoundError)
+}
+
+func isChartConfigModified(a, b *v1alpha1.ChartConfig) bool {
+	// If the Spec section has changed we need to update.
+	if !reflect.DeepEqual(a.Spec, b.Spec) {
+		return true
+	}
+	// If the Labels have changed we also need to update.
+	if !reflect.DeepEqual(a.Labels, b.Labels) {
+		return true
+	}
+
+	return false
+}
+
+func toChartConfigs(v interface{}) ([]*v1alpha1.ChartConfig, error) {
+	if v == nil {
+		return nil, nil
+	}
+
+	chartConfigs, ok := v.([]*v1alpha1.ChartConfig)
+	if !ok {
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", []*v1alpha1.ChartConfig{}, v)
+	}
+
+	return chartConfigs, nil
 }
