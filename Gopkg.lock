@@ -104,7 +104,7 @@
   revision = "39f8cfb7c2583edb28552d9e4b12193e5bddaf60"
 
 [[projects]]
-  branch = "merge-router"
+  branch = "master"
   name = "github.com/giantswarm/operatorkit"
   packages = [
     "client/k8scrdclient",
@@ -120,7 +120,7 @@
     "controller/resource/retryresource",
     "informer"
   ]
-  revision = "eca84cd810cfa584bdc507b55dbbdf356c77e176"
+  revision = "e299b3f2585f09f50ce40debe7aab42345deb7e0"
 
 [[projects]]
   branch = "master"
@@ -595,6 +595,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "fdf54da978de22932dec13b582d0350bebb5b00026d668150c0c610e2e3d7688"
+  inputs-digest = "40a1c4d235cfb6264d85a87264a11f038ab40c46718510f40d4fe06b4a6db818"
   solver-name = "gps-cdcl"
   solver-version = 1
