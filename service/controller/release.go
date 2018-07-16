@@ -59,28 +59,15 @@ func NewRelease(config ReleaseConfig) (*Release, error) {
 		}
 	}
 
-	var resourceRouter *controller.ResourceRouter
-	{
-		c := controller.ResourceRouterConfig{
-			Logger: config.Logger,
-			ResourceSets: []*controller.ResourceSet{
-				v1ResourceSet,
-			},
-		}
-
-		resourceRouter, err = controller.NewResourceRouter(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
 	var releaseController *controller.Controller
 	{
 		c := controller.Config{
-			Informer:       newInformer,
-			Logger:         config.Logger,
-			ResourceRouter: resourceRouter,
-			RESTClient:     config.K8sClient.CoreV1().RESTClient(),
+			Informer: newInformer,
+			Logger:   config.Logger,
+			ResourceSets: []*controller.ResourceSet{
+				v1ResourceSet,
+			},
+			RESTClient: config.K8sClient.CoreV1().RESTClient(),
 
 			Name: config.ProjectName,
 		}
