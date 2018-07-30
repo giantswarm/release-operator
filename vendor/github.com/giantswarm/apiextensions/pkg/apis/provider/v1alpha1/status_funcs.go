@@ -1,5 +1,10 @@
 package v1alpha1
 
+import (
+	"sort"
+	"time"
+)
+
 func (s StatusCluster) HasCreatedCondition() bool {
 	return hasCondition(s.Conditions, StatusClusterStatusTrue, StatusClusterTypeCreated)
 }
@@ -44,6 +49,10 @@ func (s StatusCluster) WithCreatingCondition() []StatusClusterCondition {
 	return withCondition(s.Conditions, StatusClusterTypeCreated, StatusClusterTypeCreating, StatusClusterStatusTrue)
 }
 
+func (s StatusCluster) WithNewVersion(version string) []StatusClusterVersion {
+	return withVersion(s.Versions, StatusClusterVersion{Date: time.Now(), Semver: version}, ClusterVersionLimit)
+}
+
 func (s StatusCluster) WithUpdatedCondition() []StatusClusterCondition {
 	return withCondition(s.Conditions, StatusClusterTypeUpdating, StatusClusterTypeUpdated, StatusClusterStatusTrue)
 }
@@ -52,9 +61,9 @@ func (s StatusCluster) WithUpdatingCondition() []StatusClusterCondition {
 	return withCondition(s.Conditions, StatusClusterTypeUpdated, StatusClusterTypeUpdating, StatusClusterStatusTrue)
 }
 
-func hasCondition(conditions []StatusClusterCondition, search string, status string) bool {
+func hasCondition(conditions []StatusClusterCondition, s string, t string) bool {
 	for _, c := range conditions {
-		if c.Status == search && c.Type == status {
+		if c.Status == s && c.Type == t {
 			return true
 		}
 	}
@@ -89,4 +98,26 @@ func withCondition(conditions []StatusClusterCondition, search string, replace s
 	}
 
 	return newConditions
+}
+
+// withVersion computes a list of version history using the given list and new
+// version structure to append. withVersion also limits total amount of elements
+// in the list by cutting off the tail with respect to the limit parameter.
+func withVersion(versions []StatusClusterVersion, version StatusClusterVersion, limit int) []StatusClusterVersion {
+	var newVersions []StatusClusterVersion
+
+	start := 0
+	if len(versions) >= limit {
+		start = len(versions) - limit + 1
+	}
+
+	sort.Sort(sortClusterStatusVersionsByDate(versions))
+
+	for i := start; i < len(versions); i++ {
+		newVersions = append(newVersions, versions[i])
+	}
+
+	newVersions = append(newVersions, version)
+
+	return newVersions
 }
