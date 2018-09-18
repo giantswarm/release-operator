@@ -16,6 +16,9 @@ type Config struct {
 	// Dependencies.
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
+
+	Name      string
+	Namespace string
 }
 
 // Resource implements the configmap resource.
@@ -23,6 +26,9 @@ type Resource struct {
 	// Dependencies.
 	k8sClient kubernetes.Interface
 	logger    micrologger.Logger
+
+	name      string
+	namespace string
 }
 
 // New creates a new configured configmap resource.
@@ -35,10 +41,20 @@ func New(config Config) (*Resource, error) {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
 
+	if config.Name == "" {
+		return nil, microerror.Maskf(invalidConfigError, "%T.Name must not be empty", config)
+	}
+	if config.Namespace == "" {
+		return nil, microerror.Maskf(invalidConfigError, "%T.Namespace must not be empty", config)
+	}
+
 	r := &Resource{
 		// Dependencies.
 		k8sClient: config.K8sClient,
 		logger:    config.Logger,
+
+		name:      config.Name,
+		namespace: config.Namespace,
 	}
 
 	return r, nil
