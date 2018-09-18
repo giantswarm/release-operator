@@ -24,6 +24,12 @@
 #   go-tests = true
 #   unused-packages = true
 
+# To use reference package:
+#   vendor/k8s.io/kubernetes/pkg/util/parsers/parsers.go:36:16: undefined: reference.ParseNormalizedNamed
+[[override]]
+  branch = "master"
+  name = "github.com/docker/distribution"
+
 
 [[constraint]]
   branch = "master"
