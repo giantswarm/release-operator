@@ -24,8 +24,8 @@ type Release struct {
 }
 
 func NewRelease(config ReleaseConfig) (*Release, error) {
-	if config.K8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
+	if config.G8sClient == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.G8sClient must not be empty", config)
 	}
 
 	var err error
@@ -33,9 +33,11 @@ func NewRelease(config ReleaseConfig) (*Release, error) {
 	var newInformer *informer.Informer
 	{
 		c := informer.Config{
-			Logger: config.Logger,
+			Logger:  config.Logger,
+			Watcher: config.G8sClient.CoreV1alpha1().Releases(""),
 
-			Watcher: config.K8sClient.CoreV1().ConfigMaps("release-operator"),
+			RateWait:     informer.DefaultRateWait,
+			ResyncPeriod: informer.DefaultResyncPeriod,
 		}
 
 		newInformer, err = informer.New(c)

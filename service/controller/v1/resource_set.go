@@ -1,8 +1,6 @@
 package v1
 
 import (
-	"context"
-
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -36,6 +34,8 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 			G8sClient: config.G8sClient,
 			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
+
+			ChartOperatorVersion: "0.3.0",
 		}
 
 		ops, err := chartconfig.New(c)
@@ -113,24 +113,23 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 		}
 	}
 
-	initCtxFunc := func(ctx context.Context, obj interface{}) (context.Context, error) {
-		return ctx, nil
-	}
-
 	handlesFunc := func(obj interface{}) bool {
-		_, err := key.ToIndexReleases(obj)
+		customResource, err := key.ToCustomResource(obj)
 		if err != nil {
 			return false
 		}
 
-		return true
+		if key.VersionBundleVersion(customResource) == VersionBundle().Version {
+			return true
+		}
+
+		return false
 	}
 
 	var resourceSet *controller.ResourceSet
 	{
 		c := controller.ResourceSetConfig{
 			Handles:   handlesFunc,
-			InitCtx:   initCtxFunc,
 			Logger:    config.Logger,
 			Resources: resources,
 		}
