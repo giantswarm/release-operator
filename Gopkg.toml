@@ -62,6 +62,18 @@ required = [
   name = "github.com/giantswarm/versionbundle"
 
 [[constraint]]
+  name = "k8s.io/api"
+  version = "kubernetes-1.10.4"
+
+[[constraint]]
+  name = "k8s.io/apimachinery"
+  version = "kubernetes-1.10.4"
+
+[[constraint]]
+  name = "k8s.io/apiserver"
+  version = "kubernetes-1.10.4"
+
+[[constraint]]
   name = "k8s.io/client-go"
   version = "kubernetes-1.10.4"
 

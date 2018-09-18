@@ -763,7 +763,6 @@
     "pkg/api/meta",
     "pkg/api/resource",
     "pkg/api/validation",
-    "pkg/api/validation/path",
     "pkg/apimachinery",
     "pkg/apimachinery/announced",
     "pkg/apimachinery/registered",
@@ -817,7 +816,6 @@
   version = "kubernetes-1.10.4"
 
 [[projects]]
-  branch = "master"
   name = "k8s.io/apiserver"
   packages = [
     "pkg/apis/audit",
@@ -828,7 +826,8 @@
     "pkg/features",
     "pkg/util/feature"
   ]
-  revision = "67c89284117046b26ecd3776eed2a39289399f15"
+  revision = "8378ef881d4fa7d3ca5c5e7e5309592ec69b11e4"
+  version = "kubernetes-1.10.4"
 
 [[projects]]
   name = "k8s.io/client-go"
@@ -1168,6 +1167,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "998a1225bc7d829fb7c015384ee3544a02564e569661a97f7811212218453ea3"
+  inputs-digest = "fd18a6579887afe28f03e5d70fe1c8d7b4ad5052b6323230cf283f48cfa602cd"
   solver-name = "gps-cdcl"
   solver-version = 1
