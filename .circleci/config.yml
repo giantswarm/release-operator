@@ -38,6 +38,11 @@ jobs:
         chmod +x ./architect
         ./architect version
     - run: ./architect build
+    - persist_to_workspace:
+        root: .
+        paths:
+          - ./release-operator
+          - ./architect
 
   e2eTestBasic:
     environment:
