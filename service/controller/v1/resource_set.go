@@ -59,12 +59,7 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 			Logger:    config.Logger,
 		}
 
-		ops, err := configmap.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-
-		configmapResource, err = toCRUDResource(config.Logger, ops)
+		configmapResource, err = configmap.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -77,12 +72,7 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 			Logger:    config.Logger,
 		}
 
-		ops, err := secret.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-
-		secretResource, err = toCRUDResource(config.Logger, ops)
+		secretResource, err = secret.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
