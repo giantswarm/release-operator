@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: release-operator
-  namespace: giantswarm
+  namespace: {{ .Values.namespace }}
   labels:
     app: release-operator
   annotations:
