@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/giantswarm/e2e-harness/pkg/framework"
+	"github.com/giantswarm/e2e-harness/pkg/framework/resource"
 	e2esetup "github.com/giantswarm/e2esetup/chart"
 	"github.com/giantswarm/helmclient"
 	"github.com/giantswarm/micrologger"
@@ -65,10 +66,11 @@ func init() {
 	}
 
 	{
-		c := resource.ResourceConfig{
+		c := resource.Config{
 			Logger:     l,
 			HelmClient: helmClient,
-			Namespace:  "giantswarm",
+
+			Namespace: "giantswarm",
 		}
 		r, err = resource.New(c)
 		if err != nil {
