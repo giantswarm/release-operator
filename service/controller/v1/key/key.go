@@ -37,6 +37,10 @@ func OperatorVersion(customResource v1alpha1.Release) string {
 	return customResource.Spec.Operator.Version
 }
 
+func ReleaseName(customResource v1alpha1.Release) string {
+	return fmt.Sprintf("%s-%s", OperatorName(customResource), OperatorChannelName(customResource))
+}
+
 func ToCustomResource(v interface{}) (v1alpha1.Release, error) {
 	customResourcePointer, ok := v.(*v1alpha1.Release)
 	if !ok {

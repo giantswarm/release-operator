@@ -33,11 +33,12 @@ func (r *Resource) newChartCR(customResource v1alpha1.Release) (*v1alpha1.ChartC
 				Name:      key.OperatorChartName(customResource),
 				Namespace: metav1.NamespaceSystem,
 				Channel:   key.OperatorChannelName(customResource),
-				ConfigMap: TODO,
-				Release:   TODO,
+				ConfigMap: v1alpha1.ChartConfigSpecConfigMap{},
+				Secret:    v1alpha1.ChartConfigSpecSecret{},
+				Release:   key.ReleaseName(customResource),
 			},
 			VersionBundle: v1alpha1.ChartConfigSpecVersionBundle{
-				Version: TODO,
+				Version: r.chartOperatorVersion,
 			},
 		},
 	}

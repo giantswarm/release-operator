@@ -34,6 +34,8 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 			G8sClient: config.G8sClient,
 			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
+
+			ChartOperatorVersion: "0.3.0",
 		}
 
 		ops, err := chartconfig.New(c)
