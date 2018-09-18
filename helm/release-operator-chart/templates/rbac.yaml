@@ -36,7 +36,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: release-operator
-    namespace: giantswarm
+    namespace: {{ .Values.namespace }}
 roleRef:
   kind: ClusterRole
   name: release-operator
@@ -63,7 +63,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: release-operator
-    namespace: giantswarm
+    namespace: {{ .Values.namespace }}
 roleRef:
   kind: ClusterRole
   name: release-operator-psp

@@ -162,12 +162,6 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/giantswarm/k8shealthz"
-  packages = ["."]
-  revision = "9abe467ab9085610b261319dfe875c6d13537b06"
-
-[[projects]]
-  branch = "master"
   name = "github.com/giantswarm/k8sportforward"
   packages = ["."]
   revision = "3608d312c501d5f4e4390399c5e8a97866205e36"
@@ -1174,6 +1168,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a6ae7bdd65a5a4ac3c0bc8b6bb56f754229590bc573a6471e3453146c40431db"
+  inputs-digest = "36dadf3821476190088f209774b95ea866b1d502c0492c4421a5eba21fac0a2a"
   solver-name = "gps-cdcl"
   solver-version = 1
