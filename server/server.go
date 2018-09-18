@@ -11,7 +11,6 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/giantswarm/release-operator/server/endpoint"
-	"github.com/giantswarm/release-operator/server/middleware"
 	"github.com/giantswarm/release-operator/service"
 )
 
@@ -36,41 +35,13 @@ type Server struct {
 
 // New creates a new configured server object.
 func New(config Config) (*Server, error) {
-	if config.Logger == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
-	}
-	if config.Service == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.Service must not be empty", config)
-	}
-	if config.Viper == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.Viper must not be empty", config)
-	}
-
-	if config.ProjectName == "" {
-		return nil, microerror.Maskf(invalidConfigError, "%T.ProjectName must not be empty", config)
-	}
-
 	var err error
-
-	var middlewareCollection *middleware.Middleware
-	{
-		c := middleware.Config{
-			Logger:  config.Logger,
-			Service: config.Service,
-		}
-
-		middlewareCollection, err = middleware.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
 
 	var endpointCollection *endpoint.Endpoint
 	{
 		c := endpoint.Config{
-			Logger:     config.Logger,
-			Middleware: middlewareCollection,
-			Service:    config.Service,
+			Logger:  config.Logger,
+			Service: config.Service,
 		}
 
 		endpointCollection, err = endpoint.New(c)

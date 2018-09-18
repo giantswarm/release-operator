@@ -15,7 +15,6 @@ import (
 
 	"github.com/giantswarm/release-operator/flag"
 	"github.com/giantswarm/release-operator/service/controller"
-	"github.com/giantswarm/release-operator/service/healthz"
 )
 
 // Config represents the configuration used to create a new service.
@@ -33,7 +32,6 @@ type Config struct {
 
 // Service is a type providing implementation of microkit service interface.
 type Service struct {
-	Healthz *healthz.Service
 	Version *version.Service
 
 	bootOnce          sync.Once
@@ -49,9 +47,6 @@ func New(config Config) (*Service, error) {
 
 	if config.Flag == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.Flag must not be empty")
-	}
-	if config.ProjectName == "" {
-		return nil, microerror.Maskf(invalidConfigError, "config.ProjectName must not be empty")
 	}
 	if config.Viper == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.Viper must not be empty")
@@ -89,19 +84,6 @@ func New(config Config) (*Service, error) {
 		return nil, microerror.Mask(err)
 	}
 
-	var healthzService *healthz.Service
-	{
-		c := healthz.Config{
-			K8sClient: k8sClient,
-			Logger:    config.Logger,
-		}
-
-		healthzService, err = healthz.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
 	var versionService *version.Service
 	{
 		versionConfig := version.Config{
@@ -135,7 +117,6 @@ func New(config Config) (*Service, error) {
 	}
 
 	s := &Service{
-		Healthz: healthzService,
 		Version: versionService,
 
 		bootOnce:          sync.Once{},
