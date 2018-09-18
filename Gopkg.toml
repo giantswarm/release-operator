@@ -36,6 +36,9 @@ required = [
   branch = "master"
   name = "github.com/docker/distribution"
 
+[[constraint]]
+  branch = "master"
+  name = "github.com/giantswarm/e2e-harness"
 
 [[constraint]]
   branch = "master"

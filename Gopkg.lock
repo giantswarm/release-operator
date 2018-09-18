@@ -125,6 +125,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/giantswarm/apprclient"
+  packages = ["."]
+  revision = "30620a9d0ecdb133f82257768ece76ebc1b6f8ef"
+
+[[projects]]
+  branch = "master"
   name = "github.com/giantswarm/backoff"
   packages = ["."]
   revision = "889af437b4d98f8a1ccb66cb85b93de13d8c666e"
@@ -135,6 +141,7 @@
   packages = [
     "pkg/framework",
     "pkg/framework/filelogger",
+    "pkg/framework/resource",
     "pkg/harness"
   ]
   revision = "7d4199c1b499743a910ec0fca8eff7fe9ca69247"
@@ -1167,6 +1174,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "fd18a6579887afe28f03e5d70fe1c8d7b4ad5052b6323230cf283f48cfa602cd"
+  inputs-digest = "1fb05a5defdafb0f0c1b2e610680198cb4dbaa538261cf565319846a6edc4f69"
   solver-name = "gps-cdcl"
   solver-version = 1
