@@ -30,12 +30,6 @@ required = [
   "k8s.io/apiserver/pkg/endpoints/request"
 ]
 
-# To use reference package:
-#   vendor/k8s.io/kubernetes/pkg/util/parsers/parsers.go:36:16: undefined: reference.ParseNormalizedNamed
-[[override]]
-  branch = "master"
-  name = "github.com/docker/distribution"
-
 [[constraint]]
   branch = "master"
   name = "github.com/giantswarm/e2e-harness"
