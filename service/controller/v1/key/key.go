@@ -1,45 +1,20 @@
 package key
 
 import (
+	"github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/versionbundle"
-	yaml "gopkg.in/yaml.v2"
-	apiv1 "k8s.io/api/core/v1"
 )
 
-func ToConfigMap(v interface{}) (apiv1.ConfigMap, error) {
-	customObjectPointer, ok := v.(*apiv1.ConfigMap)
+func ToCustomResource(v interface{}) (v1alpha1.Release, error) {
+	customResourcePointer, ok := v.(*v1alpha1.Release)
 	if !ok {
-		return apiv1.ConfigMap{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &apiv1.ConfigMap{}, v)
+		return v1alpha1.Release{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &v1alpha1.Release{}, v)
 	}
+	customResource := *customResourcePointer
 
-	return *customObjectPointer, nil
+	return customResource, nil
 }
 
-func ToIndexReleases(v interface{}) ([]versionbundle.IndexRelease, error) {
-	cm, err := ToConfigMap(v)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-	indexBlob := cm.Data["indexblob"]
-
-	indexReleases, err := toIndexReleasesFromString(indexBlob)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
-	return indexReleases, nil
-}
-
-func toIndexReleasesFromString(indexBlob string) ([]versionbundle.IndexRelease, error) {
-	if indexBlob == "" {
-		return nil, microerror.Maskf(emptyValueError, "empty value cannot be converted to IndexReleases")
-	}
-
-	var indexReleases []versionbundle.IndexRelease
-	err := yaml.Unmarshal([]byte(indexBlob), &indexReleases)
-	if err != nil {
-		return nil, microerror.Maskf(invalidConfigError, "unable to parse release index blob: %#v", err)
-	}
-	return indexReleases, nil
+func VersionBundleVersion(customResource v1alpha1.Release) string {
+	return customResource.Spec.VersionBundle.Version
 }
