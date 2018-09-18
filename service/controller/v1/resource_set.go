@@ -57,6 +57,9 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 		c := configmap.Config{
 			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
+
+			Name:      "draughtsman-values-configmap",
+			Namespace: "draughtsman",
 		}
 
 		configmapResource, err = configmap.New(c)
@@ -70,6 +73,9 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 		c := secret.Config{
 			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
+
+			Name:      "draughtsman-values-secret",
+			Namespace: "draughtsman",
 		}
 
 		secretResource, err = secret.New(c)
