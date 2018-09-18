@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"context"
+
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -9,6 +11,7 @@ import (
 	"github.com/giantswarm/operatorkit/controller/resource/retryresource"
 	"k8s.io/client-go/kubernetes"
 
+	"github.com/giantswarm/release-operator/service/controller/v1/controllercontext"
 	"github.com/giantswarm/release-operator/service/controller/v1/key"
 	"github.com/giantswarm/release-operator/service/controller/v1/resource/chartconfig"
 	"github.com/giantswarm/release-operator/service/controller/v1/resource/configmap"
@@ -86,9 +89,9 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 	}
 
 	resources := []controller.Resource{
-		chartconfigResource,
 		configmapResource,
 		secretResource,
+		chartconfigResource,
 	}
 
 	{
@@ -113,6 +116,14 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 		}
 	}
 
+	initCtxFunc := func(ctx context.Context, obj interface{}) (context.Context, error) {
+		c := controllercontext.Context{}
+
+		ctx = controllercontext.NewContext(ctx, c)
+
+		return ctx, nil
+	}
+
 	handlesFunc := func(obj interface{}) bool {
 		customResource, err := key.ToCustomResource(obj)
 		if err != nil {
@@ -129,6 +140,7 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 	var resourceSet *controller.ResourceSet
 	{
 		c := controller.ResourceSetConfig{
+			InitCtx:   initCtxFunc,
 			Handles:   handlesFunc,
 			Logger:    config.Logger,
 			Resources: resources,
