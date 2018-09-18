@@ -18,6 +18,8 @@ type Config struct {
 	G8sClient versioned.Interface
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
+
+	ChartOperatorVersion string
 }
 
 // Resource implements the chartconfig resource.
@@ -26,6 +28,8 @@ type Resource struct {
 	g8sClient versioned.Interface
 	k8sClient kubernetes.Interface
 	logger    micrologger.Logger
+
+	chartOperatorVersion string
 }
 
 // New creates a new configured chartconfig resource.
@@ -41,11 +45,17 @@ func New(config Config) (*Resource, error) {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
 
+	if config.ChartOperatorVersion == "" {
+		return nil, microerror.Maskf(invalidConfigError, "%T.ChartOperatorVersion must not be empty", config)
+	}
+
 	r := &Resource{
 		// Dependencies.
 		g8sClient: config.G8sClient,
 		k8sClient: config.K8sClient,
 		logger:    config.Logger,
+
+		chartOperatorVersion: config.ChartOperatorVersion,
 	}
 
 	return r, nil
