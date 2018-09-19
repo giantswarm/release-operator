@@ -39,6 +39,7 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 			Logger:    config.Logger,
 
 			ChartOperatorVersion: "0.3.0",
+			Namespace:            "giantswarm",
 		}
 
 		ops, err := chartconfig.New(c)
