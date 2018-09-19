@@ -1,6 +1,7 @@
 package chartconfig
 
 import (
+	"github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -69,4 +70,13 @@ func New(config Config) (*Resource, error) {
 
 func (r *Resource) Name() string {
 	return Name
+}
+
+func toChartConfigCR(v interface{}) (*v1alpha1.ChartConfig, error) {
+	chartConfigCRPointer, ok := v.(*v1alpha1.ChartConfig)
+	if !ok {
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &v1alpha1.ChartConfig{}, v)
+	}
+
+	return chartConfigCRPointer, nil
 }
