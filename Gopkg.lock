@@ -14,6 +14,43 @@
   version = "v1.4.2"
 
 [[projects]]
+  name = "github.com/aws/aws-sdk-go"
+  packages = [
+    "aws",
+    "aws/awserr",
+    "aws/awsutil",
+    "aws/client",
+    "aws/client/metadata",
+    "aws/corehandlers",
+    "aws/credentials",
+    "aws/credentials/ec2rolecreds",
+    "aws/credentials/endpointcreds",
+    "aws/credentials/stscreds",
+    "aws/csm",
+    "aws/defaults",
+    "aws/ec2metadata",
+    "aws/endpoints",
+    "aws/request",
+    "aws/session",
+    "aws/signer/v4",
+    "internal/sdkio",
+    "internal/sdkrand",
+    "internal/sdkuri",
+    "internal/shareddefaults",
+    "private/protocol",
+    "private/protocol/ec2query",
+    "private/protocol/query",
+    "private/protocol/query/queryutil",
+    "private/protocol/rest",
+    "private/protocol/xml/xmlutil",
+    "service/cloudformation",
+    "service/ec2",
+    "service/sts"
+  ]
+  revision = "3dd4f56d3cb9d194293525540562216f81bd3f27"
+  version = "v1.15.37"
+
+[[projects]]
   branch = "master"
   name = "github.com/beorn7/perks"
   packages = ["quantile"]
@@ -131,6 +168,15 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/giantswarm/aws-operator"
+  packages = [
+    "integration/env",
+    "integration/setup"
+  ]
+  revision = "f512871cb54ed7c92c016f21c4e5edea742e2027"
+
+[[projects]]
+  branch = "master"
   name = "github.com/giantswarm/backoff"
   packages = ["."]
   revision = "889af437b4d98f8a1ccb66cb85b93de13d8c666e"
@@ -148,12 +194,19 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/giantswarm/e2esetup"
+  name = "github.com/giantswarm/e2eclients"
+  packages = ["aws"]
+  revision = "425207429a641c7e43d409680d54ae78f049e04e"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/giantswarm/e2etemplates"
   packages = [
-    "chart",
-    "chart/env"
+    "internal/render",
+    "pkg/chartvalues",
+    "pkg/e2etemplates"
   ]
-  revision = "7a3fc603bf19c4d447b9b59c2e0b4ae5ff1b5fbd"
+  revision = "56099c7613bccacc3a694a0cf9c8d83d43d0d84d"
 
 [[projects]]
   branch = "master"
@@ -244,6 +297,12 @@
   name = "github.com/giantswarm/versionbundle"
   packages = ["."]
   revision = "57f08180f2122ea89e07d16e841f83020ef07577"
+
+[[projects]]
+  name = "github.com/go-ini/ini"
+  packages = ["."]
+  revision = "5cf292cae48347c2490ac1a58fe36735fb78df7e"
+  version = "v1.38.2"
 
 [[projects]]
   name = "github.com/go-kit/kit"
@@ -410,6 +469,11 @@
   packages = ["."]
   revision = "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75"
   version = "v1.0"
+
+[[projects]]
+  name = "github.com/jmespath/go-jmespath"
+  packages = ["."]
+  revision = "0b12d6b5"
 
 [[projects]]
   name = "github.com/json-iterator/go"
@@ -1174,6 +1238,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ad80ef063cb5a40dc80fdb9bcce58d0e28f5001c7da1fd8e75e5d07ce9f11263"
+  inputs-digest = "85f58ccbe638161ef9b752bc1be8144dd25e13bf8c243b4242091b0076b0036f"
   solver-name = "gps-cdcl"
   solver-version = 1
