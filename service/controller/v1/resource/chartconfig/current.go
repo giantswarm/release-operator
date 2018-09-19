@@ -10,11 +10,11 @@ import (
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
-	cc, err := controllercontext.FromContext(ctx)
+	c, err := controllercontext.FromContext(ctx)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	err = cc.Validate()
+	err = c.Validate()
 	if controllercontext.IsInvalidContext(err) {
 		// In case the controller context is not valid we miss certain information
 		// necessary to compute the chart config CRs. In this case we stop here.
