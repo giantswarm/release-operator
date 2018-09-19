@@ -3,15 +3,17 @@
 package basic
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"testing"
 
-	"github.com/giantswarm/aws-operator/integration/setup"
 	"github.com/giantswarm/e2e-harness/pkg/framework"
 	"github.com/giantswarm/e2e-harness/pkg/framework/resource"
 	"github.com/giantswarm/helmclient"
 	"github.com/giantswarm/micrologger"
+
+	"github.com/giantswarm/release-operator/integration/setup"
 )
 
 const (
@@ -81,6 +83,8 @@ func init() {
 // TestMain allows us to have common setup and teardown steps that are run
 // once for all the tests https://golang.org/pkg/testing/#hdr-Main.
 func TestMain(m *testing.M) {
+	ctx := context.Background()
+
 	v, err := setup.WrapTestMain(h, helmClient, l, m)
 	if err != nil {
 		l.LogCtx(ctx, "level", "error", "message", "e2e test failed", "stack", fmt.Sprintf("%#v\n", err))
