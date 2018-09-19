@@ -12,6 +12,7 @@ rules:
   - apiGroups:
       - core.giantswarm.io
     resources:
+      - chartconfigs
       - releases
       - releases/status
     verbs:
