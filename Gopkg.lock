@@ -157,6 +157,15 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/giantswarm/e2etemplates"
+  packages = [
+    "internal/render",
+    "pkg/chartvalues"
+  ]
+  revision = "558f447130f449fba2f1ced1b36dbc908249e3d7"
+
+[[projects]]
+  branch = "master"
   name = "github.com/giantswarm/errors"
   packages = ["guest"]
   revision = "51a7ca6b403dc133497da26a0a30684a5df56752"
@@ -1174,6 +1183,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ad80ef063cb5a40dc80fdb9bcce58d0e28f5001c7da1fd8e75e5d07ce9f11263"
+  inputs-digest = "5625d9620dc52b10f0f7d51bed0dc1051b2be579046df9c06aeeae8f452e5557"
   solver-name = "gps-cdcl"
   solver-version = 1
