@@ -13,10 +13,26 @@ rules:
       - core.giantswarm.io
     resources:
       - chartconfigs
-      - releases
-      - releases/status
     verbs:
       - "*"
+  - apiGroups:
+      - core.giantswarm.io
+    resources:
+      - releases
+    verbs:
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - core.giantswarm.io
+    resources:
+      - releases/status
+    verbs:
+      - create
+      - patch
+      - update
   - apiGroups:
       - ""
     resources:
