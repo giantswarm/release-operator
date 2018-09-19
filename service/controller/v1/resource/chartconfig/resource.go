@@ -20,6 +20,7 @@ type Config struct {
 	Logger    micrologger.Logger
 
 	ChartOperatorVersion string
+	Namespace            string
 }
 
 // Resource implements the chartconfig resource.
@@ -30,6 +31,7 @@ type Resource struct {
 	logger    micrologger.Logger
 
 	chartOperatorVersion string
+	namespace            string
 }
 
 // New creates a new configured chartconfig resource.
@@ -48,6 +50,9 @@ func New(config Config) (*Resource, error) {
 	if config.ChartOperatorVersion == "" {
 		return nil, microerror.Maskf(invalidConfigError, "%T.ChartOperatorVersion must not be empty", config)
 	}
+	if config.Namespace == "" {
+		return nil, microerror.Maskf(invalidConfigError, "%T.Namespace must not be empty", config)
+	}
 
 	r := &Resource{
 		// Dependencies.
@@ -56,6 +61,7 @@ func New(config Config) (*Resource, error) {
 		logger:    config.Logger,
 
 		chartOperatorVersion: config.ChartOperatorVersion,
+		namespace:            config.Namespace,
 	}
 
 	return r, nil
