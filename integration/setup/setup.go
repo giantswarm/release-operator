@@ -1,7 +1,6 @@
 package setup
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/giantswarm/e2e-harness/pkg/framework"
@@ -42,7 +41,6 @@ func WrapTestMain(h *framework.Host, helmClient *helmclient.Client, l micrologge
 			v = 1
 		}
 	}
-	version := fmt.Sprintf(":%s", env.CircleSHA())
 
 	err = h.InstallBranchOperator("release-operator", "release", values)
 	if err != nil {
