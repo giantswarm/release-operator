@@ -44,7 +44,7 @@ func WrapTestMain(h *framework.Host, helmClient *helmclient.Client, l micrologge
 	}
 	version := fmt.Sprintf(":%s", env.CircleSHA())
 
-	err = h.InstallOperator("release-operator", "release", values, version)
+	err = h.InstallBranchOperator("release-operator", "release", values)
 	if err != nil {
 		errors = append(errors, err)
 		v = 1
