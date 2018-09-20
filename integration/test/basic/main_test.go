@@ -42,9 +42,8 @@ func init() {
 		c := framework.HostConfig{
 			Logger: l,
 
-			ClusterID:       "n/a",
-			VaultToken:      "n/a",
-			TargetNamespace: "giantswarm",
+			ClusterID:  "n/a",
+			VaultToken: "n/a",
 		}
 		h, err = framework.NewHost(c)
 		if err != nil {
@@ -58,7 +57,7 @@ func init() {
 			K8sClient:  h.K8sClient(),
 			RestConfig: h.RestConfig(),
 
-			TillerNamespace: "giantswarm",
+			Namespace: h.TargetNamespace(),
 		}
 		helmClient, err = helmclient.New(c)
 		if err != nil {
@@ -71,7 +70,7 @@ func init() {
 			Logger:     l,
 			HelmClient: helmClient,
 
-			Namespace: "giantswarm",
+			Namespace: h.TargetNamespace(),
 		}
 		r, err = resource.New(c)
 		if err != nil {
