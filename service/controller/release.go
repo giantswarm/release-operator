@@ -88,7 +88,7 @@ func NewRelease(config ReleaseConfig) (*Release, error) {
 			ResourceSets: []*controller.ResourceSet{
 				v1ResourceSet,
 			},
-			RESTClient: config.K8sClient.CoreV1().RESTClient(),
+			RESTClient: config.G8sClient.CoreV1alpha1().RESTClient(),
 
 			Name: config.ProjectName,
 		}
