@@ -25,10 +25,11 @@
 #   unused-packages = true
 
 required = [
-  "github.com/docker/distribution/reference",
+  "github.com/docker/distribution",
   "k8s.io/apimachinery/pkg/apis/meta/v1",
   "k8s.io/apiserver/pkg/endpoints/request"
 ]
+
 
 [[constraint]]
   branch = "master"
