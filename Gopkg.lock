@@ -41,6 +41,7 @@
   branch = "master"
   name = "github.com/docker/distribution"
   packages = [
+    ".",
     "digestset",
     "reference"
   ]
@@ -121,7 +122,7 @@
     "pkg/clientset/versioned/typed/example/v1alpha1",
     "pkg/clientset/versioned/typed/provider/v1alpha1"
   ]
-  revision = "6206a841872f34408a645afddd7bae4162984bf1"
+  revision = "6c542a61a6dd1829c3337ffcc9bccf23f2949993"
 
 [[projects]]
   branch = "master"
@@ -144,16 +145,16 @@
     "pkg/framework/resource",
     "pkg/harness"
   ]
-  revision = "7d4199c1b499743a910ec0fca8eff7fe9ca69247"
+  revision = "13bdba8b28ced71653b88ed10e3fe4b5e75f319e"
 
 [[projects]]
   branch = "master"
-  name = "github.com/giantswarm/e2esetup"
+  name = "github.com/giantswarm/e2etemplates"
   packages = [
-    "chart",
-    "chart/env"
+    "internal/render",
+    "pkg/chartvalues"
   ]
-  revision = "7a3fc603bf19c4d447b9b59c2e0b4ae5ff1b5fbd"
+  revision = "56099c7613bccacc3a694a0cf9c8d83d43d0d84d"
 
 [[projects]]
   branch = "master"
@@ -165,7 +166,7 @@
   branch = "master"
   name = "github.com/giantswarm/helmclient"
   packages = ["."]
-  revision = "1bc4dcdb7e3c4b3d8900dd31c3dac2aa64d318c4"
+  revision = "cd4d9ef16c56892c70865eeec2efc00dec51ab90"
 
 [[projects]]
   branch = "master"
@@ -325,7 +326,7 @@
   branch = "master"
   name = "github.com/google/go-github"
   packages = ["github"]
-  revision = "1048f8804c0e60f23237cfa1b59cc5f521bf9826"
+  revision = "07716bad7a0c6d4277a5abcab95588925656a762"
 
 [[projects]]
   name = "github.com/google/go-querystring"
@@ -466,6 +467,15 @@
   version = "v1.0.0-rc1"
 
 [[projects]]
+  name = "github.com/opencontainers/image-spec"
+  packages = [
+    "specs-go",
+    "specs-go/v1"
+  ]
+  revision = "d60099175f88c47cd379c4738d158884749ed235"
+  version = "v1.0.1"
+
+[[projects]]
   name = "github.com/pborman/uuid"
   packages = ["."]
   revision = "adf5a7427709b9deb95d29d3fa8a2bf9cfd388f1"
@@ -485,7 +495,7 @@
     "prometheus/internal",
     "prometheus/promhttp"
   ]
-  revision = "e637cec7d9c8990247098639ebc6d43dd34ddd49"
+  revision = "73edb9af667d9467d99b2001722770062a0086c3"
 
 [[projects]]
   branch = "master"
@@ -512,7 +522,7 @@
     "nfs",
     "xfs"
   ]
-  revision = "05ee40e3a273f7245e8777337fc7b46e533a9a92"
+  revision = "418d78d0b9a7b7de3a6bbc8a23def624cc977bb2"
 
 [[projects]]
   name = "github.com/spf13/afero"
@@ -602,7 +612,7 @@
     "unix",
     "windows"
   ]
-  revision = "d0be0721c37eeb5299f245a996a483160fc36940"
+  revision = "1561086e645b2809fb9f8a1e2a38160bf8d53bf4"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -648,14 +658,14 @@
     "internal/urlfetch",
     "urlfetch"
   ]
-  revision = "b1f26356af11148e710935ed1ac8a7f5702c7612"
-  version = "v1.1.0"
+  revision = "ae0ab99deb4dc413a2b4bd6c8bdd0eb67f1e4d06"
+  version = "v1.2.0"
 
 [[projects]]
   branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
-  revision = "4b56f30a1fd96a133a036b62cdd2a249883dd89b"
+  revision = "c3f76f3b92d1ffa4c58a9ff842a58b8877655e0f"
 
 [[projects]]
   name = "google.golang.org/grpc"
@@ -995,6 +1005,20 @@
   version = "v2.10.0"
 
 [[projects]]
+  name = "k8s.io/kube-aggregator"
+  packages = [
+    "pkg/apis/apiregistration",
+    "pkg/apis/apiregistration/v1",
+    "pkg/apis/apiregistration/v1beta1",
+    "pkg/client/clientset_generated/clientset",
+    "pkg/client/clientset_generated/clientset/scheme",
+    "pkg/client/clientset_generated/clientset/typed/apiregistration/v1",
+    "pkg/client/clientset_generated/clientset/typed/apiregistration/v1beta1"
+  ]
+  revision = "239337b3ca87b9f2ce4d2f03b7a5ed985ffa8206"
+  version = "kubernetes-1.10.4"
+
+[[projects]]
   branch = "master"
   name = "k8s.io/kube-openapi"
   packages = ["pkg/util/proto"]
@@ -1163,17 +1187,17 @@
   branch = "master"
   name = "k8s.io/utils"
   packages = ["exec"]
-  revision = "982821ea41da7e7c15f3d3738921eb2e7e241ccd"
+  revision = "cd34563cd63c2bd7c6fe88a73c4dcf34ed8a67cb"
 
 [[projects]]
   branch = "master"
   name = "vbom.ml/util"
   packages = ["sortorder"]
-  revision = "256737ac55c46798123f754ab7d2c784e2c71783"
+  revision = "efcd4e0f97874370259c7d93e12aad57911dea81"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ad80ef063cb5a40dc80fdb9bcce58d0e28f5001c7da1fd8e75e5d07ce9f11263"
+  inputs-digest = "28bd9478c2f4d8a7340bb0a6d7491de94899e2a7c9fa89459d704d2b3f27fc86"
   solver-name = "gps-cdcl"
   solver-version = 1
