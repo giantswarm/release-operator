@@ -10,6 +10,7 @@ import (
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/client/k8srestconfig"
 	"github.com/spf13/viper"
+	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
@@ -84,6 +85,11 @@ func New(config Config) (*Service, error) {
 		return nil, microerror.Mask(err)
 	}
 
+	k8sExtClient, err := apiextensionsclient.NewForConfig(restConfig)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
 	var versionService *version.Service
 	{
 		versionConfig := version.Config{
@@ -103,9 +109,10 @@ func New(config Config) (*Service, error) {
 	var releaseController *controller.Release
 	{
 		c := controller.ReleaseConfig{
-			Logger:    config.Logger,
-			G8sClient: g8sClient,
-			K8sClient: k8sClient,
+			Logger:       config.Logger,
+			G8sClient:    g8sClient,
+			K8sClient:    k8sClient,
+			K8sExtClient: k8sExtClient,
 
 			ProjectName: config.ProjectName,
 		}
