@@ -41,6 +41,7 @@
   branch = "master"
   name = "github.com/docker/distribution"
   packages = [
+    ".",
     "digestset",
     "reference"
   ]
@@ -464,6 +465,15 @@
   packages = ["."]
   revision = "279bed98673dd5bef374d3b6e4b09e2af76183bf"
   version = "v1.0.0-rc1"
+
+[[projects]]
+  name = "github.com/opencontainers/image-spec"
+  packages = [
+    "specs-go",
+    "specs-go/v1"
+  ]
+  revision = "d60099175f88c47cd379c4738d158884749ed235"
+  version = "v1.0.1"
 
 [[projects]]
   name = "github.com/pborman/uuid"
@@ -1188,6 +1198,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c5b0b73bb07c558d14a72d4d94260e0e81773c6f7ed7288991e3ce6bd0ca6f5f"
+  inputs-digest = "28bd9478c2f4d8a7340bb0a6d7491de94899e2a7c9fa89459d704d2b3f27fc86"
   solver-name = "gps-cdcl"
   solver-version = 1
