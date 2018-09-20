@@ -57,7 +57,7 @@ func init() {
 			K8sClient:  h.K8sClient(),
 			RestConfig: h.RestConfig(),
 
-			Namespace: h.TargetNamespace(),
+			TillerNamespace: h.TargetNamespace(),
 		}
 		helmClient, err = helmclient.New(c)
 		if err != nil {
