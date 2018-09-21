@@ -32,7 +32,7 @@ required = [
 
 
 [[constraint]]
-  branch = "master"
+  branch = "log-to-output"
   name = "github.com/giantswarm/e2e-harness"
 
 [[constraint]]

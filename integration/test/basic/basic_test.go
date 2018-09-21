@@ -3,10 +3,8 @@
 package basic
 
 import (
-	"fmt"
 	"testing"
 
-	"github.com/giantswarm/e2esetup/chart/env"
 	"github.com/giantswarm/e2etemplates/pkg/chartvalues"
 )
 
@@ -15,11 +13,6 @@ const (
 )
 
 func TestInstall(t *testing.T) {
-	version := fmt.Sprintf(":%s", env.CircleSHA())
-	err := h.InstallOperator("release-operator", "release", "", version)
-	if err != nil {
-		t.Fatalf("expected %#v got %#v", nil, err)
-	}
 
 	// Test Creation
 	{
