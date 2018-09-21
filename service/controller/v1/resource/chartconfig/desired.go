@@ -48,7 +48,7 @@ func (r *Resource) newChartCR(ctx context.Context, customResource v1alpha1.Relea
 			APIVersion: "core.giantswarm.io",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name: authority.ApprChannelName(),
+			Name: authority.HelmChartName(),
 			Labels: map[string]string{
 				key.LabelApp:            authority.Name,
 				key.LabelManagedBy:      key.ProjectName,
@@ -65,7 +65,7 @@ func (r *Resource) newChartCR(ctx context.Context, customResource v1alpha1.Relea
 					Namespace:       c.ConfigMap.Namespace,
 					ResourceVersion: c.ConfigMap.ResourceVersion,
 				},
-				Name:      authority.ApprChannelName(),
+				Name:      authority.HelmChartName(),
 				Namespace: metav1.NamespaceSystem,
 				Secret: v1alpha1.ChartConfigSpecSecret{
 					Name:            c.Secret.Name,
