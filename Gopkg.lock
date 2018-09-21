@@ -139,8 +139,8 @@
   version = "v1.0.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:b45a115b618c60b12ba957054bdb9013703ec566ae5510cbdfc5827b55a35229"
+  branch = "key-funcs"
+  digest = "1:a9d9a8542374677a7c617b8553f8ce1f33d099c73a413d7195437c630ced5572"
   name = "github.com/giantswarm/apiextensions"
   packages = [
     "pkg/apis/core/v1alpha1",
@@ -153,7 +153,7 @@
     "pkg/clientset/versioned/typed/provider/v1alpha1",
   ]
   pruneopts = "UT"
-  revision = "7519bbf0c2f83e3e464c5a2370e8cbe5dd602960"
+  revision = "550b50e4abebb40be1d3ef2828a38b528e8c5a74"
 
 [[projects]]
   branch = "master"
@@ -747,14 +747,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:3bb4674103eef9bf860b88e59048c67ad646de4274ea7de8d71d16e9f8209bff"
+  digest = "1:4d2869b8df54b3a687c426758d0891720e8bedfa6ff5d472671ce1d31d29bdfb"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "d641721ec2dead6fe5ca284096fe4b1fcd49e427"
+  revision = "d47a0f3392421c5624713c9a19fe781f651f8a50"
 
 [[projects]]
   digest = "1:e5a8511f063c38c51ab9ab80e718e9149f692652aeb4e393a8c020dd1bf38ca2"
