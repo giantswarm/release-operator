@@ -2,14 +2,15 @@ package chartconfig
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/controller/context/resourcecanceledcontext"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/release-operator/service/controller/v1/controllercontext"
+	"github.com/giantswarm/release-operator/service/controller/v1/key"
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
@@ -29,25 +30,29 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	//	customResource, err := key.ToCustomResource(obj)
-	//	if err != nil {
-	//		return nil, microerror.Mask(err)
-	//	}
+	customResource, err := key.ToCustomResource(obj)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
 
-	var chartConfigCR *v1alpha1.ChartConfig
+	var chartConfigCRs []*v1alpha1.ChartConfig
 	{
 		r.logger.LogCtx(ctx, "level", "debug", "message", "finding current state")
 
-		m, err := r.g8sClient.CoreV1alpha1().ChartConfigs(r.namespace).Get("", metav1.GetOptions{})
-		if apierrors.IsNotFound(err) {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "did not find current state")
-		} else if err != nil {
-			return nil, microerror.Mask(err)
-		} else {
-			r.logger.LogCtx(ctx, "level", "debug", "message", "found current state")
-			chartConfigCR = m
+		o := metav1.ListOptions{
+			LabelSelector: fmt.Sprintf("%s=%s", key.LabelReleaseVersion, key.ReleaseVersion(customResource)),
 		}
+		list, err := r.g8sClient.CoreV1alpha1().ChartConfigs(r.namespace).List(o)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		for _, c := range list.Items {
+			chartConfigCRs = append(chartConfigCRs, &c)
+		}
+
+		r.logger.LogCtx(ctx, "level", "debug", "message", "found current state")
 	}
 
-	return chartConfigCR, nil
+	return chartConfigCRs, nil
 }
