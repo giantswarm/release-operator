@@ -24,12 +24,19 @@
 #   go-tests = true
 #   unused-packages = true
 
+
+
 required = [
-  "github.com/docker/distribution",
+  "github.com/docker/distribution/reference",
   "k8s.io/apimachinery/pkg/apis/meta/v1",
   "k8s.io/apiserver/pkg/endpoints/request"
 ]
 
+
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/docker/distribution"
 
 [[constraint]]
   branch = "master"
