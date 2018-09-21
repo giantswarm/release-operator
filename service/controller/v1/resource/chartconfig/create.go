@@ -44,7 +44,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out if the ChartConfig CRs have to be created")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "computing create state")
 
 	var chartConfigCRsToCreate []*v1alpha1.ChartConfig
 
@@ -54,7 +54,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		}
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "found out if the ChartConfig CRs have to be created")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "computed create state")
 
 	return chartConfigCRsToCreate, nil
 }
