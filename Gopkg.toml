@@ -32,12 +32,16 @@ required = [
 
 
 [[constraint]]
+  branch = "master"
+  name = "github.com/giantswarm/apiextensions"
+
+[[constraint]]
   branch = "log-to-output"
   name = "github.com/giantswarm/e2e-harness"
 
 [[constraint]]
   branch = "master"
-  name = "github.com/giantswarm/apiextensions"
+  name = "github.com/giantswarm/e2etemplates"
 
 [[constraint]]
   branch = "master"
