@@ -2,8 +2,6 @@ package chartconfig
 
 import (
 	"context"
-	"fmt"
-	"strings"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
 	"github.com/giantswarm/microerror"
@@ -50,7 +48,7 @@ func (r *Resource) newChartCR(ctx context.Context, customResource v1alpha1.Relea
 			APIVersion: "core.giantswarm.io",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name: fmt.Sprintf("%s-chart", authority.Name),
+			Name: authority.ApprChannelName(),
 			Labels: map[string]string{
 				key.LabelApp:            authority.Name,
 				key.LabelManagedBy:      key.ProjectName,
@@ -61,20 +59,20 @@ func (r *Resource) newChartCR(ctx context.Context, customResource v1alpha1.Relea
 		},
 		Spec: v1alpha1.ChartConfigSpec{
 			Chart: v1alpha1.ChartConfigSpecChart{
-				Channel: fmt.Sprintf("%s-%s", authority.Name, strings.Replace(authority.Version, ".", "-", -1)),
+				Channel: authority.HelmReleaseName(),
 				ConfigMap: v1alpha1.ChartConfigSpecConfigMap{
 					Name:            c.ConfigMap.Name,
 					Namespace:       c.ConfigMap.Namespace,
 					ResourceVersion: c.ConfigMap.ResourceVersion,
 				},
-				Name:      fmt.Sprintf("%s-chart", authority.Name),
+				Name:      authority.ApprChannelName(),
 				Namespace: metav1.NamespaceSystem,
 				Secret: v1alpha1.ChartConfigSpecSecret{
 					Name:            c.Secret.Name,
 					Namespace:       c.Secret.Namespace,
 					ResourceVersion: c.Secret.ResourceVersion,
 				},
-				Release: fmt.Sprintf("%s-%s", authority.Name, strings.Replace(authority.Version, ".", "-", -1)),
+				Release: authority.HelmReleaseName(),
 			},
 			VersionBundle: v1alpha1.ChartConfigSpecVersionBundle{
 				Version: r.chartOperatorVersion,
