@@ -9,47 +9,52 @@ import (
 )
 
 func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange interface{}) error {
-	chartConfigCRToCreate, err := toChartConfigCR(createChange)
+	chartConfigCRsToCreate, err := toChartConfigCRs(createChange)
 	if err != nil {
 		return microerror.Mask(err)
 	}
 
-	if chartConfigCRToCreate != nil {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "creating ChartConfig CR in the Kubernetes API")
+	if len(chartConfigCRsToCreate) != 0 {
+		r.logger.LogCtx(ctx, "level", "debug", "message", "creating ChartConfig CRs in the Kubernetes API")
 
-		_, err = r.g8sClient.CoreV1alpha1().ChartConfigs(r.namespace).Create(chartConfigCRToCreate)
-		if apierrors.IsAlreadyExists(err) {
-			// fall through
-		} else if err != nil {
-			return microerror.Mask(err)
+		for _, c := range chartConfigCRsToCreate {
+			_, err = r.g8sClient.CoreV1alpha1().ChartConfigs(r.namespace).Create(c)
+			if apierrors.IsAlreadyExists(err) {
+				// fall through
+			} else if err != nil {
+				return microerror.Mask(err)
+			}
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "created ChartConfig CR in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "created ChartConfig CRs in the Kubernetes API")
 	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "ChartConfig CR does not have to be created in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "ChartConfig CRs does not have to be created in the Kubernetes API")
 	}
 
 	return nil
 }
 
 func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	currentChartConfigCR, err := toChartConfigCR(currentState)
+	currentChartConfigCRs, err := toChartConfigCRs(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	desiredChartConfigCR, err := toChartConfigCR(desiredState)
+	desiredChartConfigCRs, err := toChartConfigCRs(desiredState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out if the ChartConfig CR has to be created")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "computing create state")
 
-	var chartConfigCRToCreate *v1alpha1.ChartConfig
-	if currentChartConfigCR == nil {
-		chartConfigCRToCreate = desiredChartConfigCR
+	var chartConfigCRsToCreate []*v1alpha1.ChartConfig
+
+	for _, d := range desiredChartConfigCRs {
+		if !containsChartConfigCRs(currentChartConfigCRs, d) {
+			chartConfigCRsToCreate = append(chartConfigCRsToCreate, d)
+		}
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "found out if the ChartConfig CR has to be created")
+	r.logger.LogCtx(ctx, "level", "debug", "message", "computed create state")
 
-	return chartConfigCRToCreate, nil
+	return chartConfigCRsToCreate, nil
 }
