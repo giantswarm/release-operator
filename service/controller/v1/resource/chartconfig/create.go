@@ -44,17 +44,18 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "computing create state")
-
 	var chartConfigCRsToCreate []*v1alpha1.ChartConfig
+	{
+		r.logger.LogCtx(ctx, "level", "debug", "message", "computing create state")
 
-	for _, d := range desiredChartConfigCRs {
-		if !containsChartConfigCRs(currentChartConfigCRs, d) {
-			chartConfigCRsToCreate = append(chartConfigCRsToCreate, d)
+		for _, d := range desiredChartConfigCRs {
+			if !containsChartConfigCRs(currentChartConfigCRs, d) {
+				chartConfigCRsToCreate = append(chartConfigCRsToCreate, d)
+			}
 		}
-	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "computed create state")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "computed create state")
+	}
 
 	return chartConfigCRsToCreate, nil
 }
