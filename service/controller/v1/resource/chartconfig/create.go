@@ -28,7 +28,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 
 		r.logger.LogCtx(ctx, "level", "debug", "message", "created ChartConfig CRs in the Kubernetes API")
 	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "ChartConfig CRs does not have to be created in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "ChartConfig CRs do not have to be created in the Kubernetes API")
 	}
 
 	return nil
