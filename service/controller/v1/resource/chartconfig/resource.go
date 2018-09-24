@@ -72,6 +72,25 @@ func (r *Resource) Name() string {
 	return Name
 }
 
+func containsChartConfigCRs(list []*v1alpha1.ChartConfig, item *v1alpha1.ChartConfig) bool {
+	_, err := getChartConfigCRByName(list, item.Name)
+	if err != nil {
+		return false
+	}
+
+	return true
+}
+
+func getChartConfigCRByName(list []*v1alpha1.ChartConfig, name string) (*v1alpha1.ChartConfig, error) {
+	for _, l := range list {
+		if l.Name == name {
+			return l, nil
+		}
+	}
+
+	return nil, microerror.Mask(notFoundError)
+}
+
 func toChartConfigCR(v interface{}) (*v1alpha1.ChartConfig, error) {
 	chartConfigCRPointer, ok := v.(*v1alpha1.ChartConfig)
 	if !ok {
@@ -79,4 +98,13 @@ func toChartConfigCR(v interface{}) (*v1alpha1.ChartConfig, error) {
 	}
 
 	return chartConfigCRPointer, nil
+}
+
+func toChartConfigCRs(v interface{}) ([]*v1alpha1.ChartConfig, error) {
+	chartConfigCRsPointer, ok := v.([]*v1alpha1.ChartConfig)
+	if !ok {
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", []*v1alpha1.ChartConfig{}, v)
+	}
+
+	return chartConfigCRsPointer, nil
 }
