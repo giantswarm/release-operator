@@ -43,7 +43,7 @@ required = [
   name = "github.com/giantswarm/e2e-harness"
 
 [[constraint]]
-  branch = "key-funcs"
+  branch = "master"
   name = "github.com/giantswarm/apiextensions"
 
 [[constraint]]

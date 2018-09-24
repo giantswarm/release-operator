@@ -2,12 +2,12 @@
 
 
 [[projects]]
-  digest = "1:b16fbfbcc20645cb419f78325bb2e85ec729b338e996a228124d68931a6f2a37"
+  digest = "1:9f3b30d9f8e0d7040f729b82dcbc8f0dead820a133b3147ce355fc451f32d761"
   name = "github.com/BurntSushi/toml"
   packages = ["."]
   pruneopts = "UT"
-  revision = "b26d9c308763d68093482582cea63d69be07a0f0"
-  version = "v0.3.0"
+  revision = "3012a1dbe2e4bd1391d42b32f0577cb7bbc7f005"
+  version = "v0.3.1"
 
 [[projects]]
   digest = "1:55388fd080150b9a072912f97b1f5891eb0b50df43401f8b75fb4273d3fec9fc"
@@ -139,7 +139,7 @@
   version = "v1.0.0"
 
 [[projects]]
-  branch = "key-funcs"
+  branch = "master"
   digest = "1:e875c7fa1eb113b69835626fcb33c61f9c1ce88a2e9a4c2b8308d2475e1682e5"
   name = "github.com/giantswarm/apiextensions"
   packages = [
@@ -153,7 +153,7 @@
     "pkg/clientset/versioned/typed/provider/v1alpha1",
   ]
   pruneopts = "UT"
-  revision = "0380961e2f9b8e58611ae940aebf41881b96d3a7"
+  revision = "fa3cf312c91ce1e624ab0fb4b94802ac6f414c5c"
 
 [[projects]]
   branch = "master"
@@ -862,7 +862,7 @@
   version = "v0.9.1"
 
 [[projects]]
-  digest = "1:b57bb9a6a2a03558d63166f1afc3c0c4f91ad137f63bf2bee995e9baeb976a9c"
+  digest = "1:7fbe10f3790dc4e6296c7c844c5a9b35513e5521c29c47e10ba99cd2956a2719"
   name = "gopkg.in/square/go-jose.v2"
   packages = [
     ".",
@@ -871,8 +871,8 @@
     "jwt",
   ]
   pruneopts = "UT"
-  revision = "8254d6c783765f38c8675fae4427a1fe73fbd09d"
-  version = "v2.1.8"
+  revision = "ef984e69dd356202fd4e4910d4d9c24468bdf0b8"
+  version = "v2.1.9"
 
 [[projects]]
   branch = "v2"
