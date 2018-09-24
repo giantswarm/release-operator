@@ -27,7 +27,7 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 
 		r.logger.LogCtx(ctx, "level", "debug", "message", "updated ChartConfig CRs in the Kubernetes API")
 	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "ChartConfig CRs does not have to be updated in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "ChartConfig CRs do not have to be updated in the Kubernetes API")
 	}
 
 	return nil
