@@ -16,7 +16,7 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 	}
 
 	if len(chartConfigCRsToUpdate) != 0 {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "creating ChartConfig CRs in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "updating ChartConfig CRs in the Kubernetes API")
 
 		for _, c := range chartConfigCRsToUpdate {
 			_, err = r.g8sClient.CoreV1alpha1().ChartConfigs(r.namespace).Update(c)
