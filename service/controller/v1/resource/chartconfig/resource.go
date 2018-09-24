@@ -91,15 +91,6 @@ func getChartConfigCRByName(list []*v1alpha1.ChartConfig, name string) (*v1alpha
 	return nil, microerror.Mask(notFoundError)
 }
 
-func toChartConfigCR(v interface{}) (*v1alpha1.ChartConfig, error) {
-	chartConfigCRPointer, ok := v.(*v1alpha1.ChartConfig)
-	if !ok {
-		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &v1alpha1.ChartConfig{}, v)
-	}
-
-	return chartConfigCRPointer, nil
-}
-
 func toChartConfigCRs(v interface{}) ([]*v1alpha1.ChartConfig, error) {
 	chartConfigCRsPointer, ok := v.([]*v1alpha1.ChartConfig)
 	if !ok {
