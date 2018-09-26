@@ -360,7 +360,7 @@ func (h *Client) list(ctx context.Context, req *rls.ListReleasesRequest) (*rls.L
 			resp = r
 			continue
 		}
-		resp.Releases = append(resp.Releases, r.GetReleases()...)
+		resp.Releases = append(resp.Releases, r.GetReleases()[0])
 	}
 	return resp, nil
 }

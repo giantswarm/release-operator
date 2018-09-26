@@ -11,24 +11,26 @@ import (
 )
 
 func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange interface{}) error {
-	chartConfigCRToDelete, err := toChartConfigCR(deleteChange)
+	chartConfigCRsToDelete, err := toChartConfigCRs(deleteChange)
 	if err != nil {
 		return microerror.Mask(err)
 	}
 
-	if chartConfigCRToDelete != nil {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "deleting ChartConfig CR in the Kubernetes API")
+	if len(chartConfigCRsToDelete) != 0 {
+		r.logger.LogCtx(ctx, "level", "debug", "message", "deleting ChartConfig CRs in the Kubernetes API")
 
-		err = r.g8sClient.CoreV1alpha1().ChartConfigs(r.namespace).Delete(chartConfigCRToDelete.Name, &metav1.DeleteOptions{})
-		if apierrors.IsNotFound(err) {
-			// fall through
-		} else if err != nil {
-			return microerror.Mask(err)
+		for _, c := range chartConfigCRsToDelete {
+			err := r.g8sClient.CoreV1alpha1().ChartConfigs(r.namespace).Delete(c.GetName(), &metav1.DeleteOptions{})
+			if apierrors.IsNotFound(err) {
+				// fall through
+			} else if err != nil {
+				return microerror.Mask(err)
+			}
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "deleted ChartConfig CR in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "deleted ChartConfig CRs in the Kubernetes API")
 	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "ChartConfig CR does not have to be deleted in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "ChartConfig CRs do not have to be deleted in the Kubernetes API")
 	}
 
 	return nil
@@ -47,19 +49,27 @@ func (r *Resource) NewDeletePatch(ctx context.Context, obj, currentState, desire
 }
 
 func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	currentChartConfigCR, err := toChartConfigCR(currentState)
+	currentChartConfigCRs, err := toChartConfigCRs(currentState)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+	desiredChartConfigCRs, err := toChartConfigCRs(desiredState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out if the ChartConfig CR has to be deleted")
+	var chartConfigCRsToDelete []*v1alpha1.ChartConfig
+	{
+		r.logger.LogCtx(ctx, "level", "debug", "message", "computing delete state")
 
-	var chartConfigCRToDelete *v1alpha1.ChartConfig
-	if currentChartConfigCR != nil {
-		chartConfigCRToDelete = currentChartConfigCR
+		for _, c := range currentChartConfigCRs {
+			if containsChartConfigCRs(desiredChartConfigCRs, c) {
+				chartConfigCRsToDelete = append(chartConfigCRsToDelete, c)
+			}
+		}
+
+		r.logger.LogCtx(ctx, "level", "debug", "message", "computed delete state")
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "found out if the ChartConfig CR has to be deleted")
-
-	return chartConfigCRToDelete, nil
+	return chartConfigCRsToDelete, nil
 }

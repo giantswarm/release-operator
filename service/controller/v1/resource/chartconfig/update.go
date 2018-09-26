@@ -10,22 +10,24 @@ import (
 )
 
 func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange interface{}) error {
-	chartConfigCRToUpdate, err := toChartConfigCR(updateChange)
+	chartConfigCRsToUpdate, err := toChartConfigCRs(updateChange)
 	if err != nil {
 		return microerror.Mask(err)
 	}
 
-	if chartConfigCRToUpdate != nil {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "updating ChartConfig CR in the Kubernetes API")
+	if len(chartConfigCRsToUpdate) != 0 {
+		r.logger.LogCtx(ctx, "level", "debug", "message", "updating ChartConfig CRs in the Kubernetes API")
 
-		_, err = r.g8sClient.CoreV1alpha1().ChartConfigs(r.namespace).Update(chartConfigCRToUpdate)
-		if err != nil {
-			return microerror.Mask(err)
+		for _, c := range chartConfigCRsToUpdate {
+			_, err = r.g8sClient.CoreV1alpha1().ChartConfigs(r.namespace).Update(c)
+			if err != nil {
+				return microerror.Mask(err)
+			}
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "updated ChartConfig CR in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "updated ChartConfig CRs in the Kubernetes API")
 	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "ChartConfig CR does not need to be updated in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "ChartConfig CRs do not have to be updated in the Kubernetes API")
 	}
 
 	return nil
@@ -50,26 +52,39 @@ func (r *Resource) NewUpdatePatch(ctx context.Context, obj, currentState, desire
 }
 
 func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	currentChartConfigCR, err := toChartConfigCR(currentState)
+	currentChartConfigCRs, err := toChartConfigCRs(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	desiredChartConfigCR, err := toChartConfigCR(desiredState)
+	desiredChartConfigCRs, err := toChartConfigCRs(desiredState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "finding out if ChartConfig CR has to be updated")
+	var chartConfigCRsToUpdate []*v1alpha1.ChartConfig
+	{
+		r.logger.LogCtx(ctx, "level", "debug", "message", "computing update state")
 
-	var chartConfigCRToUpdate *v1alpha1.ChartConfig
-	if isChartConfigCRModified(currentChartConfigCR, desiredChartConfigCR) {
-		chartConfigCRToUpdate = desiredChartConfigCR.DeepCopy()
-		chartConfigCRToUpdate.ObjectMeta.ResourceVersion = currentChartConfigCR.ObjectMeta.ResourceVersion
+		for _, c := range currentChartConfigCRs {
+			d, err := getChartConfigCRByName(desiredChartConfigCRs, c.Name)
+			if IsNotFound(err) {
+				continue
+			} else if err != nil {
+				return nil, microerror.Mask(err)
+			}
+
+			if isChartConfigCRModified(d, c) {
+				u := d.DeepCopy()
+				u.ObjectMeta.ResourceVersion = c.ObjectMeta.ResourceVersion
+
+				chartConfigCRsToUpdate = append(chartConfigCRsToUpdate, u)
+			}
+		}
+
+		r.logger.LogCtx(ctx, "level", "debug", "message", "computed update state")
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "found out if ChartConfig CR has to be updated")
-
-	return chartConfigCRToUpdate, nil
+	return chartConfigCRsToUpdate, nil
 }
 
 func isChartConfigCRModified(a, b *v1alpha1.ChartConfig) bool {

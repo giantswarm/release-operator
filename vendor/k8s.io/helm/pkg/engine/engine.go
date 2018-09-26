@@ -19,7 +19,6 @@ package engine
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"path"
 	"sort"
 	"strings"
@@ -40,8 +39,6 @@ type Engine struct {
 	// a value that was not passed in.
 	Strict           bool
 	CurrentTemplates map[string]renderable
-	// In LintMode, some 'required' template values may be missing, so don't fail
-	LintMode bool
 }
 
 // New creates a new Go template Engine instance.
@@ -158,19 +155,9 @@ func (e *Engine) alterFuncMap(t *template.Template) template.FuncMap {
 	// Add the 'required' function here
 	funcMap["required"] = func(warn string, val interface{}) (interface{}, error) {
 		if val == nil {
-			if e.LintMode {
-				// Don't fail on missing required values when linting
-				log.Printf("[INFO] Missing required value: %s", warn)
-				return val, nil
-			}
 			return val, fmt.Errorf(warn)
 		} else if _, ok := val.(string); ok {
 			if val == "" {
-				if e.LintMode {
-					// Don't fail on missing required values when linting
-					log.Printf("[INFO] Missing required value: %s", warn)
-					return val, nil
-				}
 				return val, fmt.Errorf(warn)
 			}
 		}

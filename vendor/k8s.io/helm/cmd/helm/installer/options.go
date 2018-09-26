@@ -47,9 +47,6 @@ type Options struct {
 	// ServiceAccount is the Kubernetes service account to add to Tiller.
 	ServiceAccount string
 
-	// AutoMountServiceAccountToken determines whether or not the service account should be added to Tiller.
-	AutoMountServiceAccountToken bool
-
 	// Force allows to force upgrading tiller if deployed version is greater than current version
 	ForceUpgrade bool
 
@@ -99,8 +96,7 @@ type Options struct {
 	Values []string
 }
 
-// SelectImage returns the image according to whether UseCanary is true or not
-func (opts *Options) SelectImage() string {
+func (opts *Options) selectImage() string {
 	switch {
 	case opts.UseCanary:
 		return defaultImage + ":canary"

@@ -68,7 +68,7 @@ func Upgrade(client kubernetes.Interface, opts *Options) error {
 	if semverCompare(tillerImage) == -1 && !opts.ForceUpgrade {
 		return errors.New("current Tiller version is newer, use --force-upgrade to downgrade")
 	}
-	obj.Spec.Template.Spec.Containers[0].Image = opts.SelectImage()
+	obj.Spec.Template.Spec.Containers[0].Image = opts.selectImage()
 	obj.Spec.Template.Spec.Containers[0].ImagePullPolicy = opts.pullPolicy()
 	obj.Spec.Template.Spec.ServiceAccountName = opts.ServiceAccount
 	if _, err := client.ExtensionsV1beta1().Deployments(opts.Namespace).Update(obj); err != nil {
@@ -218,12 +218,11 @@ func generateDeployment(opts *Options) (*v1beta1.Deployment, error) {
 					Labels: labels,
 				},
 				Spec: v1.PodSpec{
-					ServiceAccountName:           opts.ServiceAccount,
-					AutomountServiceAccountToken: &opts.AutoMountServiceAccountToken,
+					ServiceAccountName: opts.ServiceAccount,
 					Containers: []v1.Container{
 						{
 							Name:            "tiller",
-							Image:           opts.SelectImage(),
+							Image:           opts.selectImage(),
 							ImagePullPolicy: opts.pullPolicy(),
 							Ports: []v1.ContainerPort{
 								{ContainerPort: 44134, Name: "tiller"},

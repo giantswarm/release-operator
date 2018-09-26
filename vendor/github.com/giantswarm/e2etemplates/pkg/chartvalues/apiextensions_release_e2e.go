@@ -7,17 +7,13 @@ import (
 )
 
 type APIExtensionsReleaseE2EConfig struct {
-	Active        bool
-	Authorities   []APIExtensionsReleaseE2EConfigAuthority
-	Date          string
-	Name          string
-	Namespace     string
-	Provider      string
-	Version       string
+	Namespace string
+
+	Operator      APIExtensionsReleaseE2EConfigOperator
 	VersionBundle APIExtensionsReleaseE2EConfigVersionBundle
 }
 
-type APIExtensionsReleaseE2EConfigAuthority struct {
+type APIExtensionsReleaseE2EConfigOperator struct {
 	Name    string
 	Version string
 }
@@ -28,24 +24,14 @@ type APIExtensionsReleaseE2EConfigVersionBundle struct {
 
 // NewAPIExtensionsAWSConfigE2E renders values required by apiextensions-aws-config-e2e-chart.
 func NewAPIExtensionsReleaseE2E(config APIExtensionsReleaseE2EConfig) (string, error) {
-	if config.Date == "" {
-		return "", microerror.Maskf(invalidConfigError, "%T.Date must not be empty", config)
-	}
-	if config.Name == "" {
-		return "", microerror.Maskf(invalidConfigError, "%T.Name must not be empty", config)
-	}
 	if config.Namespace == "" {
 		return "", microerror.Maskf(invalidConfigError, "%T.Namespace must not be empty", config)
 	}
-	if config.Provider == "" {
-		return "", microerror.Maskf(invalidConfigError, "%T.Provider must not be empty", config)
+	if config.Operator.Name == "" {
+		return "", microerror.Maskf(invalidConfigError, "%T.Operator.Name must not be empty", config)
 	}
-	if config.Version == "" {
-		return "", microerror.Maskf(invalidConfigError, "%T.Version must not be empty", config)
-	}
-
-	if len(config.Authorities) == 0 {
-		return "", microerror.Maskf(invalidConfigError, "%T.Authorities must not be empty", config)
+	if config.Operator.Version == "" {
+		return "", microerror.Maskf(invalidConfigError, "%T.Operator.Version must not be empty", config)
 	}
 	if config.VersionBundle.Version == "" {
 		return "", microerror.Maskf(invalidConfigError, "%T.VersionBundle.Version must not be empty", config)

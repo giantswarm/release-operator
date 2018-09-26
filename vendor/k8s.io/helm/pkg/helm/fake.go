@@ -17,29 +17,23 @@ limitations under the License.
 package helm // import "k8s.io/helm/pkg/helm"
 
 import (
-	"bytes"
 	"errors"
 	"math/rand"
-	"strings"
 	"sync"
 
 	"github.com/golang/protobuf/ptypes/timestamp"
-	"k8s.io/helm/pkg/chartutil"
-	"k8s.io/helm/pkg/manifest"
 	"k8s.io/helm/pkg/proto/hapi/chart"
 	"k8s.io/helm/pkg/proto/hapi/release"
 	rls "k8s.io/helm/pkg/proto/hapi/services"
 	"k8s.io/helm/pkg/proto/hapi/version"
-	"k8s.io/helm/pkg/renderutil"
-	storageerrors "k8s.io/helm/pkg/storage/errors"
+	storage "k8s.io/helm/pkg/storage/driver"
 )
 
 // FakeClient implements Interface
 type FakeClient struct {
-	Rels            []*release.Release
-	Responses       map[string]release.TestRun_Status
-	Opts            options
-	RenderManifests bool
+	Rels      []*release.Release
+	Responses map[string]release.TestRun_Status
+	Opts      options
 }
 
 // Option returns the fake release client
@@ -102,22 +96,7 @@ func (c *FakeClient) InstallReleaseFromChart(chart *chart.Chart, ns string, opts
 		return nil, errors.New("cannot re-use a name that is still in use")
 	}
 
-	mockOpts := &MockReleaseOptions{
-		Name:        releaseName,
-		Chart:       chart,
-		Config:      c.Opts.instReq.Values,
-		Namespace:   ns,
-		Description: releaseDescription,
-	}
-
-	release := ReleaseMock(mockOpts)
-
-	if c.RenderManifests {
-		if err := RenderReleaseMock(release, false); err != nil {
-			return nil, err
-		}
-	}
-
+	release := ReleaseMock(&MockReleaseOptions{Name: releaseName, Namespace: ns, Description: releaseDescription})
 	if !c.Opts.dryRun {
 		c.Rels = append(c.Rels, release)
 	}
@@ -138,7 +117,7 @@ func (c *FakeClient) DeleteRelease(rlsName string, opts ...DeleteOption) (*rls.U
 		}
 	}
 
-	return nil, storageerrors.ErrReleaseNotFound(rlsName)
+	return nil, storage.ErrReleaseNotFound(rlsName)
 }
 
 // GetVersion returns a fake version
@@ -156,44 +135,14 @@ func (c *FakeClient) UpdateRelease(rlsName string, chStr string, opts ...UpdateO
 }
 
 // UpdateReleaseFromChart returns an UpdateReleaseResponse containing the updated release, if it exists
-func (c *FakeClient) UpdateReleaseFromChart(rlsName string, newChart *chart.Chart, opts ...UpdateOption) (*rls.UpdateReleaseResponse, error) {
-	for _, opt := range opts {
-		opt(&c.Opts)
-	}
+func (c *FakeClient) UpdateReleaseFromChart(rlsName string, chart *chart.Chart, opts ...UpdateOption) (*rls.UpdateReleaseResponse, error) {
 	// Check to see if the release already exists.
 	rel, err := c.ReleaseContent(rlsName, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	mockOpts := &MockReleaseOptions{
-		Name:        rel.Release.Name,
-		Version:     rel.Release.Version + 1,
-		Chart:       newChart,
-		Config:      c.Opts.updateReq.Values,
-		Namespace:   rel.Release.Namespace,
-		Description: c.Opts.updateReq.Description,
-	}
-
-	newRelease := ReleaseMock(mockOpts)
-
-	if c.Opts.updateReq.ResetValues {
-		newRelease.Config = &chart.Config{Raw: "{}"}
-	} else if c.Opts.updateReq.ReuseValues {
-		// TODO: This should merge old and new values but does not.
-	}
-
-	if c.RenderManifests {
-		if err := RenderReleaseMock(newRelease, true); err != nil {
-			return nil, err
-		}
-	}
-
-	if !c.Opts.dryRun {
-		*rel.Release = *newRelease
-	}
-
-	return &rls.UpdateReleaseResponse{Release: newRelease}, nil
+	return &rls.UpdateReleaseResponse{Release: rel.Release}, nil
 }
 
 // RollbackRelease returns nil, nil
@@ -212,7 +161,7 @@ func (c *FakeClient) ReleaseStatus(rlsName string, opts ...StatusOption) (*rls.G
 			}, nil
 		}
 	}
-	return nil, storageerrors.ErrReleaseNotFound(rlsName)
+	return nil, storage.ErrReleaseNotFound(rlsName)
 }
 
 // ReleaseContent returns the configuration for the matching release name in the fake release client.
@@ -224,7 +173,7 @@ func (c *FakeClient) ReleaseContent(rlsName string, opts ...ContentOption) (resp
 			}, nil
 		}
 	}
-	return resp, storageerrors.ErrReleaseNotFound(rlsName)
+	return resp, storage.ErrReleaseNotFound(rlsName)
 }
 
 // ReleaseHistory returns a release's revision history.
@@ -282,15 +231,12 @@ type MockReleaseOptions struct {
 	Name        string
 	Version     int32
 	Chart       *chart.Chart
-	Config      *chart.Config
 	StatusCode  release.Status_Code
 	Namespace   string
 	Description string
 }
 
-// ReleaseMock creates a mock release object based on options set by
-// MockReleaseOptions. This function should typically not be used outside of
-// testing.
+// ReleaseMock creates a mock release object based on options set by MockReleaseOptions. This function should typically not be used outside of testing.
 func ReleaseMock(opts *MockReleaseOptions) *release.Release {
 	date := timestamp.Timestamp{Seconds: 242085845, Nanos: 0}
 
@@ -327,11 +273,6 @@ func ReleaseMock(opts *MockReleaseOptions) *release.Release {
 		}
 	}
 
-	config := opts.Config
-	if config == nil {
-		config = &chart.Config{Raw: `name: "value"`}
-	}
-
 	scode := release.Status_DEPLOYED
 	if opts.StatusCode > 0 {
 		scode = opts.StatusCode
@@ -346,7 +287,7 @@ func ReleaseMock(opts *MockReleaseOptions) *release.Release {
 			Description:   description,
 		},
 		Chart:     ch,
-		Config:    config,
+		Config:    &chart.Config{Raw: `name: "value"`},
 		Version:   version,
 		Namespace: namespace,
 		Hooks: []*release.Hook{
@@ -361,40 +302,4 @@ func ReleaseMock(opts *MockReleaseOptions) *release.Release {
 		},
 		Manifest: MockManifest,
 	}
-}
-
-// RenderReleaseMock will take a release (usually produced by helm.ReleaseMock)
-// and will render the Manifest inside using the local mechanism (no tiller).
-// (Compare to renderResources in pkg/tiller)
-func RenderReleaseMock(r *release.Release, asUpgrade bool) error {
-	if r == nil || r.Chart == nil || r.Chart.Metadata == nil {
-		return errors.New("a release with a chart with metadata must be provided to render the manifests")
-	}
-
-	renderOpts := renderutil.Options{
-		ReleaseOptions: chartutil.ReleaseOptions{
-			Name:      r.Name,
-			Namespace: r.Namespace,
-			Time:      r.Info.LastDeployed,
-			Revision:  int(r.Version),
-			IsUpgrade: asUpgrade,
-			IsInstall: !asUpgrade,
-		},
-	}
-	rendered, err := renderutil.Render(r.Chart, r.Config, renderOpts)
-	if err != nil {
-		return err
-	}
-
-	b := bytes.NewBuffer(nil)
-	for _, m := range manifest.SplitManifests(rendered) {
-		// Remove empty manifests
-		if len(strings.TrimSpace(m.Content)) == 0 {
-			continue
-		}
-		b.WriteString("\n---\n# Source: " + m.Name + "\n")
-		b.WriteString(m.Content)
-	}
-	r.Manifest = b.String()
-	return nil
 }
