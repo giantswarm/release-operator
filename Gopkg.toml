@@ -36,6 +36,10 @@ required = [
 
 [[constraint]]
   branch = "master"
+  name = "github.com/giantswarm/apiextensions"
+
+[[constraint]]
+  branch = "master"
   name = "github.com/docker/distribution"
 
 [[constraint]]
@@ -44,7 +48,7 @@ required = [
 
 [[constraint]]
   branch = "master"
-  name = "github.com/giantswarm/apiextensions"
+  name = "github.com/giantswarm/e2etemplates"
 
 [[constraint]]
   branch = "master"
