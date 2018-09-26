@@ -1,5 +1,3 @@
-// +build k8srequired
-
 package basic
 
 import (
@@ -17,11 +15,18 @@ func TestInstall(t *testing.T) {
 	// Test Creation
 	{
 		releaseValuesConfig := chartvalues.APIExtensionsReleaseE2EConfig{
-			Namespace: "giantswarm",
-			Operator: chartvalues.APIExtensionsReleaseE2EConfigOperator{
-				Name:    "test-operator",
-				Version: "1.0.0",
+			Active: "true",
+			Authorities: []chartvalues.APIExtensionsReleaseE2EConfigAuthority{
+				{
+					Name:    "test-operator",
+					Version: "1.0.0",
+				},
 			},
+			Date:      "0001-01-01T00:00:00Z",
+			Name:      "1.0.0",
+			Namespace: "giantswarm",
+			Provider:  "aws",
+			Version:   "1.0.0",
 			VersionBundle: chartvalues.APIExtensionsReleaseE2EConfigVersionBundle{
 				Version: "1.0.0",
 			},
