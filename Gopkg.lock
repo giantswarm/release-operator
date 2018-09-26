@@ -140,7 +140,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:e875c7fa1eb113b69835626fcb33c61f9c1ce88a2e9a4c2b8308d2475e1682e5"
+  digest = "1:b2f69a396bae5c2c630967f7cec73ee471338b1ea162c0b35d9c8231219e16e4"
   name = "github.com/giantswarm/apiextensions"
   packages = [
     "pkg/apis/core/v1alpha1",
@@ -153,7 +153,7 @@
     "pkg/clientset/versioned/typed/provider/v1alpha1",
   ]
   pruneopts = "UT"
-  revision = "fa3cf312c91ce1e624ab0fb4b94802ac6f414c5c"
+  revision = "d67eedc9266b64dfd2d94fc61afb3d7dc8b10e8e"
 
 [[projects]]
   branch = "master"
@@ -186,14 +186,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:38f7521593a9db27eee8a850e3b7a7bc65221c48b44f3aba2e3d526c67f0dec0"
+  digest = "1:823b4b9a7cc4b60a98e0ddbb2021787f501fc8c929f1d2246b52e3e622f4f6fd"
   name = "github.com/giantswarm/e2etemplates"
   packages = [
     "internal/render",
     "pkg/chartvalues",
   ]
   pruneopts = "UT"
-  revision = "56099c7613bccacc3a694a0cf9c8d83d43d0d84d"
+  revision = "c137a54b2e623c634834f0c5dc7c26993b6c30df"
 
 [[projects]]
   branch = "master"
