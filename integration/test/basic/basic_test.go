@@ -17,7 +17,7 @@ func TestInstall(t *testing.T) {
 	// Test Creation
 	{
 		releaseValuesConfig := chartvalues.APIExtensionsReleaseE2EConfig{
-			Active: "true",
+			Active: true,
 			Authorities: []chartvalues.APIExtensionsReleaseE2EConfigAuthority{
 				{
 					Name:    "test-operator",
