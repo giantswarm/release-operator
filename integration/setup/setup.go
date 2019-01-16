@@ -1,6 +1,7 @@
 package setup
 
 import (
+	"context"
 	"testing"
 
 	"github.com/giantswarm/e2e-harness/pkg/framework"
@@ -24,7 +25,7 @@ func WrapTestMain(h *framework.Host, helmClient *helmclient.Client, l micrologge
 		v = 1
 	}
 
-	err = helmClient.EnsureTillerInstalled()
+	err = helmClient.EnsureTillerInstalled(context.Background())
 	if err != nil {
 		errors = append(errors, err)
 		v = 1
