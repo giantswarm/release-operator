@@ -40,7 +40,7 @@ func (r *Resource) newAppCR(ctx context.Context, releaseCR corev1.Release, autho
 	appCR := &applicationv1.App{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "App",
-			APIVersion: "core.giantswarm.io",
+			APIVersion: "application.giantswarm.io",
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name: authority.HelmReleaseName(),
