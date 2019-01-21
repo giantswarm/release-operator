@@ -45,11 +45,13 @@ func (r *Resource) newAppCR(ctx context.Context, releaseCR corev1.Release, autho
 		ObjectMeta: metav1.ObjectMeta{
 			Name: authority.HelmReleaseName(),
 			Labels: map[string]string{
-				key.LabelApp:            authority.Name,
-				key.LabelManagedBy:      key.ProjectName,
-				key.LabelOrganization:   key.OrganizationName,
-				key.LabelReleaseVersion: key.ReleaseVersion(releaseCR),
-				key.LabelServiceType:    key.ServiceTypeManaged,
+				key.LabelApp: authority.Name,
+				// TODO: define app-operator version.
+				key.LabelAppOperatorVersion: "",
+				key.LabelManagedBy:          key.ProjectName,
+				key.LabelOrganization:       key.OrganizationName,
+				key.LabelReleaseVersion:     key.ReleaseVersion(releaseCR),
+				key.LabelServiceType:        key.ServiceTypeManaged,
 			},
 		},
 		Spec: applicationv1.AppSpec{

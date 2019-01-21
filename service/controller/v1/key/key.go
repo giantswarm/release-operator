@@ -6,11 +6,12 @@ import (
 )
 
 const (
-	LabelApp            = "app"
-	LabelManagedBy      = "giantswarm.io/managed-by"
-	LabelOrganization   = "giantswarm.io/organization"
-	LabelReleaseVersion = "release.giantswarm.io/version"
-	LabelServiceType    = "giantswarm.io/service-type"
+	LabelApp                = "app"
+	LabelAppOperatorVersion = "app-operator.giantswarm.io/version"
+	LabelManagedBy          = "giantswarm.io/managed-by"
+	LabelOrganization       = "giantswarm.io/organization"
+	LabelReleaseVersion     = "release.giantswarm.io/version"
+	LabelServiceType        = "giantswarm.io/service-type"
 )
 
 const (
