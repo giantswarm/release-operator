@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	"github.com/giantswarm/microerror"
@@ -15,7 +16,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	}
 
 	if len(appCRs) != 0 {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "creating App CRs in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating %d App CRs in the Kubernetes API", len(appCRs)))
 
 		for _, c := range appCRs {
 			_, err = r.g8sClient.ApplicationV1alpha1().Apps(r.namespace).Create(c)
@@ -26,7 +27,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 			}
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "created App CRs in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("created %d App CRs in the Kubernetes API", len(appCRs)))
 	} else {
 		r.logger.LogCtx(ctx, "level", "debug", "message", "App CRs do not have to be created in the Kubernetes API")
 	}

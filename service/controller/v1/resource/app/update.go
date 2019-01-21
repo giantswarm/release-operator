@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
@@ -16,7 +17,7 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 	}
 
 	if len(appCRsToUpdate) != 0 {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "updating App CRs in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("updating %d App CRs in the Kubernetes API", len(appCRs)))
 
 		for _, c := range appCRsToUpdate {
 			_, err = r.g8sClient.ApplicationV1alpha1().Apps(r.namespace).Update(c)
@@ -25,7 +26,7 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 			}
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "updated App CRs in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("updated %d App CRs in the Kubernetes API", len(appCRs)))
 	} else {
 		r.logger.LogCtx(ctx, "level", "debug", "message", "App CRs do not have to be updated in the Kubernetes API")
 	}

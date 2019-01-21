@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	"github.com/giantswarm/microerror"
@@ -17,7 +18,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	}
 
 	if len(appCRs) != 0 {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "deleting App CRs in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting %d App CRs in the Kubernetes API", len(appCRs)))
 
 		for _, c := range appCRs {
 			err := r.g8sClient.ApplicationV1alpha1().Apps(r.namespace).Delete(c.GetName(), &metav1.DeleteOptions{})
@@ -28,7 +29,7 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 			}
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "deleted App CRs in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleted %d App CRs in the Kubernetes API", len(appCRs)))
 	} else {
 		r.logger.LogCtx(ctx, "level", "debug", "message", "App CRs do not have to be deleted in the Kubernetes API")
 	}
