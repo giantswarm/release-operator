@@ -6,16 +6,9 @@ import (
 	applicationv1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	"github.com/giantswarm/release-operator/service/controller/v1/key"
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
-	releaseCR, err := key.ToCustomResource(obj)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
 	var appCRs []*applicationv1.App
 	{
 		r.logger.LogCtx(ctx, "level", "debug", "message", "finding current state")
