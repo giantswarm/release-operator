@@ -11,15 +11,15 @@ import (
 )
 
 func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange interface{}) error {
-	appCRsToUpdate, err := toAppCRs(updateChange)
+	appCRs, err := toAppCRs(updateChange)
 	if err != nil {
 		return microerror.Mask(err)
 	}
 
-	if len(appCRsToUpdate) != 0 {
+	if len(appCRs) != 0 {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("updating %d App CRs in the Kubernetes API", len(appCRs)))
 
-		for _, c := range appCRsToUpdate {
+		for _, c := range appCRs {
 			_, err = r.g8sClient.ApplicationV1alpha1().Apps(r.namespace).Update(c)
 			if err != nil {
 				return microerror.Mask(err)
