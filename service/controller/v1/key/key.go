@@ -33,8 +33,3 @@ func ToReleaseCycleCR(v interface{}) (releasev1.ReleaseCycle, error) {
 
 	return customResource, nil
 }
-
-func VersionBundleVersion(customResource releasev1.Release) string {
-	return ""
-	//return customResource.Spec.VersionBundle.Version
-}
