@@ -1,7 +1,8 @@
 package controller
 
 import (
-	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+	"fmt"
+
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -9,9 +10,15 @@ import (
 	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/operatorkit/informer"
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
+	"github.com/giantswarm/release-operator/pkg/project"
 	controllerv1 "github.com/giantswarm/release-operator/service/controller/v1"
+)
+
+const (
+	releaseOperatorVersionLabel = "release-operator.giantswarm.io/version"
 )
 
 type ReleaseConfig struct {
@@ -53,6 +60,9 @@ func NewRelease(config ReleaseConfig) (*Release, error) {
 			Logger:  config.Logger,
 			Watcher: config.G8sClient.Release().ReleaseCycles(""),
 
+			ListOptions: metav1.ListOptions{
+				LabelSelector: fmt.Sprintf("%s=%s", releaseOperatorVersionLabel, project.Version()),
+			},
 			RateWait:     informer.DefaultRateWait,
 			ResyncPeriod: informer.DefaultResyncPeriod,
 		}
