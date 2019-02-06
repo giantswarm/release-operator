@@ -4,7 +4,7 @@ import (
 	"context"
 
 	corev1 "github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
-	releasev1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -42,7 +42,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	return desiredChartConfigCRs, nil
 }
 
-func (r *Resource) newChartCR(ctx context.Context, customResource releasev1.Release, component releasev1.ReleaseSpecComponent) (*corev1.ChartConfig, error) {
+func (r *Resource) newChartCR(ctx context.Context, customResource releasev1alpha1.Release, component releasev1alpha1.ReleaseSpecComponent) (*corev1.ChartConfig, error) {
 	c, err := controllercontext.FromContext(ctx)
 	if err != nil {
 		return nil, microerror.Mask(err)

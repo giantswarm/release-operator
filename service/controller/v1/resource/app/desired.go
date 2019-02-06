@@ -4,7 +4,7 @@ import (
 	"context"
 
 	applicationv1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
-	releasev1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -41,7 +41,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	return appCRs, nil
 }
 
-func (r *Resource) newAppCR(ctx context.Context, releaseCR releasev1.Release, component releasev1.ReleaseSpecComponent) (*applicationv1.App, error) {
+func (r *Resource) newAppCR(ctx context.Context, releaseCR releasev1alpha1.Release, component releasev1alpha1.ReleaseSpecComponent) (*applicationv1.App, error) {
 	appCR := &applicationv1.App{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "App",

@@ -1,7 +1,7 @@
 package controller
 
 import (
-	releasev1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -81,7 +81,7 @@ func NewRelease(config ReleaseConfig) (*Release, error) {
 	var releaseController *controller.Controller
 	{
 		c := controller.Config{
-			CRD:       releasev1.NewReleaseCRD(),
+			CRD:       releasev1alpha1.NewReleaseCRD(),
 			CRDClient: crdClient,
 			Informer:  newInformer,
 			Logger:    config.Logger,
