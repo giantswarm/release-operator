@@ -3,7 +3,7 @@ package chartconfig
 import (
 	"context"
 
-	corev1 "github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
+	corev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -23,7 +23,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	var desiredChartConfigCRs []*corev1.ChartConfig
+	var desiredChartConfigCRs []*corev1alpha1.ChartConfig
 	{
 		r.logger.LogCtx(ctx, "level", "debug", "message", "computing desired state")
 
@@ -42,13 +42,13 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	return desiredChartConfigCRs, nil
 }
 
-func (r *Resource) newChartCR(ctx context.Context, customResource releasev1alpha1.Release, component releasev1alpha1.ReleaseSpecComponent) (*corev1.ChartConfig, error) {
+func (r *Resource) newChartCR(ctx context.Context, customResource releasev1alpha1.Release, component releasev1alpha1.ReleaseSpecComponent) (*corev1alpha1.ChartConfig, error) {
 	c, err := controllercontext.FromContext(ctx)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	newChartCR := &corev1.ChartConfig{
+	newChartCR := &corev1alpha1.ChartConfig{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "ChartConfig",
 			APIVersion: "core.giantswarm.io",
@@ -63,24 +63,24 @@ func (r *Resource) newChartCR(ctx context.Context, customResource releasev1alpha
 				key.LabelServiceType:    key.ServiceTypeManaged,
 			},
 		},
-		Spec: corev1.ChartConfigSpec{
-			Chart: corev1.ChartConfigSpecChart{
+		Spec: corev1alpha1.ChartConfigSpec{
+			Chart: corev1alpha1.ChartConfigSpecChart{
 				Channel: component.Name,
-				ConfigMap: corev1.ChartConfigSpecConfigMap{
+				ConfigMap: corev1alpha1.ChartConfigSpecConfigMap{
 					Name:            c.ConfigMap.Name,
 					Namespace:       c.ConfigMap.Namespace,
 					ResourceVersion: c.ConfigMap.ResourceVersion,
 				},
 				Name:      component.Name,
 				Namespace: metav1.NamespaceSystem,
-				Secret: corev1.ChartConfigSpecSecret{
+				Secret: corev1alpha1.ChartConfigSpecSecret{
 					Name:            c.Secret.Name,
 					Namespace:       c.Secret.Namespace,
 					ResourceVersion: c.Secret.ResourceVersion,
 				},
 				Release: component.Name,
 			},
-			VersionBundle: corev1.ChartConfigSpecVersionBundle{
+			VersionBundle: corev1alpha1.ChartConfigSpecVersionBundle{
 				Version: r.chartOperatorVersion,
 			},
 		},
