@@ -104,8 +104,8 @@
   version = "v1.0.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:403d834e1447b512b5f44dd4bbeaac62d770bfa597d3e6729727b91b80c9551f"
+  branch = "releasecycle/date-time"
+  digest = "1:5554a045fb34dd12a39ee7befeba590c34c7aabe541efd24813256de48fa010d"
   name = "github.com/giantswarm/apiextensions"
   packages = [
     "pkg/apis/application/v1alpha1",
@@ -122,7 +122,7 @@
     "pkg/clientset/versioned/typed/release/v1alpha1",
   ]
   pruneopts = "UT"
-  revision = "cd7862fb5ee9addd30c6e211ced977b69133268a"
+  revision = "3b769027ed1bbd605203477c376306d8216f1d38"
 
 [[projects]]
   branch = "master"
@@ -1116,6 +1116,7 @@
     "github.com/docker/distribution/reference",
     "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1",
     "github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1",
+    "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1",
     "github.com/giantswarm/apiextensions/pkg/clientset/versioned",
     "github.com/giantswarm/e2e-harness/pkg/framework",
     "github.com/giantswarm/e2e-harness/pkg/framework/resource",
