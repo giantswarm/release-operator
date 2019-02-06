@@ -81,14 +81,14 @@ func NewRelease(config ReleaseConfig) (*Release, error) {
 	var releaseController *controller.Controller
 	{
 		c := controller.Config{
-			CRD:       releasev1alpha1.NewReleaseCRD(),
+			CRD:       releasev1alpha1.NewReleaseCycleCRD(),
 			CRDClient: crdClient,
 			Informer:  newInformer,
 			Logger:    config.Logger,
 			ResourceSets: []*controller.ResourceSet{
 				v1ResourceSet,
 			},
-			RESTClient: config.G8sClient.Release().RESTClient(),
+			RESTClient: config.G8sClient.ReleaseV1alpha1().RESTClient(),
 
 			Name: config.ProjectName,
 		}
