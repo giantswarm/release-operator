@@ -24,16 +24,6 @@ func ReleaseVersion(customResource releasev1.Release) string {
 	return customResource.Spec.Version
 }
 
-func ToReleaseCR(v interface{}) (releasev1.Release, error) {
-	customResourcePointer, ok := v.(*releasev1.Release)
-	if !ok {
-		return releasev1.Release{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &releasev1.Release{}, v)
-	}
-	customResource := *customResourcePointer
-
-	return customResource, nil
-}
-
 func ToReleaseCycleCR(v interface{}) (releasev1.ReleaseCycle, error) {
 	customResourcePointer, ok := v.(*releasev1.ReleaseCycle)
 	if !ok {
