@@ -1,7 +1,7 @@
 package key
 
 import (
-	"github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
+	releasev1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/microerror"
 )
 
@@ -20,20 +20,31 @@ const (
 	ServiceTypeManaged = "managed"
 )
 
-func ReleaseVersion(customResource v1alpha1.Release) string {
+func ReleaseVersion(customResource releasev1.Release) string {
 	return customResource.Spec.Version
 }
 
-func ToCustomResource(v interface{}) (v1alpha1.Release, error) {
-	customResourcePointer, ok := v.(*v1alpha1.Release)
+func ToReleaseCR(v interface{}) (releasev1.Release, error) {
+	customResourcePointer, ok := v.(*releasev1.Release)
 	if !ok {
-		return v1alpha1.Release{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &v1alpha1.Release{}, v)
+		return releasev1.Release{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &releasev1.Release{}, v)
 	}
 	customResource := *customResourcePointer
 
 	return customResource, nil
 }
 
-func VersionBundleVersion(customResource v1alpha1.Release) string {
-	return customResource.Spec.VersionBundle.Version
+func ToReleaseCycleCR(v interface{}) (releasev1.ReleaseCycle, error) {
+	customResourcePointer, ok := v.(*releasev1.ReleaseCycle)
+	if !ok {
+		return releasev1.ReleaseCycle{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &releasev1.ReleaseCycle{}, v)
+	}
+	customResource := *customResourcePointer
+
+	return customResource, nil
+}
+
+func VersionBundleVersion(customResource releasev1.Release) string {
+	return ""
+	//return customResource.Spec.VersionBundle.Version
 }

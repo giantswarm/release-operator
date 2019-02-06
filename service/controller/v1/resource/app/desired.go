@@ -4,7 +4,7 @@ import (
 	"context"
 
 	applicationv1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
-	corev1 "github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
+	releasev1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -12,7 +12,12 @@ import (
 )
 
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
-	releaseCR, err := key.ToCustomResource(obj)
+	releaseCycleCR, err := key.ToReleaseCycleCR(obj)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	releaseCR, err := r.g8sClient.ReleaseV1alpha1().Releases(releaseCycleCR.GetNamespace()).Get(releaseCycleCR.Spec.Release.Name, metav1.GetOptions{})
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -21,8 +26,8 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	{
 		r.logger.LogCtx(ctx, "level", "debug", "message", "computing desired state")
 
-		for _, authority := range releaseCR.Spec.Authorities {
-			appCR, err := r.newAppCR(ctx, releaseCR, authority)
+		for _, component := range releaseCR.Spec.Components {
+			appCR, err := r.newAppCR(ctx, *releaseCR, component)
 			if err != nil {
 				return nil, microerror.Mask(err)
 			}
@@ -36,16 +41,16 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	return appCRs, nil
 }
 
-func (r *Resource) newAppCR(ctx context.Context, releaseCR corev1.Release, authority corev1.ReleaseSpecAuthority) (*applicationv1.App, error) {
+func (r *Resource) newAppCR(ctx context.Context, releaseCR releasev1.Release, component releasev1.ReleaseSpecComponent) (*applicationv1.App, error) {
 	appCR := &applicationv1.App{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "App",
 			APIVersion: "application.giantswarm.io",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name: authority.HelmReleaseName(),
+			Name: component.Name,
 			Labels: map[string]string{
-				key.LabelApp: authority.Name,
+				key.LabelApp: component.Name,
 				// TODO: define app-operator version.
 				key.LabelAppOperatorVersion: "",
 				key.LabelManagedBy:          key.ProjectName,
@@ -55,9 +60,9 @@ func (r *Resource) newAppCR(ctx context.Context, releaseCR corev1.Release, autho
 			},
 		},
 		Spec: applicationv1.AppSpec{
-			Name:      authority.Name,
+			Name:      component.Name,
 			Namespace: r.namespace,
-			Release:   authority.Version,
+			Version:   component.Version,
 			Catalog:   "",
 			Config: applicationv1.AppSpecConfig{
 				ConfigMap: applicationv1.AppSpecConfigConfigMap{

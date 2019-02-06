@@ -30,7 +30,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	customResource, err := key.ToCustomResource(obj)
+	customResource, err := key.ToReleaseCR(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}

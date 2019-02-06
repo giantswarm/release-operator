@@ -145,7 +145,7 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 	}
 
 	handlesFunc := func(obj interface{}) bool {
-		customResource, err := key.ToCustomResource(obj)
+		customResource, err := key.ToReleaseCR(obj)
 		if err != nil {
 			return false
 		}
