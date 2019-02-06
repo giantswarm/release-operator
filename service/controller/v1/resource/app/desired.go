@@ -3,7 +3,7 @@ package app
 import (
 	"context"
 
-	applicationv1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
+	applicationv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -22,7 +22,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	var appCRs []*applicationv1.App
+	var appCRs []*applicationv1alpha1.App
 	{
 		r.logger.LogCtx(ctx, "level", "debug", "message", "computing desired state")
 
@@ -41,8 +41,8 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	return appCRs, nil
 }
 
-func (r *Resource) newAppCR(ctx context.Context, releaseCR releasev1alpha1.Release, component releasev1alpha1.ReleaseSpecComponent) (*applicationv1.App, error) {
-	appCR := &applicationv1.App{
+func (r *Resource) newAppCR(ctx context.Context, releaseCR releasev1alpha1.Release, component releasev1alpha1.ReleaseSpecComponent) (*applicationv1alpha1.App, error) {
+	appCR := &applicationv1alpha1.App{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "App",
 			APIVersion: "application.giantswarm.io",
@@ -59,23 +59,23 @@ func (r *Resource) newAppCR(ctx context.Context, releaseCR releasev1alpha1.Relea
 				key.LabelServiceType:        key.ServiceTypeManaged,
 			},
 		},
-		Spec: applicationv1.AppSpec{
+		Spec: applicationv1alpha1.AppSpec{
 			Name:      component.Name,
 			Namespace: r.namespace,
 			Version:   component.Version,
 			Catalog:   "",
-			Config: applicationv1.AppSpecConfig{
-				ConfigMap: applicationv1.AppSpecConfigConfigMap{
+			Config: applicationv1alpha1.AppSpecConfig{
+				ConfigMap: applicationv1alpha1.AppSpecConfigConfigMap{
 					Name:      "",
 					Namespace: "",
 				},
-				Secret: applicationv1.AppSpecConfigSecret{
+				Secret: applicationv1alpha1.AppSpecConfigSecret{
 					Name:      "",
 					Namespace: "",
 				},
 			},
-			KubeConfig: applicationv1.AppSpecKubeConfig{
-				Secret: applicationv1.AppSpecKubeConfigSecret{
+			KubeConfig: applicationv1alpha1.AppSpecKubeConfig{
+				Secret: applicationv1alpha1.AppSpecKubeConfigSecret{
 					Name:      "",
 					Namespace: "",
 				},

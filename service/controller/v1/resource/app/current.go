@@ -3,13 +3,13 @@ package app
 import (
 	"context"
 
-	applicationv1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
+	applicationv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
-	var appCRs []*applicationv1.App
+	var appCRs []*applicationv1alpha1.App
 	{
 		r.logger.LogCtx(ctx, "level", "debug", "message", "finding current state")
 
