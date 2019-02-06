@@ -43,7 +43,7 @@ func WrapTestMain(h *framework.Host, helmClient *helmclient.Client, l micrologge
 		}
 	}
 
-	err = h.InstallBranchOperator("release-operator", "release", values)
+	err = h.InstallBranchOperator("release-operator", "releasecycle", values)
 	if err != nil {
 		errors = append(errors, err)
 		v = 1
