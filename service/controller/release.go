@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/giantswarm/apiextensions/pkg/apis/core/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -11,7 +11,7 @@ import (
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/release-operator/service/controller/v1"
+	controllerv1 "github.com/giantswarm/release-operator/service/controller/v1"
 )
 
 type ReleaseConfig struct {
@@ -51,7 +51,7 @@ func NewRelease(config ReleaseConfig) (*Release, error) {
 	{
 		c := informer.Config{
 			Logger:  config.Logger,
-			Watcher: config.G8sClient.CoreV1alpha1().Releases(""),
+			Watcher: config.G8sClient.Release().ReleaseCycles(""),
 
 			RateWait:     informer.DefaultRateWait,
 			ResyncPeriod: informer.DefaultResyncPeriod,
@@ -65,14 +65,14 @@ func NewRelease(config ReleaseConfig) (*Release, error) {
 
 	var v1ResourceSet *controller.ResourceSet
 	{
-		c := v1.ResourceSetConfig{
+		c := controllerv1.ResourceSetConfig{
 			G8sClient:   config.G8sClient,
 			K8sClient:   config.K8sClient,
 			Logger:      config.Logger,
 			ProjectName: config.ProjectName,
 		}
 
-		v1ResourceSet, err = v1.NewResourceSet(c)
+		v1ResourceSet, err = controllerv1.NewResourceSet(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -81,14 +81,14 @@ func NewRelease(config ReleaseConfig) (*Release, error) {
 	var releaseController *controller.Controller
 	{
 		c := controller.Config{
-			CRD:       v1alpha1.NewReleaseCRD(),
+			CRD:       releasev1alpha1.NewReleaseCycleCRD(),
 			CRDClient: crdClient,
 			Informer:  newInformer,
 			Logger:    config.Logger,
 			ResourceSets: []*controller.ResourceSet{
 				v1ResourceSet,
 			},
-			RESTClient: config.G8sClient.CoreV1alpha1().RESTClient(),
+			RESTClient: config.G8sClient.ReleaseV1alpha1().RESTClient(),
 
 			Name: config.ProjectName,
 		}

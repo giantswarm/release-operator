@@ -12,7 +12,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/release-operator/service/controller/v1/controllercontext"
-	"github.com/giantswarm/release-operator/service/controller/v1/key"
 	"github.com/giantswarm/release-operator/service/controller/v1/resource/app"
 	"github.com/giantswarm/release-operator/service/controller/v1/resource/chartconfig"
 	"github.com/giantswarm/release-operator/service/controller/v1/resource/configmap"
@@ -126,9 +125,7 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 	}
 
 	{
-		c := metricsresource.WrapConfig{
-			Name: config.ProjectName,
-		}
+		c := metricsresource.WrapConfig{}
 
 		resources, err = metricsresource.Wrap(resources, c)
 		if err != nil {
@@ -145,16 +142,7 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 	}
 
 	handlesFunc := func(obj interface{}) bool {
-		customResource, err := key.ToCustomResource(obj)
-		if err != nil {
-			return false
-		}
-
-		if key.VersionBundleVersion(customResource) == VersionBundle().Version {
-			return true
-		}
-
-		return false
+		return true
 	}
 
 	var resourceSet *controller.ResourceSet

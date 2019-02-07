@@ -30,7 +30,12 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	customResource, err := key.ToCustomResource(obj)
+	releaseCycleCR, err := key.ToReleaseCycleCR(obj)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	releaseCR, err := r.g8sClient.ReleaseV1alpha1().Releases(releaseCycleCR.GetNamespace()).Get(releaseCycleCR.Spec.Release.Name, metav1.GetOptions{})
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -40,7 +45,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		r.logger.LogCtx(ctx, "level", "debug", "message", "finding current state")
 
 		o := metav1.ListOptions{
-			LabelSelector: fmt.Sprintf("%s=%s", key.LabelReleaseVersion, key.ReleaseVersion(customResource)),
+			LabelSelector: fmt.Sprintf("%s=%s", key.LabelReleaseVersion, key.ReleaseVersion(*releaseCR)),
 		}
 		list, err := r.g8sClient.CoreV1alpha1().ChartConfigs(r.namespace).List(o)
 		if err != nil {
