@@ -3,14 +3,20 @@ package service
 import (
 	"context"
 	"fmt"
+	"os"
 	"sync"
+	"time"
 
+	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
+	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/microendpoint/service/version"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
+	"github.com/giantswarm/operatorkit/client/k8scrdclient"
 	"github.com/giantswarm/operatorkit/client/k8srestconfig"
 	"github.com/spf13/viper"
+	apiextensionsv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -37,6 +43,9 @@ type Service struct {
 	Version *version.Service
 
 	bootOnce          sync.Once
+	crd               *apiextensionsv1beta1.CustomResourceDefinition
+	crdClient         *k8scrdclient.CRDClient
+	logger            micrologger.Logger
 	releaseController *controller.Release
 }
 
@@ -124,10 +133,26 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
+	var crdClient *k8scrdclient.CRDClient
+	{
+		c := k8scrdclient.Config{
+			K8sExtClient: k8sExtClient,
+			Logger:       config.Logger,
+		}
+
+		crdClient, err = k8scrdclient.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	s := &Service{
 		Version: versionService,
 
+		crd:               releasev1alpha1.NewReleaseCRD(),
+		crdClient:         crdClient,
 		bootOnce:          sync.Once{},
+		logger:            config.Logger,
 		releaseController: releaseController,
 	}
 
@@ -137,6 +162,20 @@ func New(config Config) (*Service, error) {
 // Boot starts top level service implementation.
 func (s *Service) Boot() {
 	s.bootOnce.Do(func() {
-		go s.releaseController.Boot(context.Background())
+		ctx := context.Background()
+		backOffFactory := func() backoff.Interface { return backoff.NewMaxRetries(7, 1*time.Second) }
+
+		// Install Release CRD.
+		s.logger.LogCtx(ctx, "level", "debug", "message", "ensuring custom resource definition exists")
+
+		err := s.crdClient.EnsureCreated(ctx, s.crd, backOffFactory())
+		if err != nil {
+			s.logger.LogCtx(ctx, "level", "error", "message", "stop service boot retries due to too many errors", "stack", fmt.Sprintf("%#v", err))
+			os.Exit(1)
+		}
+
+		s.logger.LogCtx(ctx, "level", "debug", "message", "ensured custom resource definition exists")
+
+		go s.releaseController.Boot(ctx)
 	})
 }
