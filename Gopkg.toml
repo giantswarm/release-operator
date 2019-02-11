@@ -43,7 +43,7 @@ required = [
   name = "github.com/giantswarm/e2e-harness"
 
 [[constraint]]
-  branch = "releasecycle/date-time"
+  branch = "releasecycle-date"
   name = "github.com/giantswarm/apiextensions"
 
 [[constraint]]
