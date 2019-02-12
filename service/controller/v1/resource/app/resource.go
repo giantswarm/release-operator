@@ -69,8 +69,8 @@ func (r *Resource) Name() string {
 func getAppCR(list []*applicationv1alpha1.App, namespace, name string) (*applicationv1alpha1.App, bool) {
 	for _, l := range list {
 		b := true
-		b := b && l.Namespace == namespace
-		b := b && l.Name == name
+		b = b && l.Namespace == namespace
+		b = b && l.Name == name
 		if b {
 			return l, true
 		}
