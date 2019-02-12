@@ -168,7 +168,7 @@ func (s *Service) Boot() {
 		// Install Release CRD.
 		s.logger.LogCtx(ctx, "level", "debug", "message", "ensuring release custom resource definition exists")
 
-		err := s.crdClient.EnsureCreated(ctx, s.crd, backOff())
+		err := s.crdClient.EnsureCreated(ctx, s.crd, backOff)
 		if err != nil {
 			s.logger.LogCtx(ctx, "level", "error", "message", "stop service boot retries due to too many errors", "stack", fmt.Sprintf("%#v", err))
 			os.Exit(1)
