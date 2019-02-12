@@ -13,7 +13,6 @@ import (
 
 	"github.com/giantswarm/release-operator/service/controller/v1/controllercontext"
 	"github.com/giantswarm/release-operator/service/controller/v1/resource/app"
-	"github.com/giantswarm/release-operator/service/controller/v1/resource/chartconfig"
 	"github.com/giantswarm/release-operator/service/controller/v1/resource/configmap"
 	"github.com/giantswarm/release-operator/service/controller/v1/resource/secret"
 )
@@ -30,28 +29,6 @@ type ResourceSetConfig struct {
 
 func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 	var err error
-
-	var chartconfigResource controller.Resource
-	{
-		c := chartconfig.Config{
-			G8sClient: config.G8sClient,
-			K8sClient: config.K8sClient,
-			Logger:    config.Logger,
-
-			ChartOperatorVersion: "0.3.0",
-			Namespace:            "giantswarm",
-		}
-
-		ops, err := chartconfig.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-
-		chartconfigResource, err = toCRUDResource(config.Logger, ops)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
 
 	var appResource controller.Resource
 	{
@@ -109,7 +86,6 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 	resources := []controller.Resource{
 		configmapResource,
 		secretResource,
-		chartconfigResource,
 		appResource,
 	}
 
