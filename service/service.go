@@ -166,7 +166,7 @@ func (s *Service) Boot() {
 		backOff := backoff.NewMaxRetries(7, 1*time.Second)
 
 		// Install Release CRD.
-		s.logger.LogCtx(ctx, "level", "debug", "message", "ensuring custom resource definition exists")
+		s.logger.LogCtx(ctx, "level", "debug", "message", "ensuring release custom resource definition exists")
 
 		err := s.crdClient.EnsureCreated(ctx, s.crd, backOff())
 		if err != nil {
@@ -174,7 +174,7 @@ func (s *Service) Boot() {
 			os.Exit(1)
 		}
 
-		s.logger.LogCtx(ctx, "level", "debug", "message", "ensured custom resource definition exists")
+		s.logger.LogCtx(ctx, "level", "debug", "message", "ensured release custom resource definition exists")
 
 		go s.releaseController.Boot(ctx)
 	})
