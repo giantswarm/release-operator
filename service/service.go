@@ -94,11 +94,10 @@ func New(config Config) (*Service, error) {
 	var versionService *version.Service
 	{
 		versionConfig := version.Config{
-			Description:    config.Description,
-			GitCommit:      config.GitCommit,
-			Name:           config.ProjectName,
-			Source:         config.Source,
-			VersionBundles: NewVersionBundles(),
+			Description: config.Description,
+			GitCommit:   config.GitCommit,
+			Name:        config.ProjectName,
+			Source:      config.Source,
 		}
 
 		versionService, err = version.New(versionConfig)
