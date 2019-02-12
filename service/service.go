@@ -163,12 +163,12 @@ func New(config Config) (*Service, error) {
 func (s *Service) Boot() {
 	s.bootOnce.Do(func() {
 		ctx := context.Background()
-		backOffFactory := func() backoff.Interface { return backoff.NewMaxRetries(7, 1*time.Second) }
+		backOff := backoff.NewMaxRetries(7, 1*time.Second)
 
 		// Install Release CRD.
 		s.logger.LogCtx(ctx, "level", "debug", "message", "ensuring custom resource definition exists")
 
-		err := s.crdClient.EnsureCreated(ctx, s.crd, backOffFactory())
+		err := s.crdClient.EnsureCreated(ctx, s.crd, backOff())
 		if err != nil {
 			s.logger.LogCtx(ctx, "level", "error", "message", "stop service boot retries due to too many errors", "stack", fmt.Sprintf("%#v", err))
 			os.Exit(1)
