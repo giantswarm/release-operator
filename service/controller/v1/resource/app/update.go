@@ -67,11 +67,9 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 		r.logger.LogCtx(ctx, "level", "debug", "message", "computing update state")
 
 		for _, c := range currentAppCRs {
-			d, err := getAppCRByName(desiredAppCRs, c.Name)
-			if IsNotFound(err) {
+			d, ok := getAppCR(desiredAppCRs, c.Namespace, c.Name)
+			if !ok {
 				continue
-			} else if err != nil {
-				return nil, microerror.Mask(err)
 			}
 
 			if isAppCRModified(d, c) {
