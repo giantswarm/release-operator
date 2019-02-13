@@ -72,7 +72,7 @@ func NewRelease(config ReleaseConfig) (*Release, error) {
 			ProjectName: config.ProjectName,
 		}
 
-		v1ResourceSet, err = release.NewResourceSet(c)
+		resourceSet, err = release.NewResourceSet(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
