@@ -37,6 +37,7 @@ type Service struct {
 	Version *version.Service
 
 	bootOnce               sync.Once
+	releaseController      *controller.Release
 	releaseCycleController *controller.ReleaseCycle
 }
 
@@ -106,6 +107,23 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
+	var releaseController *controller.Release
+	{
+		c := controller.ReleaseConfig{
+			Logger:       config.Logger,
+			G8sClient:    g8sClient,
+			K8sClient:    k8sClient,
+			K8sExtClient: k8sExtClient,
+
+			ProjectName: config.ProjectName,
+		}
+
+		releaseController, err = controller.NewRelease(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var releaseCycleController *controller.ReleaseCycle
 	{
 		c := controller.ReleaseCycleConfig{
@@ -127,6 +145,7 @@ func New(config Config) (*Service, error) {
 		Version: versionService,
 
 		bootOnce:               sync.Once{},
+		releaseController:      releaseController,
 		releaseCycleController: releaseCycleController,
 	}
 
@@ -136,6 +155,7 @@ func New(config Config) (*Service, error) {
 // Boot starts top level service implementation.
 func (s *Service) Boot() {
 	s.bootOnce.Do(func() {
+		go s.releaseController.Boot(context.Background())
 		go s.releaseCycleController.Boot(context.Background())
 	})
 }
