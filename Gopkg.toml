@@ -71,6 +71,10 @@ required = [
   name = "github.com/giantswarm/versionbundle"
 
 [[constraint]]
+  version = "=0.2.0"
+  name = "github.com/google/go-cmp"
+
+[[constraint]]
   name = "k8s.io/apimachinery"
   version = "kubernetes-1.13.2"
 

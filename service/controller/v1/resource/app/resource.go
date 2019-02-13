@@ -66,23 +66,17 @@ func (r *Resource) Name() string {
 	return Name
 }
 
-func containsAppCRs(list []*applicationv1alpha1.App, item *applicationv1alpha1.App) bool {
-	_, err := getAppCRByName(list, item.Name)
-	if err != nil {
-		return false
-	}
-
-	return true
-}
-
-func getAppCRByName(list []*applicationv1alpha1.App, name string) (*applicationv1alpha1.App, error) {
+func getAppCR(list []*applicationv1alpha1.App, namespace, name string) (*applicationv1alpha1.App, bool) {
 	for _, l := range list {
-		if l.Name == name {
-			return l, nil
+		b := true
+		b = b && l.Namespace == namespace
+		b = b && l.Name == name
+		if b {
+			return l, true
 		}
 	}
 
-	return nil, microerror.Mask(notFoundError)
+	return nil, false
 }
 
 func toAppCRs(v interface{}) ([]*applicationv1alpha1.App, error) {
