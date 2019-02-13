@@ -99,7 +99,7 @@ func NewReleaseCycle(config ReleaseCycleConfig) (*ReleaseCycle, error) {
 		}
 	}
 
-	c := &Release{
+	c := &ReleaseCycle{
 		Controller: releaseController,
 	}
 
