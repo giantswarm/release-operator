@@ -1,15 +1,11 @@
 package project
 
-const (
-	notAvailable = "n/a"
-)
-
 var (
 	description = "The release-operator manages chart configs for new releases."
-	gitSHA      = notAvailable
+	gitSHA      = "n/a"
 	name        = "release-operator"
 	source      = "https://github.com/giantswarm/release-operator"
-	version     = notAvailable
+	version     = "n/a"
 )
 
 func Description() string {
