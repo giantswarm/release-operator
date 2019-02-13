@@ -63,7 +63,7 @@ func NewReleaseCycle(config ReleaseCycleConfig) (*ReleaseCycle, error) {
 		}
 	}
 
-	var resourceSet *controller.ResourceSet
+	var v1ResourceSet *controller.ResourceSet
 	{
 		c := releasecycle.ResourceSetConfig{
 			G8sClient:   config.G8sClient,
@@ -72,7 +72,7 @@ func NewReleaseCycle(config ReleaseCycleConfig) (*ReleaseCycle, error) {
 			ProjectName: config.ProjectName,
 		}
 
-		resourceSet, err = releasecycle.NewResourceSet(c)
+		v1ResourceSet, err = releasecycle.NewResourceSet(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -86,7 +86,7 @@ func NewReleaseCycle(config ReleaseCycleConfig) (*ReleaseCycle, error) {
 			Informer:  newInformer,
 			Logger:    config.Logger,
 			ResourceSets: []*controller.ResourceSet{
-				resourceSet,
+				v1ResourceSet,
 			},
 			RESTClient: config.G8sClient.ReleaseV1alpha1().RESTClient(),
 
