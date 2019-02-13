@@ -36,8 +36,8 @@ type Config struct {
 type Service struct {
 	Version *version.Service
 
-	bootOnce          sync.Once
-	releaseController *controller.Release
+	bootOnce               sync.Once
+	releaseCycleController *controller.ReleaseCycle
 }
 
 // New creates a new service with given configuration.
@@ -106,9 +106,9 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
-	var releaseController *controller.Release
+	var releaseCycleController *controller.ReleaseCycle
 	{
-		c := controller.ReleaseConfig{
+		c := controller.ReleaseCycleConfig{
 			Logger:       config.Logger,
 			G8sClient:    g8sClient,
 			K8sClient:    k8sClient,
@@ -117,7 +117,7 @@ func New(config Config) (*Service, error) {
 			ProjectName: config.ProjectName,
 		}
 
-		releaseController, err = controller.NewRelease(c)
+		releaseCycleController, err = controller.NewReleaseCycle(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -126,8 +126,8 @@ func New(config Config) (*Service, error) {
 	s := &Service{
 		Version: versionService,
 
-		bootOnce:          sync.Once{},
-		releaseController: releaseController,
+		bootOnce:               sync.Once{},
+		releaseCycleController: releaseCycleController,
 	}
 
 	return s, nil
@@ -136,6 +136,6 @@ func New(config Config) (*Service, error) {
 // Boot starts top level service implementation.
 func (s *Service) Boot() {
 	s.bootOnce.Do(func() {
-		go s.releaseController.Boot(context.Background())
+		go s.releaseCycleController.Boot(context.Background())
 	})
 }

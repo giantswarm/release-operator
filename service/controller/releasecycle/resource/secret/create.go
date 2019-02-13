@@ -1,4 +1,4 @@
-package configmap
+package secret
 
 import (
 	"context"
@@ -6,17 +6,17 @@ import (
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/giantswarm/release-operator/service/controller/v1/controllercontext"
+	"github.com/giantswarm/release-operator/service/controller/releasecycle/controllercontext"
 )
 
 func (r Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	var resourceVersion string
 	{
-		configMap, err := r.k8sClient.CoreV1().ConfigMaps(r.namespace).Get(r.name, metav1.GetOptions{})
+		secret, err := r.k8sClient.CoreV1().Secrets(r.namespace).Get(r.name, metav1.GetOptions{})
 		if err != nil {
 			return microerror.Mask(err)
 		}
-		resourceVersion = configMap.GetResourceVersion()
+		resourceVersion = secret.GetResourceVersion()
 	}
 
 	{
@@ -25,9 +25,9 @@ func (r Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			return microerror.Mask(err)
 		}
 
-		c.ConfigMap.Name = r.name
-		c.ConfigMap.Namespace = r.namespace
-		c.ConfigMap.ResourceVersion = resourceVersion
+		c.Secret.Name = r.name
+		c.Secret.Namespace = r.namespace
+		c.Secret.ResourceVersion = resourceVersion
 	}
 
 	return nil
