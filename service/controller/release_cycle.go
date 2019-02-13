@@ -11,10 +11,10 @@ import (
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/kubernetes"
 
-	controllerv1 "github.com/giantswarm/release-operator/service/controller/v1"
+	"github.com/giantswarm/release-operator/service/controller/releasecycle"
 )
 
-type ReleaseConfig struct {
+type ReleaseCycleConfig struct {
 	G8sClient    versioned.Interface
 	K8sClient    kubernetes.Interface
 	K8sExtClient apiextensionsclient.Interface
@@ -23,11 +23,11 @@ type ReleaseConfig struct {
 	ProjectName string
 }
 
-type Release struct {
+type ReleaseCycle struct {
 	*controller.Controller
 }
 
-func NewRelease(config ReleaseConfig) (*Release, error) {
+func NewReleaseCycle(config ReleaseCycleConfig) (*ReleaseCycle, error) {
 	if config.G8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.G8sClient must not be empty", config)
 	}
@@ -65,14 +65,14 @@ func NewRelease(config ReleaseConfig) (*Release, error) {
 
 	var v1ResourceSet *controller.ResourceSet
 	{
-		c := controllerv1.ResourceSetConfig{
+		c := releasecycle.ResourceSetConfig{
 			G8sClient:   config.G8sClient,
 			K8sClient:   config.K8sClient,
 			Logger:      config.Logger,
 			ProjectName: config.ProjectName,
 		}
 
-		v1ResourceSet, err = controllerv1.NewResourceSet(c)
+		v1ResourceSet, err = releasecycle.NewResourceSet(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

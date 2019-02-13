@@ -1,4 +1,4 @@
-package configmap
+package secret
 
 import (
 	"github.com/giantswarm/microerror"
@@ -8,10 +8,10 @@ import (
 
 const (
 	// Name is the identifier of the resource.
-	Name = "configmapv1"
+	Name = "secret"
 )
 
-// Config represents the configuration used to create a new configmap resource.
+// Config represents the configuration used to create a new secret resource.
 type Config struct {
 	// Dependencies.
 	K8sClient kubernetes.Interface
@@ -21,7 +21,7 @@ type Config struct {
 	Namespace string
 }
 
-// Resource implements the configmap resource.
+// Resource implements the secret resource.
 type Resource struct {
 	// Dependencies.
 	k8sClient kubernetes.Interface
@@ -31,7 +31,7 @@ type Resource struct {
 	namespace string
 }
 
-// New creates a new configured configmap resource.
+// New creates a new configured secret resource.
 func New(config Config) (*Resource, error) {
 	// Dependencies.
 	if config.K8sClient == nil {

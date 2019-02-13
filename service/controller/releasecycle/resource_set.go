@@ -1,4 +1,4 @@
-package v1
+package releasecycle
 
 import (
 	"context"
@@ -11,10 +11,10 @@ import (
 	"github.com/giantswarm/operatorkit/controller/resource/retryresource"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/release-operator/service/controller/v1/controllercontext"
-	"github.com/giantswarm/release-operator/service/controller/v1/resource/app"
-	"github.com/giantswarm/release-operator/service/controller/v1/resource/configmap"
-	"github.com/giantswarm/release-operator/service/controller/v1/resource/secret"
+	"github.com/giantswarm/release-operator/service/controller/releasecycle/controllercontext"
+	"github.com/giantswarm/release-operator/service/controller/releasecycle/resource/app"
+	"github.com/giantswarm/release-operator/service/controller/releasecycle/resource/configmap"
+	"github.com/giantswarm/release-operator/service/controller/releasecycle/resource/secret"
 )
 
 type ResourceSetConfig struct {
