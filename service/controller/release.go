@@ -3,7 +3,6 @@ package controller
 import (
 	"fmt"
 
-	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
