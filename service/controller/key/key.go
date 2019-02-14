@@ -28,7 +28,7 @@ func ReleaseVersion(customResource releasev1alpha1.Release) string {
 func ToAppCR(v interface{}) (*applicationv1alpha1.App, error) {
 	appCR, ok := v.(*applicationv1alpha1.App)
 	if !ok {
-		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", applicationv1alpha1.App{}, v)
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &applicationv1alpha1.App{}, v)
 	}
 
 	return appCR, nil
