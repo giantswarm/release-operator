@@ -26,7 +26,7 @@ const (
 
 // ReleaseAppCRName returns the name of the release App CR for the given release cycle.
 func ReleaseAppCRName(releaseCycleCR releasev1alpha1.ReleaseCycle) string {
-	return releasePrefix(releaseCycleCR.GetName())
+	return ReleasePrefix(releaseCycleCR.GetName())
 }
 
 // ReleasePrefix adds release- prefix to name.
