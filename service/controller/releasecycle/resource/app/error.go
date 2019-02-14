@@ -15,6 +15,15 @@ var notFoundError = &microerror.Error{
 	Kind: "notFoundError",
 }
 
+var invalidReleaseNameError = &microerror.Error{
+	Kind: "invalidReleaseNameError",
+}
+
+// IsInvalidReleaseName asserts invalidReleaseNameError.
+func IsInvalidReleaseName(err error) bool {
+	return microerror.Cause(err) == invalidReleaseNameError
+}
+
 // IsNotFound asserts notFoundError.
 func IsNotFound(err error) bool {
 	return microerror.Cause(err) == notFoundError

@@ -2,62 +2,60 @@ package app
 
 import (
 	"context"
-	"fmt"
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/release-operator/service/controller/releasecycle/key"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 )
 
+// ApplyCreateChange ensures createChange App CR is created in k8s api.
 func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange interface{}) error {
-	appCRs, err := toAppCRs(createChange)
+	appCR, err := key.ToAppCR(createChange)
 	if err != nil {
 		return microerror.Mask(err)
 	}
 
-	if len(appCRs) != 0 {
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating %d App CRs in the Kubernetes API", len(appCRs)))
+	if appCR != nil {
+		r.logger.LogCtx(ctx, "level", "debug", "message", "ensuring creation of release App CR", "app", appCR.GetName())
 
-		for _, c := range appCRs {
-			_, err = r.g8sClient.ApplicationV1alpha1().Apps(r.namespace).Create(c)
-			if apierrors.IsAlreadyExists(err) {
-				// fall through
-			} else if err != nil {
-				return microerror.Mask(err)
-			}
+		_, err = r.g8sClient.ApplicationV1alpha1().Apps(r.namespace).Create(appCR)
+		if apierrors.IsAlreadyExists(err) {
+			// fall through
+		} else if err != nil {
+			return microerror.Mask(err)
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("created %d App CRs in the Kubernetes API", len(appCRs)))
-	} else {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "App CRs do not have to be created in the Kubernetes API")
+		r.logger.LogCtx(ctx, "level", "debug", "message", "ensured creation of release App CR", "app", appCR.GetName())
 	}
 
 	return nil
 }
 
+// newCreateChange computes the App CR to be created.
+//
+// nil, nil is returned when no App CR has to be created.
 func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	currentAppCRs, err := toAppCRs(currentState)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-	desiredAppCRs, err := toAppCRs(desiredState)
+	currentAppCR, err := key.ToAppCR(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	var appCRsToCreate []*applicationv1alpha1.App
+	desiredAppCR, err := key.ToAppCR(desiredState)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	r.logger.LogCtx(ctx, "level", "debug", "message", "computing create state", "app", desiredAppCR.GetName())
+
+	var createAppCR *applicationv1alpha1.App
 	{
-		r.logger.LogCtx(ctx, "level", "debug", "message", "computing create state")
-
-		for _, d := range desiredAppCRs {
-			_, ok := getAppCR(currentAppCRs, d.Namespace, d.Name)
-			if !ok {
-				appCRsToCreate = append(appCRsToCreate, d)
-			}
+		if currentAppCR.GetName() == "" {
+			createAppCR = desiredAppCR
 		}
-
-		r.logger.LogCtx(ctx, "level", "debug", "message", "computed create state")
 	}
 
-	return appCRsToCreate, nil
+	r.logger.LogCtx(ctx, "level", "debug", "message", "computed create state", "app", desiredAppCR.GetName())
+
+	return createAppCR, nil
 }
