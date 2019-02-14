@@ -7,7 +7,7 @@ import (
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/operatorkit/controller"
-	"github.com/giantswarm/release-operator/service/controller/releasecycle/key"
+	"github.com/giantswarm/release-operator/service/controller/key"
 )
 
 // ApplyUpdateChange ensures updateChange App CR is updated in k8s api.
