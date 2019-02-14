@@ -16,7 +16,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	appName := releaseAppName(releaseCycleCR)
+	appName := key.ReleaseAppCRName(releaseCycleCR)
 	r.logger.LogCtx(ctx, "level", "debug", "message", "finding current state", "app", appName)
 
 	appCR, err := r.g8sClient.ApplicationV1alpha1().Apps(r.namespace).Get(appName, v1.GetOptions{})
