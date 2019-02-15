@@ -16,7 +16,6 @@ const (
 )
 
 const (
-	ProjectName        = "release-operator"
 	OrganizationName   = "giantswarm"
 	ServiceTypeManaged = "managed"
 )

@@ -8,6 +8,7 @@ import (
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/giantswarm/release-operator/pkg/project"
 	"github.com/giantswarm/release-operator/service/controller/key"
 )
 
@@ -53,7 +54,7 @@ func (r *Resource) newAppCR(ctx context.Context, releaseCR releasev1alpha1.Relea
 				key.LabelApp: component.Name,
 				// TODO: define app-operator version.
 				key.LabelAppOperatorVersion: "",
-				key.LabelManagedBy:          key.ProjectName,
+				key.LabelManagedBy:          project.Name(),
 				key.LabelOrganization:       key.OrganizationName,
 				key.LabelReleaseVersion:     key.ReleaseVersion(releaseCR),
 				key.LabelServiceType:        key.ServiceTypeManaged,
