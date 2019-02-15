@@ -92,15 +92,10 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 		return ctx, nil
 	}
 
-	handlesFunc := func(obj interface{}) bool {
-		return true
-	}
-
 	var resourceSet *controller.ResourceSet
 	{
 		c := controller.ResourceSetConfig{
 			InitCtx:   initCtxFunc,
-			Handles:   handlesFunc,
 			Logger:    config.Logger,
 			Resources: resources,
 		}
