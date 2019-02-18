@@ -1,7 +1,6 @@
 package key
 
 import (
-	"fmt"
 	"strings"
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
@@ -23,16 +22,6 @@ const (
 	OrganizationName   = "giantswarm"
 	ServiceTypeManaged = "managed"
 )
-
-// ReleaseAppCRName returns the name of the release App CR for the given release cycle.
-func ReleaseAppCRName(releaseCycleCR releasev1alpha1.ReleaseCycle) string {
-	return ReleasePrefix(releaseCycleCR.GetName())
-}
-
-// ReleasePrefix adds release- prefix to name.
-func ReleasePrefix(name string) string {
-	return fmt.Sprintf("release-%s", name)
-}
 
 // ReleaseVersion returns the version of the given release.
 func ReleaseVersion(releaseCR releasev1alpha1.Release) string {
