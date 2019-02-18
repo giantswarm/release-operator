@@ -35,7 +35,7 @@ func ReleaseVersion(releaseCR releasev1alpha1.Release) string {
 // e.g. aws.v6.0.1
 func SplitReleaseName(name string) (string, string, error) {
 	split := strings.SplitN(name, ".", 2)
-	if len(split) < 2 {
+	if len(split) < 2 || len(split[0]) == 0 || len(split[1]) == 0 {
 		return "", "", microerror.Maskf(invalidReleaseNameError, "expect <provider>.<version>, got %#q", name)
 	}
 
