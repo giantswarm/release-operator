@@ -5,8 +5,9 @@ import (
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/release-operator/service/controller/key"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+
+	"github.com/giantswarm/release-operator/service/controller/key"
 )
 
 // ApplyCreateChange ensures createChange App CR is created in k8s api.

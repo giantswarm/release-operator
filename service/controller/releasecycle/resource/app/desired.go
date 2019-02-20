@@ -11,7 +11,7 @@ import (
 	"github.com/giantswarm/release-operator/service/controller/key"
 )
 
-// GetDesiredState computes the desired App CR for the release referenced in obj ReleaseCycle CR.
+// GetDesiredState computes the desired App CR for the release referenced in ReleaseCycle CR.
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
 	releaseCycleCR, err := key.ToReleaseCycleCR(obj)
 	if err != nil {

@@ -4,12 +4,13 @@ import (
 	"context"
 
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/release-operator/service/controller/key"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/giantswarm/release-operator/service/controller/key"
 )
 
-// GetCurrentState collects the current App CR for the release referenced in obj ReleaseCycle CR from k8s api.
+// GetCurrentState collects the current App CR for the release referenced in ReleaseCycle CR from k8s api.
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
 	releaseCycleCR, err := key.ToReleaseCycleCR(obj)
 	if err != nil {
