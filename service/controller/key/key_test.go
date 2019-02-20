@@ -20,7 +20,7 @@ func TestSplitReleaseName(t *testing.T) {
 			errorMatcher:     nil,
 		},
 		{
-			name:             "case 0: valid any version",
+			name:             "case 1: valid any version",
 			input:            "aws.any",
 			expectedProvider: "aws",
 			expectedVersion:  "any",
