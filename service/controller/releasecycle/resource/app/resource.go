@@ -96,7 +96,7 @@ func releaseAppCRName(releaseCycleCR releasev1alpha1.ReleaseCycle) string {
 	return releasePrefix(releaseCycleCR.GetName())
 }
 
-// ReleasePrefix adds release- prefix to name.
+// releasePrefix adds release- prefix to name.
 func releasePrefix(name string) string {
 	return fmt.Sprintf("release-%s", name)
 }
