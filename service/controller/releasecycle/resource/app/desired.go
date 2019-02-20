@@ -18,7 +18,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	appName := key.ReleaseAppCRName(releaseCycleCR)
+	appName := releaseAppCRName(releaseCycleCR)
 	r.logger.LogCtx(ctx, "level", "debug", "message", "computing desired state", "app", appName)
 
 	releaseProvider, releaseVersion, err := key.SplitReleaseName(releaseCycleCR.GetName())
@@ -26,7 +26,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	releaseRepo := key.ReleasePrefix(releaseProvider)
+	releaseRepo := releasePrefix(releaseProvider)
 	appCR := r.newAppCR(appName, releaseRepo, releaseVersion)
 
 	r.logger.LogCtx(ctx, "level", "debug", "message", "computed desired state", "app", appName)
