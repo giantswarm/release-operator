@@ -1,7 +1,6 @@
 package key
 
 import (
-	"fmt"
 	"strings"
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
@@ -24,16 +23,6 @@ const (
 	ServiceTypeManaged = "managed"
 )
 
-// ReleaseAppCRName returns the name of the release App CR for the given release cycle.
-func ReleaseAppCRName(releaseCycleCR releasev1alpha1.ReleaseCycle) string {
-	return ReleasePrefix(releaseCycleCR.GetName())
-}
-
-// ReleasePrefix adds release- prefix to name.
-func ReleasePrefix(name string) string {
-	return fmt.Sprintf("release-%s", name)
-}
-
 // ReleaseVersion returns the version of the given release.
 func ReleaseVersion(releaseCR releasev1alpha1.Release) string {
 	return releaseCR.Spec.Version
@@ -46,7 +35,7 @@ func ReleaseVersion(releaseCR releasev1alpha1.Release) string {
 // e.g. aws.v6.0.1
 func SplitReleaseName(name string) (string, string, error) {
 	split := strings.SplitN(name, ".", 2)
-	if len(split) < 2 {
+	if len(split) < 2 || len(split[0]) == 0 || len(split[1]) == 0 {
 		return "", "", microerror.Maskf(invalidReleaseNameError, "expect <provider>.<version>, got %#q", name)
 	}
 

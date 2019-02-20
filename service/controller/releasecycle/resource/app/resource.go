@@ -1,6 +1,10 @@
 package app
 
 import (
+	"fmt"
+
+	applicationv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -65,4 +69,36 @@ func New(config Config) (*Resource, error) {
 
 func (r *Resource) Name() string {
 	return Name
+}
+
+func getAppCR(list []*applicationv1alpha1.App, namespace, name string) (*applicationv1alpha1.App, bool) {
+	for _, l := range list {
+		b := true
+		b = b && l.Namespace == namespace
+		b = b && l.Name == name
+		if b {
+			return l, true
+		}
+	}
+
+	return nil, false
+}
+
+func toAppCRs(v interface{}) ([]*applicationv1alpha1.App, error) {
+	appCRs, ok := v.([]*applicationv1alpha1.App)
+	if !ok {
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", []*applicationv1alpha1.App{}, v)
+	}
+
+	return appCRs, nil
+}
+
+// releaseAppCRName returns the name of the release App CR for the given release cycle.
+func releaseAppCRName(releaseCycleCR releasev1alpha1.ReleaseCycle) string {
+	return releasePrefix(releaseCycleCR.GetName())
+}
+
+// releasePrefix adds release- prefix to name.
+func releasePrefix(name string) string {
+	return fmt.Sprintf("release-%s", name)
 }
