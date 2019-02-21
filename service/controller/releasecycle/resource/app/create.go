@@ -33,7 +33,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	return nil
 }
 
-// newCreateChange computes the App CR to be created.
+// newCreateChange computes whether the App CR has to be created.
 //
 // nil, nil is returned when no App CR has to be created.
 func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {

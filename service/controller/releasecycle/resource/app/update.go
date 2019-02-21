@@ -51,7 +51,7 @@ func (r *Resource) NewUpdatePatch(ctx context.Context, obj, currentState, desire
 	return patch, nil
 }
 
-// newUpdateChange computes the App CR to be updated.
+// newUpdateChange computes whether the App CR has to be updated.
 //
 // nil, nil is returned when no App CR has to be updated.
 func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
