@@ -18,7 +18,6 @@ const (
 
 // Config represents the configuration used to create a new app resource.
 type Config struct {
-	// Dependencies.
 	G8sClient versioned.Interface
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
@@ -27,8 +26,13 @@ type Config struct {
 }
 
 // Resource implements the app resource.
+//
+// It ensures each release cycle has its corresponding release installed.
+// It does so by creating an App CR for the release, which will then be
+// installed by app-operator.
+// Note: releases are never removed, so removing a release cycle CR has no effect
+// 	 on the previously installed release.
 type Resource struct {
-	// Dependencies.
 	g8sClient versioned.Interface
 	k8sClient kubernetes.Interface
 	logger    micrologger.Logger
@@ -38,7 +42,6 @@ type Resource struct {
 
 // New creates a new configured app resource.
 func New(config Config) (*Resource, error) {
-	// Dependencies.
 	if config.G8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.G8sClient must not be empty", config)
 	}
@@ -54,7 +57,6 @@ func New(config Config) (*Resource, error) {
 	}
 
 	r := &Resource{
-		// Dependencies.
 		g8sClient: config.G8sClient,
 		k8sClient: config.K8sClient,
 		logger:    config.Logger,
