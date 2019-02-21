@@ -69,7 +69,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 
 	var updateAppCR *applicationv1alpha1.App
 	{
-		if currentAppCR.GetName() != "" && isAppCRModified(desiredAppCR, currentAppCR) {
+		if currentAppCR != nil && currentAppCR.GetName() != "" && isAppCRModified(desiredAppCR, currentAppCR) {
 			updateAppCR = desiredAppCR
 		}
 	}

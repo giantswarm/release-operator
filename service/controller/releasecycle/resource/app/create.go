@@ -51,7 +51,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 
 	var createAppCR *applicationv1alpha1.App
 	{
-		if currentAppCR.GetName() == "" {
+		if currentAppCR == nil || currentAppCR.GetName() == "" {
 			createAppCR = desiredAppCR
 		}
 	}
