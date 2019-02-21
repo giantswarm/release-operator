@@ -47,16 +47,16 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "computing create state", "app", desiredAppCR.GetName())
-
 	var createAppCR *applicationv1alpha1.App
-	{
+	if desiredAppCR != nil {
+		r.logger.LogCtx(ctx, "level", "debug", "message", "computing create state", "app", desiredAppCR.GetName())
+
 		if currentAppCR == nil || currentAppCR.GetName() == "" {
 			createAppCR = desiredAppCR
 		}
-	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "computed create state", "app", desiredAppCR.GetName())
+		r.logger.LogCtx(ctx, "level", "debug", "message", "computed create state", "app", desiredAppCR.GetName())
+	}
 
 	return createAppCR, nil
 }
