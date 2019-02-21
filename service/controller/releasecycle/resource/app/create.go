@@ -10,7 +10,7 @@ import (
 	"github.com/giantswarm/release-operator/service/controller/key"
 )
 
-// ApplyCreateChange ensures createChange App CR is created in k8s api.
+// ApplyCreateChange ensures the App CR is created in the k8s api.
 func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange interface{}) error {
 	appCR, err := key.ToAppCR(createChange)
 	if err != nil {
