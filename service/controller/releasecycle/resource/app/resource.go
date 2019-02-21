@@ -30,7 +30,7 @@ type Config struct {
 // It ensures each release cycle has its corresponding release installed.
 // It does so by creating an App CR for the release, which will then be
 // installed by app-operator.
-// Note: release are never removed, so removing a release cycle CR has no effect
+// Note: releases are never removed, so removing a release cycle CR has no effect
 // 	 on the previously installed release.
 type Resource struct {
 	g8sClient versioned.Interface
