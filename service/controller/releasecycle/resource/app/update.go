@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
@@ -19,14 +20,14 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 	}
 
 	if appCR != nil {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "ensuring update of release App CR", "app", appCR.GetName())
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("ensuring update of release App CR %#q", appCR.GetName()))
 
 		_, err = r.g8sClient.ApplicationV1alpha1().Apps(r.namespace).Update(appCR)
 		if err != nil {
 			return microerror.Mask(err)
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "ensured update of release App CR", "app", appCR.GetName())
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("ensured update of release App CR %#q", appCR.GetName()))
 	}
 
 	return nil
@@ -67,13 +68,13 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 
 	var updateAppCR *applicationv1alpha1.App
 	if desiredAppCR != nil {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "computing update state", "app", desiredAppCR.GetName())
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("computing update state %#q", desiredAppCR.GetName()))
 
 		if currentAppCR != nil && currentAppCR.GetName() != "" && isAppCRModified(desiredAppCR, currentAppCR) {
 			updateAppCR = desiredAppCR
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "computed update state", "app", desiredAppCR.GetName())
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("computed update state %#q", desiredAppCR.GetName()))
 	}
 
 	return updateAppCR, nil

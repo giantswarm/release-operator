@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/giantswarm/microerror"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -18,7 +19,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	}
 
 	appName := releaseAppCRName(releaseCycleCR)
-	r.logger.LogCtx(ctx, "level", "debug", "message", "finding current state", "app", appName)
+	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("finding current state %#q", appName))
 
 	appCR, err := r.g8sClient.ApplicationV1alpha1().Apps(r.namespace).Get(appName, v1.GetOptions{})
 	if apierrors.IsNotFound(err) {
@@ -27,7 +28,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 		return nil, microerror.Mask(err)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "found current state", "app", appName)
+	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found current state %#q", appName))
 
 	return appCR, nil
 }

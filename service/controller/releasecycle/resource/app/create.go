@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	"github.com/giantswarm/microerror"
@@ -18,7 +19,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	}
 
 	if appCR != nil {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "ensuring creation of release App CR", "app", appCR.GetName())
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("ensuring creation of release App CR %#q", appCR.GetName()))
 
 		_, err = r.g8sClient.ApplicationV1alpha1().Apps(r.namespace).Create(appCR)
 		if apierrors.IsAlreadyExists(err) {
@@ -27,7 +28,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 			return microerror.Mask(err)
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "ensured creation of release App CR", "app", appCR.GetName())
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("ensured creation of release App CR %#q", appCR.GetName()))
 	}
 
 	return nil
@@ -49,13 +50,13 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 
 	var createAppCR *applicationv1alpha1.App
 	if desiredAppCR != nil {
-		r.logger.LogCtx(ctx, "level", "debug", "message", "computing create state", "app", desiredAppCR.GetName())
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("computing create state %#q", desiredAppCR.GetName()))
 
 		if currentAppCR == nil || currentAppCR.GetName() == "" {
 			createAppCR = desiredAppCR
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", "computed create state", "app", desiredAppCR.GetName())
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("computed create state %#q", desiredAppCR.GetName()))
 	}
 
 	return createAppCR, nil

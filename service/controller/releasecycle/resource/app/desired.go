@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	"github.com/giantswarm/microerror"
@@ -19,7 +20,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	}
 
 	appName := releaseAppCRName(releaseCycleCR)
-	r.logger.LogCtx(ctx, "level", "debug", "message", "computing desired state", "app", appName)
+	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("computing desired state %#q", appName))
 
 	releaseProvider, releaseVersion, err := key.SplitReleaseName(releaseCycleCR.GetName())
 	if err != nil {
@@ -29,7 +30,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 	releaseRepo := releasePrefix(releaseProvider)
 	appCR := r.newAppCR(appName, releaseRepo, releaseVersion)
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "computed desired state", "app", appName)
+	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("computed desired state %#q", appName))
 
 	return appCR, nil
 }
