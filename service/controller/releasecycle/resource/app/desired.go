@@ -36,10 +36,7 @@ func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interf
 
 func (r *Resource) newAppCR(name, repository, version string) *applicationv1alpha1.App {
 	appCR := &applicationv1alpha1.App{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "App",
-			APIVersion: "application.giantswarm.io",
-		},
+		TypeMeta: applicationv1alpha1.NewAppTypeMeta(),
 		ObjectMeta: metav1.ObjectMeta{
 			Name: name,
 			Labels: map[string]string{
