@@ -20,6 +20,7 @@ type ReleaseCycleConfig struct {
 	K8sExtClient apiextensionsclient.Interface
 	Logger       micrologger.Logger
 
+	AppCatalog  string
 	ProjectName string
 }
 
@@ -69,6 +70,7 @@ func NewReleaseCycle(config ReleaseCycleConfig) (*ReleaseCycle, error) {
 			G8sClient:   config.G8sClient,
 			K8sClient:   config.K8sClient,
 			Logger:      config.Logger,
+			AppCatalog:  config.AppCatalog,
 			ProjectName: config.ProjectName,
 		}
 

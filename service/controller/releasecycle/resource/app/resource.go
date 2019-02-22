@@ -22,7 +22,8 @@ type Config struct {
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
 
-	Namespace string
+	AppCatalog string
+	Namespace  string
 }
 
 // Resource implements the app resource.
@@ -37,7 +38,8 @@ type Resource struct {
 	k8sClient kubernetes.Interface
 	logger    micrologger.Logger
 
-	namespace string
+	appCatalog string
+	namespace  string
 }
 
 // New creates a new configured app resource.
@@ -52,6 +54,9 @@ func New(config Config) (*Resource, error) {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
 
+	if config.AppCatalog == "" {
+		return nil, microerror.Maskf(invalidConfigError, "%T.AppCatalog must not be empty", config)
+	}
 	if config.Namespace == "" {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Namespace must not be empty", config)
 	}
@@ -61,7 +66,8 @@ func New(config Config) (*Resource, error) {
 		k8sClient: config.K8sClient,
 		logger:    config.Logger,
 
-		namespace: config.Namespace,
+		appCatalog: config.AppCatalog,
+		namespace:  config.Namespace,
 	}
 
 	return r, nil

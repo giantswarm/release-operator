@@ -132,6 +132,7 @@ func New(config Config) (*Service, error) {
 			K8sClient:    k8sClient,
 			K8sExtClient: k8sExtClient,
 
+			AppCatalog:  config.Viper.GetString(config.Flag.Release.AppCatalog),
 			ProjectName: config.ProjectName,
 		}
 
