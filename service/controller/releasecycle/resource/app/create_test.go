@@ -87,10 +87,11 @@ func Test_newCreateChange(t *testing.T) {
 				}
 			}
 			c := Config{
-				G8sClient: versionedfake.NewSimpleClientset(),
-				K8sClient: kubernetesfake.NewSimpleClientset(),
-				Logger:    logger,
-				Namespace: "foo",
+				G8sClient:  versionedfake.NewSimpleClientset(),
+				K8sClient:  kubernetesfake.NewSimpleClientset(),
+				Logger:     logger,
+				AppCatalog: "none",
+				Namespace:  "foo",
 			}
 			r, err := New(c)
 			if err != nil {
