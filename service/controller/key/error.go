@@ -20,6 +20,15 @@ func IsInvalidConfig(err error) bool {
 	return microerror.Cause(err) == invalidConfigError
 }
 
+var invalidReleaseNameError = &microerror.Error{
+	Kind: "invalidReleaseNameError",
+}
+
+// IsInvalidReleaseName asserts invalidReleaseNameError.
+func IsInvalidReleaseName(err error) bool {
+	return microerror.Cause(err) == invalidReleaseNameError
+}
+
 var wrongTypeError = &microerror.Error{
 	Kind: "wrongTypeError",
 }

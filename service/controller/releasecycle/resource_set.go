@@ -21,6 +21,9 @@ type ResourceSetConfig struct {
 	G8sClient versioned.Interface
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
+
+	// Settings.
+	AppCatalog string
 }
 
 func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
@@ -33,7 +36,8 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
 
-			Namespace: "giantswarm",
+			AppCatalog: config.AppCatalog,
+			Namespace:  "giantswarm",
 		}
 
 		ops, err := app.New(c)
