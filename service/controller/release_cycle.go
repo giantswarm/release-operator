@@ -25,8 +25,7 @@ type ReleaseCycleConfig struct {
 	K8sExtClient apiextensionsclient.Interface
 	Logger       micrologger.Logger
 
-	AppCatalog  string
-	ProjectName string
+	AppCatalog string
 }
 
 type ReleaseCycle struct {
