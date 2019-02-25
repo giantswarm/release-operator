@@ -6,7 +6,7 @@ metadata:
 data:
   config.yml: |
     release:
-      appcatalog: {{ .Values.V1.GiantSwarm.ReleaseOperator.Release.AppCatalog }}
+      appcatalog: {{ .Values.Installation.V1.GiantSwarm.ReleaseOperator.Release.AppCatalog }}
     server:
       enable:
         debug:
