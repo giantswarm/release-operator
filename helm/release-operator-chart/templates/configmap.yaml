@@ -5,6 +5,8 @@ metadata:
   namespace: {{ .Values.namespace }}
 data:
   config.yml: |
+    release:
+      appcatalog: {{ .Values.V1.GiantSwarm.ReleaseOperator.Release.AppCatalog }}
     server:
       enable:
         debug:
