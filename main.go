@@ -46,11 +46,6 @@ func mainWithError() (err error) {
 				Flag:   f,
 				Logger: newLogger,
 				Viper:  v,
-
-				Description: project.Description(),
-				GitCommit:   project.GitSHA(),
-				ProjectName: project.Name(),
-				Source:      project.Source(),
 			}
 
 			newService, err = service.New(serviceConfig)
@@ -68,8 +63,6 @@ func mainWithError() (err error) {
 				Logger:  newLogger,
 				Service: newService,
 				Viper:   v,
-
-				ProjectName: project.Name(),
 			}
 
 			newServer, err = server.New(c)

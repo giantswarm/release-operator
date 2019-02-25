@@ -18,14 +18,12 @@ import (
 )
 
 type ResourceSetConfig struct {
-	// Dependencies.
 	G8sClient versioned.Interface
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
 
 	// Settings.
-	AppCatalog  string
-	ProjectName string
+	AppCatalog string
 }
 
 func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
