@@ -20,8 +20,6 @@ type ResourceSetConfig struct {
 	G8sClient versioned.Interface
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
-
-	ProjectName string
 }
 
 func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {

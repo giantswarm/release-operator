@@ -16,6 +16,7 @@ import (
 	"k8s.io/client-go/rest"
 
 	"github.com/giantswarm/release-operator/flag"
+	"github.com/giantswarm/release-operator/pkg/project"
 	"github.com/giantswarm/release-operator/service/controller"
 )
 
@@ -25,11 +26,6 @@ type Config struct {
 
 	Flag  *flag.Flag
 	Viper *viper.Viper
-
-	Description string
-	GitCommit   string
-	ProjectName string
-	Source      string
 }
 
 // Service is a type providing implementation of microkit service interface.
@@ -46,7 +42,7 @@ func New(config Config) (*Service, error) {
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.Logger must not be empty")
 	}
-	config.Logger.Log("level", "debug", "message", fmt.Sprintf("creating release-operator gitCommit:%s", config.GitCommit))
+	config.Logger.Log("level", "debug", "message", fmt.Sprintf("creating %#q %#q with git SHA %#q", project.Name(), project.Version(), project.GitSHA()))
 
 	if config.Flag == nil {
 		return nil, microerror.Maskf(invalidConfigError, "config.Flag must not be empty")
@@ -95,10 +91,10 @@ func New(config Config) (*Service, error) {
 	var versionService *version.Service
 	{
 		versionConfig := version.Config{
-			Description: config.Description,
-			GitCommit:   config.GitCommit,
-			Name:        config.ProjectName,
-			Source:      config.Source,
+			Description: project.Description(),
+			GitCommit:   project.GitSHA(),
+			Name:        project.Name(),
+			Source:      project.Source(),
 		}
 
 		versionService, err = version.New(versionConfig)
@@ -114,8 +110,6 @@ func New(config Config) (*Service, error) {
 			G8sClient:    g8sClient,
 			K8sClient:    k8sClient,
 			K8sExtClient: k8sExtClient,
-
-			ProjectName: config.ProjectName,
 		}
 
 		releaseController, err = controller.NewRelease(c)
@@ -132,8 +126,7 @@ func New(config Config) (*Service, error) {
 			K8sClient:    k8sClient,
 			K8sExtClient: k8sExtClient,
 
-			AppCatalog:  config.Viper.GetString(config.Flag.Release.AppCatalog),
-			ProjectName: config.ProjectName,
+			AppCatalog: config.Viper.GetString(config.Flag.Release.AppCatalog),
 		}
 
 		releaseCycleController, err = controller.NewReleaseCycle(c)

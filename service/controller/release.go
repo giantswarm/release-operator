@@ -11,7 +11,12 @@ import (
 	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/kubernetes"
 
+	"github.com/giantswarm/release-operator/pkg/project"
 	"github.com/giantswarm/release-operator/service/controller/release"
+)
+
+var (
+	releaseControllerName = project.Name() + "-release"
 )
 
 type ReleaseConfig struct {
@@ -19,8 +24,6 @@ type ReleaseConfig struct {
 	K8sClient    kubernetes.Interface
 	K8sExtClient apiextensionsclient.Interface
 	Logger       micrologger.Logger
-
-	ProjectName string
 }
 
 type Release struct {
@@ -66,10 +69,9 @@ func NewRelease(config ReleaseConfig) (*Release, error) {
 	var resourceSet *controller.ResourceSet
 	{
 		c := release.ResourceSetConfig{
-			G8sClient:   config.G8sClient,
-			K8sClient:   config.K8sClient,
-			Logger:      config.Logger,
-			ProjectName: config.ProjectName,
+			G8sClient: config.G8sClient,
+			K8sClient: config.K8sClient,
+			Logger:    config.Logger,
 		}
 
 		resourceSet, err = release.NewResourceSet(c)
@@ -90,7 +92,7 @@ func NewRelease(config ReleaseConfig) (*Release, error) {
 			},
 			RESTClient: config.G8sClient.ReleaseV1alpha1().RESTClient(),
 
-			Name: config.ProjectName,
+			Name: releaseControllerName,
 		}
 
 		releaseController, err = controller.New(c)

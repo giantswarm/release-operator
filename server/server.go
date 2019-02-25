@@ -10,6 +10,7 @@ import (
 	"github.com/giantswarm/micrologger"
 	"github.com/spf13/viper"
 
+	"github.com/giantswarm/release-operator/pkg/project"
 	"github.com/giantswarm/release-operator/server/endpoint"
 	"github.com/giantswarm/release-operator/service"
 )
@@ -19,8 +20,6 @@ type Config struct {
 	Logger  micrologger.Logger
 	Service *service.Service
 	Viper   *viper.Viper
-
-	ProjectName string
 }
 
 type Server struct {
@@ -55,7 +54,7 @@ func New(config Config) (*Server, error) {
 		bootOnce: sync.Once{},
 		config: microserver.Config{
 			Logger:      config.Logger,
-			ServiceName: config.ProjectName,
+			ServiceName: project.Name(),
 			Viper:       config.Viper,
 
 			Endpoints: []microserver.Endpoint{
