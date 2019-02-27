@@ -63,7 +63,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 
 	var appCRsToUpdate []*v1alpha1.App
 	{
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("computing app CRs to update"))
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("computing App CRs to update"))
 
 		for _, c := range currentAppCRs {
 			for _, d := range desiredAppCRs {
@@ -74,7 +74,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 			}
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("computed %d app CRs to update", appCRsToUpdate))
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("computed %d App CRs to update", appCRsToUpdate))
 	}
 
 	return appCRsToUpdate, nil
