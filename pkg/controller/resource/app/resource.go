@@ -13,6 +13,8 @@ type Config struct {
 	K8sClient   kubernetes.Interface
 	Logger      micrologger.Logger
 	StateGetter StateGetter
+
+	Name string
 }
 
 type Resource struct {
@@ -20,6 +22,8 @@ type Resource struct {
 	k8sClient   kubernetes.Interface
 	logger      micrologger.Logger
 	stateGetter StateGetter
+
+	name string
 }
 
 func New(config Config) (*Resource, error) {
@@ -36,18 +40,24 @@ func New(config Config) (*Resource, error) {
 		return nil, microerror.Maskf(invalidConfigError, "%T.StateGetter must not be empty", config)
 	}
 
+	if config.Name == "" {
+		return nil, microerror.Maskf(invalidConfigError, "%T.Name must not be empty", config)
+	}
+
 	r := &Resource{
 		g8sClient:   config.G8sClient,
 		k8sClient:   config.K8sClient,
 		logger:      config.Logger,
 		stateGetter: config.StateGetter,
+
+		name: config.Name,
 	}
 
 	return r, nil
 }
 
 func (r *Resource) Name() string {
-	return r.stateGetter.Name()
+	return r.name
 }
 
 func containsAppCR(cr *v1alpha1.App, crs []*v1alpha1.App) bool {

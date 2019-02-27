@@ -7,9 +7,6 @@ import (
 )
 
 type StateGetter interface {
-	// Name is the name of the resource constructed from this StateGetter.
-	Name() string
-
 	// GetCurrentState returns a current state of the system for the given
 	// carnation of the observed Kubernetes object.
 	GetCurrentState(ctx context.Context, obj interface{}) ([]*v1alpha1.App, error)
