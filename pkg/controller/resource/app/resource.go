@@ -60,7 +60,7 @@ func containsAppCR(cr *v1alpha1.App, crs []*v1alpha1.App) bool {
 	return false
 }
 
-func toState(v interface{}) ([]*v1alpha1.App, error) {
+func toAppCRs(v interface{}) ([]*v1alpha1.App, error) {
 	x, ok := v.([]*v1alpha1.App)
 	if !ok {
 		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", x, v)

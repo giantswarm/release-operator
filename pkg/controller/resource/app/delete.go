@@ -12,7 +12,7 @@ import (
 )
 
 func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange interface{}) error {
-	appCRsToDelete, err := toState(deleteChange)
+	appCRsToDelete, err := toAppCRs(deleteChange)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -47,11 +47,11 @@ func (r *Resource) NewDeletePatch(ctx context.Context, obj, currentState, desire
 }
 
 func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desiredState interface{}) ([]*v1alpha1.App, error) {
-	currentAppCRs, err := toState(currentState)
+	currentAppCRs, err := toAppCRs(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	desiredAppCRs, err := toState(desiredState)
+	desiredAppCRs, err := toAppCRs(desiredState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}

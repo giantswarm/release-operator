@@ -51,12 +51,12 @@ func (r *Resource) NewUpdatePatch(ctx context.Context, obj, currentState, desire
 }
 
 func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	currentAppCRs, err := toState(currentState)
+	currentAppCRs, err := toAppCRs(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	desiredAppCRs, err := toState(desiredState)
+	desiredAppCRs, err := toAppCRs(desiredState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}

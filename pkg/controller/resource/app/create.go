@@ -11,7 +11,7 @@ import (
 
 // ApplyCreateChange ensures the App CR is created in the k8s api.
 func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange interface{}) error {
-	appCRs, err := toState(createChange)
+	appCRs, err := toAppCRs(createChange)
 	if err != nil {
 		return microerror.Mask(err)
 	}
@@ -33,12 +33,12 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 }
 
 func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desiredState interface{}) (interface{}, error) {
-	currentAppCRs, err := toState(currentState)
+	currentAppCRs, err := toAppCRs(currentState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	desiredAppCRs, err := toState(desiredState)
+	desiredAppCRs, err := toAppCRs(desiredState)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
