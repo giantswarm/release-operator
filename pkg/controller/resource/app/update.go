@@ -67,15 +67,9 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 
 		for _, c := range currentAppCRs {
 			for _, d := range desiredAppCRs {
-				if c.Name != d.Name {
-					continue
-				}
-				if c.Namespace != d.Namespace {
-					continue
-				}
-
-				if isAppCRModified(c, d) {
-					appCRsToUpdate = append(appCRsToUpdate, d)
+				m := newAppCRToUpdate(c, d)
+				if m != nil {
+					appCRsToUpdate = append(appCRsToUpdate, m)
 				}
 			}
 		}
@@ -86,16 +80,24 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 	return appCRsToUpdate, nil
 }
 
-func isAppCRModified(a, b *v1alpha1.App) bool {
-	if !reflect.DeepEqual(a.Annotations, b.Annotations) {
-		return true
+func newAppCRToUpdate(current, desired *v1alpha1.App) *v1alpha1.App {
+	if current.Namespace != desired.Namespace {
+		return nil
 	}
-	if !reflect.DeepEqual(a.Spec, b.Spec) {
-		return true
-	}
-	if !reflect.DeepEqual(a.Labels, b.Labels) {
-		return true
+	if current.Name != desired.Name {
+		return nil
 	}
 
-	return false
+	merged := current.DeepCopy()
+
+	merged.Annotations = desired.Annotations
+	merged.Labels = desired.Labels
+
+	merged.Spec = desired.Spec
+
+	if reflect.DeepEqual(current, merged) {
+		return nil
+	}
+
+	return merged
 }
