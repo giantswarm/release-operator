@@ -7,7 +7,7 @@ import (
 )
 
 func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
-	state, err := r.getCurrentStateFunc(ctx, obj)
+	state, err := r.stateGetter.GetCurrentState(ctx, obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}

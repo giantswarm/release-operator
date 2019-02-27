@@ -1,8 +1,6 @@
 package app
 
 import (
-	"context"
-
 	"github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
@@ -10,27 +8,18 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-const (
-	// Name is the identifier of the resource.
-	Name = "app"
-)
-
 type Config struct {
-	G8sClient versioned.Interface
-	K8sClient kubernetes.Interface
-	Logger    micrologger.Logger
-
-	GetCurrentStateFunc func(ctx context.Context, obj interface{}) ([]*v1alpha1.App, error)
-	GetDesiredStateFunc func(ctx context.Context, obj interface{}) ([]*v1alpha1.App, error)
+	G8sClient   versioned.Interface
+	K8sClient   kubernetes.Interface
+	Logger      micrologger.Logger
+	StateGetter StateGetter
 }
 
 type Resource struct {
-	g8sClient versioned.Interface
-	k8sClient kubernetes.Interface
-	logger    micrologger.Logger
-
-	getCurrentStateFunc func(ctx context.Context, obj interface{}) ([]*v1alpha1.App, error)
-	getDesiredStateFunc func(ctx context.Context, obj interface{}) ([]*v1alpha1.App, error)
+	g8sClient   versioned.Interface
+	k8sClient   kubernetes.Interface
+	logger      micrologger.Logger
+	stateGetter StateGetter
 }
 
 func New(config Config) (*Resource, error) {
@@ -43,28 +32,22 @@ func New(config Config) (*Resource, error) {
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
-
-	if config.GetCurrentStateFunc == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.GetCurrentStateFunc must not be empty", config)
-	}
-	if config.GetDesiredStateFunc == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.GetDesiredStateFunc must not be empty", config)
+	if config.StateGetter == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.StateGetter must not be empty", config)
 	}
 
 	r := &Resource{
-		g8sClient: config.G8sClient,
-		k8sClient: config.K8sClient,
-		logger:    config.Logger,
-
-		getCurrentStateFunc: config.GetCurrentStateFunc,
-		getDesiredStateFunc: config.GetDesiredStateFunc,
+		g8sClient:   config.G8sClient,
+		k8sClient:   config.K8sClient,
+		logger:      config.Logger,
+		stateGetter: config.StateGetter,
 	}
 
 	return r, nil
 }
 
 func (r *Resource) Name() string {
-	return Name
+	return r.stateGetter.Name()
 }
 
 func containsAppCR(cr *v1alpha1.App, crs []*v1alpha1.App) bool {

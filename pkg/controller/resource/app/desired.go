@@ -7,7 +7,7 @@ import (
 )
 
 func (r *Resource) GetDesiredState(ctx context.Context, obj interface{}) (interface{}, error) {
-	state, err := r.getDesiredStateFunc(ctx, obj)
+	state, err := r.stateGetter.GetDesiredState(ctx, obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
