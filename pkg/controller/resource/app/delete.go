@@ -6,7 +6,6 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/operatorkit/controller"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -32,18 +31,6 @@ func (r *Resource) ApplyDeleteChange(ctx context.Context, obj, deleteChange inte
 	}
 
 	return nil
-}
-
-func (r *Resource) NewDeletePatch(ctx context.Context, obj, currentState, desiredState interface{}) (*controller.Patch, error) {
-	deleteChange, err := r.newDeleteChange(ctx, obj, currentState, desiredState)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
-	patch := controller.NewPatch()
-	patch.SetDeleteChange(deleteChange)
-
-	return patch, nil
 }
 
 func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desiredState interface{}) ([]*v1alpha1.App, error) {
