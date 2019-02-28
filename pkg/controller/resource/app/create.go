@@ -48,7 +48,7 @@ func (r *Resource) newCreateChange(ctx context.Context, obj, currentState, desir
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("computing App CRs to create "))
 
 		for _, d := range desiredAppCRs {
-			if !containsAppCR(d, currentAppCRs) {
+			if !containsAppCR(currentAppCRs, d) {
 				appCRsToCreate = append(appCRsToCreate, d)
 			}
 		}
