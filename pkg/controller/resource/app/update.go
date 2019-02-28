@@ -6,17 +6,15 @@ import (
 
 	"github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	"github.com/giantswarm/microerror"
-
-	"github.com/giantswarm/release-operator/service/controller/key"
 )
 
 func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange interface{}) error {
-	appCR, err := key.ToAppCR(updateChange)
+	appCRs, err := toAppCRs(updateChange)
 	if err != nil {
 		return microerror.Mask(err)
 	}
 
-	if appCR != nil {
+	for _, appCR := range appCRs {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("updating App CR %#q in namespace %#q", appCR.Name, appCR.Namespace))
 
 		_, err = r.g8sClient.ApplicationV1alpha1().Apps(appCR.Namespace).Update(appCR)
