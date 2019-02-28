@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"fmt"
-	"reflect"
 
 	"github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	"github.com/giantswarm/microerror"
@@ -57,26 +56,4 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 	}
 
 	return appCRsToUpdate, nil
-}
-
-func newAppCRToUpdate(current, desired *v1alpha1.App) *v1alpha1.App {
-	if current.Namespace != desired.Namespace {
-		return nil
-	}
-	if current.Name != desired.Name {
-		return nil
-	}
-
-	merged := current.DeepCopy()
-
-	merged.Annotations = desired.Annotations
-	merged.Labels = desired.Labels
-
-	merged.Spec = desired.Spec
-
-	if reflect.DeepEqual(current, merged) {
-		return nil
-	}
-
-	return merged
 }
