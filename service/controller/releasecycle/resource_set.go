@@ -1,8 +1,6 @@
 package releasecycle
 
 import (
-	"context"
-
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -11,7 +9,6 @@ import (
 	"github.com/giantswarm/operatorkit/controller/resource/retryresource"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/release-operator/service/controller/releasecycle/controllercontext"
 	"github.com/giantswarm/release-operator/service/controller/releasecycle/resource/app"
 )
 
@@ -73,18 +70,9 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 		}
 	}
 
-	initCtxFunc := func(ctx context.Context, obj interface{}) (context.Context, error) {
-		c := controllercontext.Context{}
-
-		ctx = controllercontext.NewContext(ctx, c)
-
-		return ctx, nil
-	}
-
 	var resourceSet *controller.ResourceSet
 	{
 		c := controller.ResourceSetConfig{
-			InitCtx:   initCtxFunc,
 			Logger:    config.Logger,
 			Resources: resources,
 		}
