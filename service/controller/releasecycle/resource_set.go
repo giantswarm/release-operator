@@ -13,8 +13,6 @@ import (
 
 	"github.com/giantswarm/release-operator/service/controller/releasecycle/controllercontext"
 	"github.com/giantswarm/release-operator/service/controller/releasecycle/resource/app"
-	"github.com/giantswarm/release-operator/service/controller/releasecycle/resource/configmap"
-	"github.com/giantswarm/release-operator/service/controller/releasecycle/resource/secret"
 )
 
 type ResourceSetConfig struct {
@@ -51,41 +49,7 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 		}
 	}
 
-	var configmapResource controller.Resource
-	{
-		c := configmap.Config{
-			K8sClient: config.K8sClient,
-			Logger:    config.Logger,
-
-			Name:      "draughtsman-values-configmap",
-			Namespace: "draughtsman",
-		}
-
-		configmapResource, err = configmap.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var secretResource controller.Resource
-	{
-		c := secret.Config{
-			K8sClient: config.K8sClient,
-			Logger:    config.Logger,
-
-			Name:      "draughtsman-values-secret",
-			Namespace: "draughtsman",
-		}
-
-		secretResource, err = secret.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
 	resources := []controller.Resource{
-		configmapResource,
-		secretResource,
 		appResource,
 	}
 
