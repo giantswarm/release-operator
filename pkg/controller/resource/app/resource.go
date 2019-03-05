@@ -53,9 +53,9 @@ func (r *Resource) Name() string {
 	return r.name
 }
 
-func containsAppCR(cr *v1alpha1.App, crs []*v1alpha1.App) bool {
-	for _, a := range crs {
-		if cr.Name == a.Name && cr.Namespace == a.Namespace {
+func containsAppCR(appCRs []*v1alpha1.App, appCR *v1alpha1.App) bool {
+	for _, a := range appCRs {
+		if appCR.Name == a.Name && appCR.Namespace == a.Namespace {
 			return true
 		}
 	}

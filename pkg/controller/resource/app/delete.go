@@ -48,7 +48,7 @@ func (r *Resource) newDeleteChange(ctx context.Context, obj, currentState, desir
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("computing App CRs to delete"))
 
 		for _, c := range currentAppCRs {
-			if !containsAppCR(c, desiredAppCRs) {
+			if !containsAppCR(desiredAppCRs, c) {
 				appCRsToDelete = append(appCRsToDelete, c)
 			}
 		}
