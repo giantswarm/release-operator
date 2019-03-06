@@ -15,8 +15,6 @@ type Config struct {
 	G8sClient versioned.Interface
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
-
-	Namespace string
 }
 
 // Resource copies Spec of the corresponding ReleaseCycle CR to the
@@ -25,8 +23,6 @@ type Resource struct {
 	g8sClient versioned.Interface
 	k8sClient kubernetes.Interface
 	logger    micrologger.Logger
-
-	namespace string
 }
 
 func New(config Config) (*Resource, error) {
@@ -40,16 +36,10 @@ func New(config Config) (*Resource, error) {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
 
-	if config.Namespace == "" {
-		return nil, microerror.Maskf(invalidConfigError, "%T.Namespace must not be empty", config)
-	}
-
 	r := &Resource{
 		g8sClient: config.G8sClient,
 		k8sClient: config.K8sClient,
 		logger:    config.Logger,
-
-		namespace: config.Namespace,
 	}
 
 	return r, nil

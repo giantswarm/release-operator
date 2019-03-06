@@ -21,7 +21,7 @@ func (r *Resource) ApplyCreateChange(ctx context.Context, obj, createChange inte
 	if appCR != nil {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("ensuring creation of release App CR %#q", appCR.GetName()))
 
-		_, err = r.g8sClient.ApplicationV1alpha1().Apps(r.namespace).Create(appCR)
+		_, err = r.g8sClient.ApplicationV1alpha1().Apps(key.Namespace).Create(appCR)
 		if apierrors.IsAlreadyExists(err) {
 			// fall through
 		} else if err != nil {

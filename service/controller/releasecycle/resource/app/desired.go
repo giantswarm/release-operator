@@ -43,7 +43,7 @@ func (r *Resource) newAppCR(name, repository, version string) *applicationv1alph
 			Labels: map[string]string{
 				key.LabelAppOperatorVersion: project.Version(),
 				key.LabelManagedBy:          project.Name(),
-				key.LabelServiceType:        key.ServiceTypeManaged,
+				key.LabelServiceType:        key.ValueServiceTypeManaged,
 			},
 		},
 		Spec: applicationv1alpha1.AppSpec{
@@ -52,7 +52,7 @@ func (r *Resource) newAppCR(name, repository, version string) *applicationv1alph
 				InCluster: true,
 			},
 			Name:      repository,
-			Namespace: r.namespace,
+			Namespace: key.Namespace,
 			Version:   version,
 		},
 	}

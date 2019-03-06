@@ -117,7 +117,6 @@ func Test_newUpdateChange(t *testing.T) {
 				K8sClient:  kubernetesfake.NewSimpleClientset(),
 				Logger:     logger,
 				AppCatalog: "none",
-				Namespace:  "foo",
 			}
 			r, err := New(c)
 			if err != nil {

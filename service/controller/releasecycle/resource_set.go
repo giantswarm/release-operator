@@ -32,7 +32,6 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 			Logger:    config.Logger,
 
 			AppCatalog: config.AppCatalog,
-			Namespace:  "giantswarm",
 		}
 
 		ops, err := app.New(c)
