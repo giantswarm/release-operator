@@ -100,7 +100,7 @@ func toAppCRs(v interface{}) ([]*applicationv1alpha1.App, error) {
 }
 
 // releaseAppCRName returns the name of the release App CR for the given release cycle.
-func releaseAppCRName(releaseCycleCR releasev1alpha1.ReleaseCycle) string {
+func releaseAppCRName(releaseCycleCR *releasev1alpha1.ReleaseCycle) string {
 	return releasePrefix(releaseCycleCR.GetName())
 }
 
