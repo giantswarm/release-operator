@@ -6,6 +6,8 @@ import (
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/giantswarm/release-operator/pkg/testfixture"
 )
 
 func Test_getAppCR(t *testing.T) {
@@ -20,22 +22,22 @@ func Test_getAppCR(t *testing.T) {
 		{
 			name: "case 0: same name different namespace",
 			inputAppCRs: []*applicationv1alpha1.App{
-				newTestAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
+				testfixture.NewAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
 					appCR.Name = "app"
 					appCR.Namespace = "default"
 				}),
-				newTestAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
+				testfixture.NewAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
 					appCR.Name = "app-1"
 					appCR.Namespace = "default"
 				}),
-				newTestAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
+				testfixture.NewAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
 					appCR.Name = "app"
 					appCR.Namespace = "non-default"
 				}),
 			},
 			inputName:      "app",
 			inputNamespace: "non-default",
-			expectedAppCR: newTestAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
+			expectedAppCR: testfixture.NewAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
 				appCR.Name = "app"
 				appCR.Namespace = "non-default"
 			}),
@@ -44,15 +46,15 @@ func Test_getAppCR(t *testing.T) {
 		{
 			name: "case 1: nonexistent namespace",
 			inputAppCRs: []*applicationv1alpha1.App{
-				newTestAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
+				testfixture.NewAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
 					appCR.Name = "app-0"
 					appCR.Namespace = "default"
 				}),
-				newTestAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
+				testfixture.NewAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
 					appCR.Name = "app-1"
 					appCR.Namespace = "default"
 				}),
-				newTestAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
+				testfixture.NewAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
 					appCR.Name = "app-2"
 					appCR.Namespace = "default"
 				}),
@@ -65,15 +67,15 @@ func Test_getAppCR(t *testing.T) {
 		{
 			name: "case 2: nonexistent name",
 			inputAppCRs: []*applicationv1alpha1.App{
-				newTestAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
+				testfixture.NewAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
 					appCR.Name = "app-0"
 					appCR.Namespace = "default"
 				}),
-				newTestAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
+				testfixture.NewAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
 					appCR.Name = "app-1"
 					appCR.Namespace = "default"
 				}),
-				newTestAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
+				testfixture.NewAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
 					appCR.Name = "app-2"
 					appCR.Namespace = "default"
 				}),
