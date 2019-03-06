@@ -1,8 +1,6 @@
 package releasecycle
 
 import (
-	"context"
-
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -11,10 +9,7 @@ import (
 	"github.com/giantswarm/operatorkit/controller/resource/retryresource"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/release-operator/service/controller/releasecycle/controllercontext"
 	"github.com/giantswarm/release-operator/service/controller/releasecycle/resource/app"
-	"github.com/giantswarm/release-operator/service/controller/releasecycle/resource/configmap"
-	"github.com/giantswarm/release-operator/service/controller/releasecycle/resource/secret"
 )
 
 type ResourceSetConfig struct {
@@ -51,41 +46,7 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 		}
 	}
 
-	var configmapResource controller.Resource
-	{
-		c := configmap.Config{
-			K8sClient: config.K8sClient,
-			Logger:    config.Logger,
-
-			Name:      "draughtsman-values-configmap",
-			Namespace: "draughtsman",
-		}
-
-		configmapResource, err = configmap.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var secretResource controller.Resource
-	{
-		c := secret.Config{
-			K8sClient: config.K8sClient,
-			Logger:    config.Logger,
-
-			Name:      "draughtsman-values-secret",
-			Namespace: "draughtsman",
-		}
-
-		secretResource, err = secret.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
 	resources := []controller.Resource{
-		configmapResource,
-		secretResource,
 		appResource,
 	}
 
@@ -109,18 +70,9 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 		}
 	}
 
-	initCtxFunc := func(ctx context.Context, obj interface{}) (context.Context, error) {
-		c := controllercontext.Context{}
-
-		ctx = controllercontext.NewContext(ctx, c)
-
-		return ctx, nil
-	}
-
 	var resourceSet *controller.ResourceSet
 	{
 		c := controller.ResourceSetConfig{
-			InitCtx:   initCtxFunc,
 			Logger:    config.Logger,
 			Resources: resources,
 		}
