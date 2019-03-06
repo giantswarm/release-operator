@@ -51,6 +51,16 @@ func ToAppCR(v interface{}) (*applicationv1alpha1.App, error) {
 	return appCR, nil
 }
 
+// ToReleaseCR converts v into a Release CR.
+func ToReleaseCR(v interface{}) (*releasev1alpha1.Release, error) {
+	x, ok := v.(*releasev1alpha1.Release)
+	if !ok {
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", x, v)
+	}
+
+	return x, nil
+}
+
 // ToReleaseCycleCR converts v into a ReleaseCycle CR.
 func ToReleaseCycleCR(v interface{}) (releasev1alpha1.ReleaseCycle, error) {
 	releaseCycleCR, ok := v.(*releasev1alpha1.ReleaseCycle)

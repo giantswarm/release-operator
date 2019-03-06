@@ -1,8 +1,6 @@
 package status
 
 import (
-	"context"
-
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -21,6 +19,8 @@ type Config struct {
 	Namespace string
 }
 
+// Resource copies Spec of the corresponding ReleaseCycle CR to the
+// Status.Cycle of the watched Release CR.
 type Resource struct {
 	g8sClient versioned.Interface
 	k8sClient kubernetes.Interface
@@ -57,12 +57,4 @@ func New(config Config) (*Resource, error) {
 
 func (r *Resource) Name() string {
 	return Name
-}
-
-func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
-	return nil
-}
-
-func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
-	return nil
 }
