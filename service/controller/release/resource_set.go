@@ -31,8 +31,6 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 			G8sClient: config.G8sClient,
 			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
-
-			Namespace: "giantswarm",
 		}
 
 		statusResource, err = status.New(c)
@@ -47,8 +45,6 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 			G8sClient: config.G8sClient,
 			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
-
-			Namespace: "giantswarm",
 		}
 
 		appResource, err = app.New(c)

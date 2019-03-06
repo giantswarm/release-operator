@@ -22,7 +22,7 @@ func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange inte
 	if appCR != nil {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("ensuring update of release App CR %#q", appCR.GetName()))
 
-		_, err = r.g8sClient.ApplicationV1alpha1().Apps(r.namespace).Update(appCR)
+		_, err = r.g8sClient.ApplicationV1alpha1().Apps(key.Namespace).Update(appCR)
 		if err != nil {
 			return microerror.Mask(err)
 		}

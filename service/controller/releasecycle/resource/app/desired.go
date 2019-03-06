@@ -52,7 +52,7 @@ func (r *Resource) newAppCR(name, repository, version string) *applicationv1alph
 				InCluster: true,
 			},
 			Name:      repository,
-			Namespace: r.namespace,
+			Namespace: key.Namespace,
 			Version:   version,
 		},
 	}

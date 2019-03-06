@@ -9,6 +9,7 @@ import (
 )
 
 const (
+	// Namespace is the namespace where App CRs are created.
 	Namespace = "giantswarm"
 
 	LabelAppOperatorVersion = "app-operator.giantswarm.io/version"

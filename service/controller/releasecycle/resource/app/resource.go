@@ -23,7 +23,6 @@ type Config struct {
 	Logger    micrologger.Logger
 
 	AppCatalog string
-	Namespace  string
 }
 
 // Resource implements the app resource.
@@ -39,7 +38,6 @@ type Resource struct {
 	logger    micrologger.Logger
 
 	appCatalog string
-	namespace  string
 }
 
 // New creates a new configured app resource.
@@ -57,9 +55,6 @@ func New(config Config) (*Resource, error) {
 	if config.AppCatalog == "" {
 		return nil, microerror.Maskf(invalidConfigError, "%T.AppCatalog must not be empty", config)
 	}
-	if config.Namespace == "" {
-		return nil, microerror.Maskf(invalidConfigError, "%T.Namespace must not be empty", config)
-	}
 
 	r := &Resource{
 		g8sClient: config.G8sClient,
@@ -67,7 +62,6 @@ func New(config Config) (*Resource, error) {
 		logger:    config.Logger,
 
 		appCatalog: config.AppCatalog,
-		namespace:  config.Namespace,
 	}
 
 	return r, nil
