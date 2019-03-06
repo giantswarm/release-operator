@@ -9,17 +9,14 @@ import (
 )
 
 const (
-	LabelApp                = "app"
+	// Namespace is the namespace where App CRs are created.
+	Namespace = "giantswarm"
+
 	LabelAppOperatorVersion = "app-operator.giantswarm.io/version"
 	LabelManagedBy          = "giantswarm.io/managed-by"
-	LabelOrganization       = "giantswarm.io/organization"
-	LabelReleaseVersion     = "release.giantswarm.io/version"
 	LabelServiceType        = "giantswarm.io/service-type"
-)
 
-const (
-	OrganizationName   = "giantswarm"
-	ServiceTypeManaged = "managed"
+	ValueServiceTypeManaged = "managed"
 )
 
 // ReleaseVersion returns the version of the given release.
@@ -43,20 +40,20 @@ func SplitReleaseName(name string) (string, string, error) {
 
 // ToAppCR converts v into an App CR.
 func ToAppCR(v interface{}) (*applicationv1alpha1.App, error) {
-	appCR, ok := v.(*applicationv1alpha1.App)
+	x, ok := v.(*applicationv1alpha1.App)
 	if !ok {
-		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &applicationv1alpha1.App{}, v)
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", x, v)
 	}
 
-	return appCR, nil
+	return x, nil
 }
 
 // ToReleaseCycleCR converts v into a ReleaseCycle CR.
-func ToReleaseCycleCR(v interface{}) (releasev1alpha1.ReleaseCycle, error) {
-	releaseCycleCR, ok := v.(*releasev1alpha1.ReleaseCycle)
+func ToReleaseCycleCR(v interface{}) (*releasev1alpha1.ReleaseCycle, error) {
+	x, ok := v.(*releasev1alpha1.ReleaseCycle)
 	if !ok {
-		return releasev1alpha1.ReleaseCycle{}, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", &releasev1alpha1.ReleaseCycle{}, v)
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", x, v)
 	}
 
-	return *releaseCycleCR, nil
+	return x, nil
 }

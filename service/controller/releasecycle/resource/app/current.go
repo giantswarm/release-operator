@@ -21,7 +21,7 @@ func (r *Resource) GetCurrentState(ctx context.Context, obj interface{}) (interf
 	appName := releaseAppCRName(releaseCycleCR)
 	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("finding current state %#q", appName))
 
-	appCR, err := r.g8sClient.ApplicationV1alpha1().Apps(r.namespace).Get(appName, v1.GetOptions{})
+	appCR, err := r.g8sClient.ApplicationV1alpha1().Apps(key.Namespace).Get(appName, v1.GetOptions{})
 	if apierrors.IsNotFound(err) {
 		// fallthrough
 	} else if err != nil {
