@@ -3,10 +3,13 @@ package app
 import (
 	"context"
 
+	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"k8s.io/client-go/kubernetes"
+
+	"github.com/giantswarm/release-operator/pkg/controller/resource/app"
 )
 
 const (
@@ -36,6 +39,8 @@ func New(config Config) (*Resource, error) {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
 
+	c := app.Config{}
+
 	r := &Resource{
 		g8sClient: config.G8sClient,
 		k8sClient: config.K8sClient,
@@ -55,4 +60,8 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
 	return nil
+}
+
+func appCRName(c releasev1alpha1.ReleaseSpecComponent) string {
+	return c.Name + "." + c.Version
 }
