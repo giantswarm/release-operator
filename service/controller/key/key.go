@@ -14,6 +14,7 @@ const (
 
 	LabelAppOperatorVersion = "app-operator.giantswarm.io/version"
 	LabelManagedBy          = "giantswarm.io/managed-by"
+	LabelReleaseCyclePhase  = "release-operator.giantswarm.io/release-cycle-phase"
 	LabelServiceType        = "giantswarm.io/service-type"
 
 	ValueServiceTypeManaged = "managed"
