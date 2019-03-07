@@ -25,7 +25,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		}
 
 		v := currentLabels[key.LabelReleaseCyclePhase]
-		if v == string(cr.Status.Cycle.Phase) {
+		if v == cr.Status.Cycle.Phase.String() {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "found custom resource does not need to be updated")
 			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
 			return nil
@@ -52,7 +52,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		if desiredLabels == nil {
 			desiredLabels = map[string]string{}
 		}
-		desiredLabels[key.LabelReleaseCyclePhase] = string(cr.Status.Cycle.Phase)
+		desiredLabels[key.LabelReleaseCyclePhase] = cr.Status.Cycle.Phase.String()
 
 		cr.Labels = desiredLabels
 
