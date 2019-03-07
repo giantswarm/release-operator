@@ -24,7 +24,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			currentLabels = map[string]string{}
 		}
 
-		v := cr.Labels[key.LabelReleaseCyclePhase]
+		v := currentLabels[key.LabelReleaseCyclePhase]
 		if v == string(cr.Status.Cycle.Phase) {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "found custom resource does not need to be updated")
 			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
