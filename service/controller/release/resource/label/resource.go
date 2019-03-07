@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	Name = "status"
+	Name = "label"
 )
 
 type Config struct {
