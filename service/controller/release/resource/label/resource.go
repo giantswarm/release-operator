@@ -1,4 +1,4 @@
-package status
+package label
 
 import (
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
