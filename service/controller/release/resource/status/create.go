@@ -25,7 +25,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("finding ReleaseCycle CR %#q in namespace %#q", cr.Name, cr.Namespace))
 
 		// Release CR and corresponding ReleaseCycle CR have the same name and namespace.
-		releaseCycleCR, err = r.g8sClient.ReleaseV1alpha1().ReleaseCycles(cr.Namespace).Get(cr.Name, metav1.GetOptions{})
+		releaseCycleCR, err = r.g8sClient.ReleaseV1alpha1().ReleaseCycles(cr.GetNamespace()).Get(cr.GetName(), metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			releaseCycleCR = nil
 			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("did not find ReleaseCycle CR %#q in namespace %#q", cr.Name, cr.Namespace))
@@ -57,7 +57,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	{
 		r.logger.LogCtx(ctx, "level", "debug", "message", "finding the latest version of custom resource")
 
-		cr, err = r.g8sClient.ReleaseV1alpha1().Releases(cr.Namespace).Get(cr.Name, metav1.GetOptions{})
+		cr, err = r.g8sClient.ReleaseV1alpha1().Releases(cr.GetNamespace()).Get(cr.GetName(), metav1.GetOptions{})
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -74,7 +74,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			cr.Status.Cycle = releaseCycleCR.Spec
 		}
 
-		_, err = r.g8sClient.ReleaseV1alpha1().Releases(cr.Namespace).UpdateStatus(cr)
+		_, err = r.g8sClient.ReleaseV1alpha1().Releases(cr.GetNamespace()).UpdateStatus(cr)
 		if err != nil {
 			return microerror.Mask(err)
 		}
