@@ -41,12 +41,16 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 		if releaseCycleCR == nil && cr.Status.Cycle.Phase == releasev1alpha1.CyclePhaseUpcoming {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "found custom resource status does not need to be updated")
+
+			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("corresponding ReleaseCycle CR not found and cycle phase is %#q", cr.Stataus.Cycle.Phase))
 			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
 			return nil
 		}
 
 		if reflect.DeepEqual(cr.Status.Cycle, releaseCycleCR.Spec) {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "found custom resource status does not need to be updated")
+
+			r.logger.LogCtx(ctx, "level", "debug", "message", "cycle status is up to date")
 			r.logger.LogCtx(ctx, "level", "debug", "message", "canceling resource")
 			return nil
 		}
