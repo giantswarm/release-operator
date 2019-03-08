@@ -19,6 +19,10 @@ type Config struct {
 // Resource sets "release-operator.giantswarm.io/release-cycle-phase" on the
 // observed CR. The value is taken from .Status.Cycle.Phase. This is to allow
 // selecting non-EOL Release CRs efficiently using label selector.
+//
+// Label resource and status resource are separated to be able to cancel
+// reconciliation independently. There are two requests one to update stats and
+// second to update labels which generate separate events.
 type Resource struct {
 	g8sClient versioned.Interface
 	k8sClient kubernetes.Interface
