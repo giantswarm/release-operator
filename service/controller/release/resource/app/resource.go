@@ -8,8 +8,6 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"k8s.io/client-go/kubernetes"
-
-	"github.com/giantswarm/release-operator/pkg/controller/resource/app"
 )
 
 const (
@@ -38,8 +36,6 @@ func New(config Config) (*Resource, error) {
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
-
-	c := app.Config{}
 
 	r := &Resource{
 		g8sClient: config.G8sClient,

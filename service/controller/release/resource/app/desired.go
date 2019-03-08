@@ -60,7 +60,7 @@ func (r *resourceStateGetter) getDesiredComponents(ctx context.Context, cr *rele
 	var activeReleases []releasev1alpha1.Release
 	{
 		opts := metav1.ListOptions{
-			LabelSelector: key.LabelReleaseCyclePhase + "!=" + releasev1alpha1.CyclePhaseEOL,
+			LabelSelector: key.LabelReleaseCyclePhase + "!=" + releasev1alpha1.CyclePhaseEOL.String(),
 		}
 
 		result, err := r.g8sClient.ReleaseV1alpha1().Releases("").List(opts)
@@ -76,7 +76,7 @@ func (r *resourceStateGetter) getDesiredComponents(ctx context.Context, cr *rele
 	// If this an EOL release only components that are also part of other
 	// non-EOL (active) releases are desired.
 	for _, activeCR := range activeReleases {
-		cs := componentIntersection(cr, activeCR)
+		cs := componentIntersection(cr, &activeCR)
 		desiredComponents = append(desiredComponents, cs...)
 	}
 
