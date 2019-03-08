@@ -49,7 +49,7 @@ func (r *resourceStateGetter) GetDesiredState(ctx context.Context, obj interface
 
 func (r *resourceStateGetter) getDesiredComponents(ctx context.Context, cr *releasev1alpha1.Release) ([]releasev1alpha1.ReleaseSpecComponent, error) {
 	// TODO unit-test short path.
-	// If this is non-EOL release and it isn't deletion event all
+	// If this is a non-EOL release and it isn't deletion event all
 	// components of that release are desired.
 	cr.GetDeletionTimestamp()
 	if cr.Status.Cycle.Phase != releasev1alpha1.CyclePhaseEOL && !key.IsDeleted(cr) {
@@ -57,28 +57,24 @@ func (r *resourceStateGetter) getDesiredComponents(ctx context.Context, cr *rele
 	}
 
 	// TODO unit-test long path.
-	// TODO This is very suboptimal and likely to cause problems in the
-	// future. All Release CRs CRs are listed every time for all EOL
-	// releases. More EOL releases we have this becomes worse. We should
-	// optimize it with some sort of caching or labelling.
-	var activeReleases []*releasev1alpha1.Release
+	var activeReleases []releasev1alpha1.Release
 	{
-		result, err := r.g8sClient.ReleaseV1alpha1().Releases("").List(metav1.ListOptions{})
+		opts := metav1.ListOptions{
+			LabelSelector: key.LabelReleaseCyclePhase + "!=" + releasev1alpha1.CyclePhaseEOL,
+		}
+
+		result, err := r.g8sClient.ReleaseV1alpha1().Releases("").List(opts)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 
-		for _, cr := range result.Items {
-			if cr.Status.Cycle.Phase == releasev1alpha1.CyclePhaseEOL {
-				continue
-			}
-
-			activeReleases = append(activeReleases, &cr)
-		}
+		activeReleases = result.Items
 	}
 
 	var desiredComponents []releasev1alpha1.ReleaseSpecComponent
 
+	// If this an EOL release only components that are also part of other
+	// non-EOL (active) releases are desired.
 	for _, activeCR := range activeReleases {
 		cs := componentIntersection(cr, activeCR)
 		desiredComponents = append(desiredComponents, cs...)
