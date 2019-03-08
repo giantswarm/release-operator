@@ -21,8 +21,8 @@ type Config struct {
 // selecting non-EOL Release CRs efficiently using label selector.
 //
 // Label resource and status resource are separated to be able to cancel
-// reconciliation independently. There are two requests one to update stats and
-// second to update labels which generate separate events.
+// reconciliation independently. There are two requests one to update status
+// and second to update labels which generate separate events.
 type Resource struct {
 	g8sClient versioned.Interface
 	k8sClient kubernetes.Interface
