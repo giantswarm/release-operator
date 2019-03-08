@@ -57,7 +57,6 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 	{
 		c := app.Config{
 			G8sClient: config.G8sClient,
-			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
 		}
 

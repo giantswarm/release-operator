@@ -12,7 +12,7 @@ import (
 	"github.com/giantswarm/release-operator/service/controller/key"
 )
 
-func (r *resourceStateGetter) GetCurrentState(ctx context.Context, obj interface{}) (interface{}, error) {
+func (r *resourceStateGetter) GetCurrentState(ctx context.Context, obj interface{}) ([]*applicationv1alpha1.App, error) {
 	cr, err := key.ToReleaseCR(obj)
 	if err != nil {
 		return nil, microerror.Mask(err)
