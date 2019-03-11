@@ -48,7 +48,6 @@ func (r *resourceStateGetter) GetDesiredState(ctx context.Context, obj interface
 }
 
 func (r *resourceStateGetter) getDesiredComponents(ctx context.Context, cr *releasev1alpha1.Release) ([]releasev1alpha1.ReleaseSpecComponent, error) {
-	// TODO unit-test short path.
 	// If this is a non-EOL release and it isn't deletion event all
 	// components of that release are desired.
 	cr.GetDeletionTimestamp()
@@ -56,7 +55,6 @@ func (r *resourceStateGetter) getDesiredComponents(ctx context.Context, cr *rele
 		return cr.Spec.Components, nil
 	}
 
-	// TODO unit-test long path.
 	var activeReleases []releasev1alpha1.Release
 	{
 		opts := metav1.ListOptions{
