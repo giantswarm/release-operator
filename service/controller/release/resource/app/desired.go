@@ -50,7 +50,6 @@ func (r *resourceStateGetter) GetDesiredState(ctx context.Context, obj interface
 func (r *resourceStateGetter) getDesiredComponents(ctx context.Context, cr *releasev1alpha1.Release) ([]releasev1alpha1.ReleaseSpecComponent, error) {
 	// If this is a non-EOL release and it isn't deletion event all
 	// components of that release are desired.
-	cr.GetDeletionTimestamp()
 	if cr.Status.Cycle.Phase != releasev1alpha1.CyclePhaseEOL && !key.IsDeleted(cr) {
 		return cr.Spec.Components, nil
 	}
