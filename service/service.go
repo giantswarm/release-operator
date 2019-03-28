@@ -111,6 +111,8 @@ func New(config Config) (*Service, error) {
 			G8sClient:    g8sClient,
 			K8sClient:    k8sClient,
 			K8sExtClient: k8sExtClient,
+
+			AppCatalog: config.Viper.GetString(config.Flag.Release.AppCatalog),
 		}
 
 		releaseController, err = controller.NewRelease(c)

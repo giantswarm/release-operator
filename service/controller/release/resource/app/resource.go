@@ -69,7 +69,10 @@ func New(config Config) (controller.Resource, error) {
 			Ops:    appResource,
 		}
 
-		controller.NewCRUDResource(c)
+		r, err = controller.NewCRUDResource(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
 	}
 
 	return r, nil
