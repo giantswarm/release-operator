@@ -65,7 +65,7 @@ func (r *resourceStateGetter) getDesiredComponents(ctx context.Context, cr *rele
 			LabelSelector: key.LabelReleaseCyclePhase + "!=" + releasev1alpha1.CyclePhaseEOL.String(),
 		}
 
-		result, err := r.g8sClient.ReleaseV1alpha1().Releases("").List(opts)
+		result, err := r.g8sClient.ReleaseV1alpha1().Releases().List(opts)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
