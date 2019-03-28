@@ -22,17 +22,17 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 	var releaseCycleCR *releasev1alpha1.ReleaseCycle
 	{
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("finding ReleaseCycle CR %#q in namespace %#q", cr.Name, cr.Namespace))
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("finding ReleaseCycle CR %#q", cr.Name))
 
-		// Release CR and corresponding ReleaseCycle CR have the same name and namespace.
-		releaseCycleCR, err = r.g8sClient.ReleaseV1alpha1().ReleaseCycles(cr.GetNamespace()).Get(cr.GetName(), metav1.GetOptions{})
+		// Release CR and corresponding ReleaseCycle CR have the same name.
+		releaseCycleCR, err = r.g8sClient.ReleaseV1alpha1().ReleaseCycles().Get(cr.GetName(), metav1.GetOptions{})
 		if apierrors.IsNotFound(err) {
 			releaseCycleCR = nil
-			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("did not find ReleaseCycle CR %#q in namespace %#q", cr.Name, cr.Namespace))
+			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("did not find ReleaseCycle CR %#q", cr.Name))
 		} else if err != nil {
 			return microerror.Mask(err)
 		} else {
-			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found ReleaseCycle CR %#q in namespace %#q", cr.Name, cr.Namespace))
+			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found ReleaseCycle CR %#q", cr.Name))
 		}
 	}
 
@@ -61,7 +61,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	{
 		r.logger.LogCtx(ctx, "level", "debug", "message", "finding the latest version of custom resource")
 
-		cr, err = r.g8sClient.ReleaseV1alpha1().Releases(cr.GetNamespace()).Get(cr.GetName(), metav1.GetOptions{})
+		cr, err = r.g8sClient.ReleaseV1alpha1().Releases().Get(cr.GetName(), metav1.GetOptions{})
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -78,7 +78,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			cr.Status.Cycle = releaseCycleCR.Spec
 		}
 
-		_, err = r.g8sClient.ReleaseV1alpha1().Releases(cr.GetNamespace()).UpdateStatus(cr)
+		_, err = r.g8sClient.ReleaseV1alpha1().Releases().UpdateStatus(cr)
 		if err != nil {
 			return microerror.Mask(err)
 		}
