@@ -54,7 +54,7 @@ func NewRelease(config ReleaseConfig) (*Release, error) {
 	{
 		c := informer.Config{
 			Logger:  config.Logger,
-			Watcher: config.G8sClient.Release().Releases(""),
+			Watcher: config.G8sClient.Release().Releases(),
 
 			RateWait:     informer.DefaultRateWait,
 			ResyncPeriod: informer.DefaultResyncPeriod,

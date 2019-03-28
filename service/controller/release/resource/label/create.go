@@ -36,7 +36,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	{
 		r.logger.LogCtx(ctx, "level", "debug", "message", "finding the latest version of custom resource")
 
-		cr, err = r.g8sClient.ReleaseV1alpha1().Releases(cr.GetNamespace()).Get(cr.GetName(), metav1.GetOptions{})
+		cr, err = r.g8sClient.ReleaseV1alpha1().Releases().Get(cr.GetName(), metav1.GetOptions{})
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -55,7 +55,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 		cr.Labels = desiredLabels
 
-		_, err = r.g8sClient.ReleaseV1alpha1().Releases(cr.GetNamespace()).Update(cr)
+		_, err = r.g8sClient.ReleaseV1alpha1().Releases().Update(cr)
 		if err != nil {
 			return microerror.Mask(err)
 		}
