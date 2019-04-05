@@ -52,7 +52,7 @@ func (r *Resource) newUpdateChange(ctx context.Context, obj, currentState, desir
 			}
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("computed %d App CRs to update", appCRsToUpdate))
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("computed %d App CRs to update", len(appCRsToUpdate)))
 	}
 
 	return appCRsToUpdate, nil
