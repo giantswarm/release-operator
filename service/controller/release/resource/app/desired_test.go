@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"strconv"
 	"testing"
+	"time"
 
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned/fake"
@@ -105,6 +106,104 @@ func Test_resourceStateGetter_getDesiredComponents(t *testing.T) {
 						Name: "r1",
 						Labels: map[string]string{
 							"release-operator.giantswarm.io/release-cycle-phase": "upcoming",
+						},
+					},
+					Spec: releasev1alpha1.ReleaseSpec{
+						Components: []releasev1alpha1.ReleaseSpecComponent{
+							{
+								Name:    "c2",
+								Version: "v2",
+							},
+						},
+					},
+				},
+			},
+			inputRelease: &releasev1alpha1.Release{
+				Spec: releasev1alpha1.ReleaseSpec{
+					Components: []releasev1alpha1.ReleaseSpecComponent{
+						{
+							Name:    "c1",
+							Version: "v1",
+						},
+						{
+							Name:    "c2",
+							Version: "v2",
+						},
+						{
+							Name:    "c3",
+							Version: "v3",
+						},
+					},
+				},
+				Status: releasev1alpha1.ReleaseStatus{
+					Cycle: releasev1alpha1.ReleaseCycleSpec{
+						Phase: releasev1alpha1.CyclePhaseEOL,
+					},
+				},
+			},
+			expectedComponents: []releasev1alpha1.ReleaseSpecComponent{
+				{
+					Name:    "c2",
+					Version: "v2",
+				},
+			},
+			errorMatcher: nil,
+		},
+		{
+			name:                  "case 3: simple marked as deleted",
+			inputExistingReleases: nil,
+			inputRelease: &releasev1alpha1.Release{
+				ObjectMeta: metav1.ObjectMeta{
+					// DeletionTimestamp is set so it should be ignored.
+					DeletionTimestamp: &metav1.Time{Time: time.Date(2019, 4, 5, 12, 0, 0, 0, time.UTC)},
+				},
+				Spec: releasev1alpha1.ReleaseSpec{
+					Components: []releasev1alpha1.ReleaseSpecComponent{
+						{
+							Name:    "c1",
+							Version: "v1",
+						},
+						{
+							Name:    "c2",
+							Version: "v2",
+						},
+					},
+				},
+				Status: releasev1alpha1.ReleaseStatus{
+					Cycle: releasev1alpha1.ReleaseCycleSpec{
+						Phase: releasev1alpha1.CyclePhaseEnabled,
+					},
+				},
+			},
+			expectedComponents: nil,
+			errorMatcher:       nil,
+		},
+		{
+			name: "case 4: complex marked as deleted",
+			inputExistingReleases: []*releasev1alpha1.Release{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						// DeletionTimestamp is set so this one should be ignored.
+						DeletionTimestamp: &metav1.Time{Time: time.Date(2019, 4, 5, 12, 0, 0, 0, time.UTC)},
+						Name:              "r0",
+						Labels: map[string]string{
+							"release-operator.giantswarm.io/release-cycle-phase": "enabled",
+						},
+					},
+					Spec: releasev1alpha1.ReleaseSpec{
+						Components: []releasev1alpha1.ReleaseSpecComponent{
+							{
+								Name:    "c1",
+								Version: "v1",
+							},
+						},
+					},
+				},
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "r1",
+						Labels: map[string]string{
+							"release-operator.giantswarm.io/release-cycle-phase": "enabled",
 						},
 					},
 					Spec: releasev1alpha1.ReleaseSpec{

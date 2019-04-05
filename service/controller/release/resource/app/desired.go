@@ -70,7 +70,13 @@ func (r *resourceStateGetter) getDesiredComponents(ctx context.Context, cr *rele
 			return nil, microerror.Mask(err)
 		}
 
-		activeReleases = result.Items
+		for _, r := range result.Items {
+			if key.IsDeleted(&r) {
+				continue
+			}
+
+			activeReleases = append(activeReleases, r)
+		}
 	}
 
 	var desiredComponents []releasev1alpha1.ReleaseSpecComponent
