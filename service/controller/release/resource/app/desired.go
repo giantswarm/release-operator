@@ -89,7 +89,8 @@ func newAppCR(crName, appName, appVersion, appCatalog string) *applicationv1alph
 	appCR := &applicationv1alpha1.App{
 		TypeMeta: applicationv1alpha1.NewAppTypeMeta(),
 		ObjectMeta: metav1.ObjectMeta{
-			Name: crName,
+			Name:      crName,
+			Namespace: key.Namespace,
 			Labels: map[string]string{
 				key.LabelAppOperatorVersion: project.Version(),
 				key.LabelManagedBy:          project.Name(),
