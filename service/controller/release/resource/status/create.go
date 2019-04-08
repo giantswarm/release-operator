@@ -47,7 +47,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			return nil
 		}
 
-		if reflect.DeepEqual(cr.Status.Cycle, releaseCycleCR.Spec) {
+		if releaseCycleCR != nil && reflect.DeepEqual(cr.Status.Cycle, releaseCycleCR.Spec) {
 			r.logger.LogCtx(ctx, "level", "debug", "message", "found custom resource status does not need to be updated")
 
 			r.logger.LogCtx(ctx, "level", "debug", "message", "cycle status is up to date")

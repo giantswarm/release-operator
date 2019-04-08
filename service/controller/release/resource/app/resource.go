@@ -1,12 +1,13 @@
 package app
 
 import (
-	"context"
-
+	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"k8s.io/client-go/kubernetes"
+	"github.com/giantswarm/operatorkit/controller"
+
+	"github.com/giantswarm/release-operator/pkg/controller/resource/app"
 )
 
 const (
@@ -15,44 +16,68 @@ const (
 
 type Config struct {
 	G8sClient versioned.Interface
-	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
+
+	AppCatalog string
 }
 
-type Resource struct {
-	g8sClient versioned.Interface
-	k8sClient kubernetes.Interface
-	logger    micrologger.Logger
-}
-
-func New(config Config) (*Resource, error) {
+// New returns a resource creating/updating App CRs for components in non-EOL
+// releases and deleting App CRs for components in EOL releases. App CRs for
+// components existing in both EOL and non-EOL releases are not deleted by the
+// returned resource.
+func New(config Config) (controller.Resource, error) {
 	if config.G8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.G8sClient must not be empty", config)
-	}
-	if config.K8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
 	}
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
 
-	r := &Resource{
+	if config.AppCatalog == "" {
+		return nil, microerror.Maskf(invalidConfigError, "%T.AppCatalog must not be empty", config)
+	}
+
+	var err error
+
+	stateGetter := &resourceStateGetter{
 		g8sClient: config.G8sClient,
-		k8sClient: config.K8sClient,
 		logger:    config.Logger,
+
+		appCatalog: config.AppCatalog,
+	}
+
+	var appResource *app.Resource
+	{
+		c := app.Config{
+			G8sClient:   config.G8sClient,
+			Logger:      config.Logger,
+			StateGetter: stateGetter,
+
+			Name: Name,
+		}
+
+		appResource, err = app.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
+	var r *controller.CRUDResource
+	{
+		c := controller.CRUDResourceConfig{
+			Logger: config.Logger,
+			Ops:    appResource,
+		}
+
+		r, err = controller.NewCRUDResource(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
 	}
 
 	return r, nil
 }
 
-func (r *Resource) Name() string {
-	return Name
-}
-
-func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
-	return nil
-}
-
-func (r *Resource) EnsureDeleted(ctx context.Context, obj interface{}) error {
-	return nil
+func appCRName(c releasev1alpha1.ReleaseSpecComponent) string {
+	return c.Name + "." + c.Version
 }
