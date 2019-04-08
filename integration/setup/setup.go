@@ -53,9 +53,9 @@ func WrapTestMain(h *framework.Host, helmClient *helmclient.Client, l micrologge
 		v = m.Run()
 	}
 
-	if env.KeepResources() != "true" {
+	if !env.KeepResources() {
 		// Only do full teardown when not on CI.
-		if env.CircleCI() != "true" {
+		if !env.CircleCI() {
 			err := teardown.Teardown(h, helmClient)
 			if err != nil {
 				errors = append(errors, err)
