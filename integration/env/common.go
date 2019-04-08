@@ -1,7 +1,6 @@
 package env
 
 import (
-	"crypto/sha1"
 	"fmt"
 	"os"
 	"strings"
@@ -56,32 +55,6 @@ func CircleCI() bool {
 
 func CircleSHA() string {
 	return circleSHA
-}
-
-// ClusterID returns a cluster ID unique to a run integration test. It might
-// look like ci-3cc75-5e958.
-//
-//     - ci is a static identifier stating a CI run.
-//     - 3cc75 is the Git SHA.
-//     - 5e958 is a hash of the integration test dir.
-//
-// NOTE: If a test requires multiple clusters this value should be used as
-// a cluster ID prefix.
-func ClusterID() string {
-	var parts []string
-
-	var testHash string
-	{
-		h := sha1.New()
-		h.Write([]byte(TestDir()))
-		testHash = fmt.Sprintf("%x", h.Sum(nil))[0:5]
-	}
-
-	parts = append(parts, "ci")
-	parts = append(parts, CircleSHA()[0:5])
-	parts = append(parts, testHash)
-
-	return strings.Join(parts, "-")
 }
 
 func KeepResources() bool {
