@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"time"
+
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
@@ -59,7 +61,7 @@ func NewRelease(config ReleaseConfig) (*Release, error) {
 			Watcher: config.G8sClient.Release().Releases(),
 
 			RateWait:     informer.DefaultRateWait,
-			ResyncPeriod: informer.DefaultResyncPeriod,
+			ResyncPeriod: 2 * time.Minute,
 		}
 
 		newInformer, err = informer.New(c)
