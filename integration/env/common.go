@@ -50,7 +50,7 @@ func init() {
 }
 
 func CircleCI() bool {
-	return strings.ToLower(circleCI) =="true"
+	return strings.ToLower(circleCI) == "true"
 }
 
 func CircleSHA() string {
