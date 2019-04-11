@@ -156,7 +156,7 @@
     "pkg/harness",
   ]
   pruneopts = "UT"
-  revision = "5a101474fa6d784552bf4cc9bf620bcfed13a7b2"
+  revision = "bf99ab87d641c54adbc3693dfaf7ce7fe89bd725"
 
 [[projects]]
   branch = "master"
@@ -259,7 +259,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:2d1f3fc41fd8f55225233dce260827bbf1fa3425d758cdfe572f168da6e8cc55"
+  digest = "1:06d85b7a32fefc8d774db32228e925c01fc7d95b209486d135cb51ccddcaf6c1"
   name = "github.com/giantswarm/operatorkit"
   packages = [
     "client/k8scrdclient",
@@ -279,7 +279,7 @@
     "informer/collector",
   ]
   pruneopts = "UT"
-  revision = "3eee778ada56b5947a0e2631aad5ad608a6ac1cd"
+  revision = "dc60ddf19e89ce0a1ade4a52e94258734bf82dab"
 
 [[projects]]
   branch = "master"
