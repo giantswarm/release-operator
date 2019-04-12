@@ -10,6 +10,7 @@ const (
 	EnvVarCircleCI           = "CIRCLECI"
 	EnvVarCircleSHA          = "CIRCLE_SHA1"
 	EnvVarE2EKeepResources   = "E2E_KEEP_RESOURCES"
+	EnvVarE2EKubeconfig      = "E2E_KUBECONFIG"
 	EnvVarE2ETestDir         = "E2E_TEST_DIR"
 	EnvVarGithubBotToken     = "GITHUB_BOT_TOKEN"
 	EnvVarRegistryPullSecret = "REGISTRY_PULL_SECRET"
@@ -20,6 +21,7 @@ var (
 	circleSHA          string
 	githubToken        string
 	keepResources      string
+	kubeconfig         string
 	registryPullSecret string
 	testDir            string
 )
@@ -27,6 +29,7 @@ var (
 func init() {
 	circleCI = os.Getenv(EnvVarCircleCI)
 	keepResources = os.Getenv(EnvVarE2EKeepResources)
+	kubeconfig = os.Getenv(EnvVarE2EKubeconfig)
 
 	circleSHA = os.Getenv(EnvVarCircleSHA)
 	if circleSHA == "" {
@@ -59,6 +62,10 @@ func CircleSHA() string {
 
 func KeepResources() bool {
 	return keepResources == strings.ToLower("true")
+}
+
+func KubeConfigPath() string {
+	return kubeconfig
 }
 
 func GithubToken() string {
