@@ -8,6 +8,4 @@ import (
 type resourceStateGetter struct {
 	g8sClient versioned.Interface
 	logger    micrologger.Logger
-
-	appCatalog string
 }

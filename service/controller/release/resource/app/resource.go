@@ -17,8 +17,6 @@ const (
 type Config struct {
 	G8sClient versioned.Interface
 	Logger    micrologger.Logger
-
-	AppCatalog string
 }
 
 // New returns a resource creating/updating App CRs for components in non-EOL
@@ -33,17 +31,11 @@ func New(config Config) (controller.Resource, error) {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
 
-	if config.AppCatalog == "" {
-		return nil, microerror.Maskf(invalidConfigError, "%T.AppCatalog must not be empty", config)
-	}
-
 	var err error
 
 	stateGetter := &resourceStateGetter{
 		g8sClient: config.G8sClient,
 		logger:    config.Logger,
-
-		appCatalog: config.AppCatalog,
 	}
 
 	var appResource *app.Resource

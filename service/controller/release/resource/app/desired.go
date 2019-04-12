@@ -37,7 +37,7 @@ func (r *resourceStateGetter) GetDesiredState(ctx context.Context, obj interface
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("computing desired app CRs for release %#q components", cr.Name))
 
 		for _, c := range desiredComponents {
-			appCR := newAppCR(appCRName(c), c.Name, c.Version, r.appCatalog)
+			appCR := newAppCR(appCRName(c), c.Name, c.Version, key.AppCatalog)
 			desiredAppCRs = append(desiredAppCRs, appCR)
 		}
 
