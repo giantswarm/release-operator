@@ -50,7 +50,7 @@ func NewConfig() (Config, error) {
 	var k8sSetup *k8s.Setup
 	{
 		c := k8s.SetupConfig{
-			K8sClient: host.K8sClient(),
+			K8sClient: k8sClients.K8sClient(),
 			Logger:    logger,
 		}
 
@@ -64,9 +64,9 @@ func NewConfig() (Config, error) {
 	{
 		c := helmclient.Config{
 			Logger:    logger,
-			K8sClient: host.K8sClient(),
+			K8sClient: k8sClients.K8sClient(),
 
-			RestConfig:      host.RestConfig(),
+			RestConfig:      k8sClients.RestConfig(),
 			TillerNamespace: tillerNamespace,
 		}
 
@@ -79,10 +79,10 @@ func NewConfig() (Config, error) {
 	var newRelease *release.Release
 	{
 		c := release.Config{
-			ExtClient:  host.ExtClient(),
-			G8sClient:  host.G8sClient(),
+			ExtClient:  k8sClients.ExtClient(),
+			G8sClient:  k8sClients.G8sClient(),
 			HelmClient: helmClient,
-			K8sClient:  host.K8sClient(),
+			K8sClient:  k8sClients.K8sClient(),
 			Logger:     logger,
 
 			Namespace: namespace,

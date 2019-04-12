@@ -22,7 +22,7 @@ func Setup(m *testing.M, config Config) {
 
 	v, err := setup(ctx, m, config)
 	if err != nil {
-		config.logger.LogCtx(ctx, "level", "error", "message", "failed to setup test environment", "stack", fmt.Sprintf("%#v", err))
+		config.Logger.LogCtx(ctx, "level", "error", "message", "failed to setup test environment", "stack", fmt.Sprintf("%#v", err))
 		os.Exit(1)
 	}
 
@@ -30,20 +30,20 @@ func Setup(m *testing.M, config Config) {
 }
 
 func setup(ctx context.Context, m *testing.M, config Config) (int, error) {
-	ctx := context.Background()
+	var err error
 
 	// Create namespace.
 	{
-		err := config.K8sSetup.EnsureNamespaceCreated(key.Namespace)
+		err := config.K8sSetup.EnsureNamespaceCreated(ctx, key.Namespace)
 		if err != nil {
-			return microerror.Mask(err)
+			return 0, microerror.Mask(err)
 		}
 
 		if !env.CircleCI() && !env.KeepResources() {
 			defer func() {
-				err := config.K8sSetup.EnsureNamespaceDeleted(key.Namespace)
+				err := config.K8sSetup.EnsureNamespaceDeleted(ctx, key.Namespace)
 				if err != nil {
-					receiver.logger.LogCtx(ctx, "level", "error", "message", fmt.Sprintf("failed to delete namespace %#q", key.Namespace), "stack", fmt.Sprintf("%#v", err))
+					config.Logger.LogCtx(ctx, "level", "error", "message", fmt.Sprintf("failed to delete namespace %#q", key.Namespace), "stack", fmt.Sprintf("%#v", err))
 				}
 			}()
 		}
@@ -62,7 +62,7 @@ func setup(ctx context.Context, m *testing.M, config Config) (int, error) {
 
 			values, err = chartvalues.NewReleaseOperator(c)
 			if err != nil {
-				return microerror.Mask(err)
+				return 0, microerror.Mask(err)
 			}
 		}
 
@@ -73,7 +73,7 @@ func setup(ctx context.Context, m *testing.M, config Config) (int, error) {
 
 		err = config.Release.EnsureInstalled(ctx, releaseName, chartInfo, values, installConditions...)
 		if err != nil {
-			return microerror.Mask(err)
+			return 0, microerror.Mask(err)
 		}
 
 		if !env.CircleCI() && !env.KeepResources() {
@@ -85,12 +85,12 @@ func setup(ctx context.Context, m *testing.M, config Config) (int, error) {
 
 				err := config.Release.EnsureDeleted(ctx, releaseName, deleteConditions...)
 				if err != nil {
-					receiver.logger.LogCtx(ctx, "level", "error", "message", fmt.Sprintf("failed to delete helm release %#q", releaseName), "stack", fmt.Sprintf("%#v", err))
+					config.Logger.LogCtx(ctx, "level", "error", "message", fmt.Sprintf("failed to delete helm release %#q", releaseName), "stack", fmt.Sprintf("%#v", err))
 				}
 			}()
 		}
 	}
 
 	v := m.Run()
-	return v
+	return v, nil
 }

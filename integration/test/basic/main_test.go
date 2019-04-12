@@ -18,7 +18,7 @@ var (
 func init() {
 	err := initMainTest()
 	if err != nil {
-		return panic(fmt.Sprintf("%#v", err))
+		panic(fmt.Sprintf("%#v", err))
 	}
 }
 
@@ -31,6 +31,8 @@ func initMainTest() error {
 			return microerror.Mask(err)
 		}
 	}
+
+	return nil
 }
 
 // TestMain allows us to have common setup and teardown steps that are run

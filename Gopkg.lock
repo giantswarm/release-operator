@@ -140,6 +140,14 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:2810bd14b69c6b38eddb5d6d34c2ee89ad9c8d67eb528794b12584202e7510ff"
+  name = "github.com/giantswarm/apprclient"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "4615b197120e48c20818898c04df0845b0bf15c9"
+
+[[projects]]
+  branch = "master"
   digest = "1:ab67fdefbc890c7880ffc2904048d7b9d14e29ebc716f8d637a17b16bb91d9e6"
   name = "github.com/giantswarm/backoff"
   packages = ["."]
@@ -148,15 +156,23 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:112bd84416da1b0dfc2d7aef1e8c4fec0f36de592c6d0f350e8085e3afa9212a"
+  digest = "1:9f466a354564c164ee1a68817464e39d97ad0c7080ab775e2adce12e3a475a67"
   name = "github.com/giantswarm/e2e-harness"
   packages = [
     "internal/filelogger",
-    "pkg/framework",
     "pkg/harness",
+    "pkg/release",
   ]
   pruneopts = "UT"
-  revision = "bf99ab87d641c54adbc3693dfaf7ce7fe89bd725"
+  revision = "130ef056aaf90dba4f3500d76c073236eaa379b9"
+
+[[projects]]
+  branch = "master"
+  digest = "1:1aa4cc4501c54834108fd38587e57b1658374939b9a4ab9a4d8f99322bc6187b"
+  name = "github.com/giantswarm/e2esetup"
+  packages = ["k8s"]
+  pruneopts = "UT"
+  revision = "5b8be38d61b1afe5bf17cb5600599cadbe3feca8"
 
 [[projects]]
   branch = "master"
@@ -395,22 +411,6 @@
   pruneopts = "UT"
   revision = "3af367b6b30c263d47e8895973edcca9a49cf029"
   version = "v0.2.0"
-
-[[projects]]
-  branch = "master"
-  digest = "1:ddc1d6ec130e02866113a9ad7c37dee62bd5c28251130894dc748f77040c201e"
-  name = "github.com/google/go-github"
-  packages = ["github"]
-  pruneopts = "UT"
-  revision = "d5a4c1154960c22fead755a9c1af734bfef9ea3e"
-
-[[projects]]
-  digest = "1:a63cff6b5d8b95638bfe300385d93b2a6d9d687734b863da8e09dc834510a690"
-  name = "github.com/google/go-querystring"
-  packages = ["query"]
-  pruneopts = "UT"
-  revision = "44c6ddd0a2342c386950e880b658017258da92fc"
-  version = "v1.0.0"
 
 [[projects]]
   digest = "1:a6181aca1fd5e27103f9a920876f29ac72854df7345a39f3b01e61c8c94cc8af"
@@ -1142,22 +1142,6 @@
   version = "v0.2.0"
 
 [[projects]]
-  digest = "1:0761d08cbab7345aa2b7715073879dde6235aaa5671adcab409a91da67b97b8b"
-  name = "k8s.io/kube-aggregator"
-  packages = [
-    "pkg/apis/apiregistration",
-    "pkg/apis/apiregistration/v1",
-    "pkg/apis/apiregistration/v1beta1",
-    "pkg/client/clientset_generated/clientset",
-    "pkg/client/clientset_generated/clientset/scheme",
-    "pkg/client/clientset_generated/clientset/typed/apiregistration/v1",
-    "pkg/client/clientset_generated/clientset/typed/apiregistration/v1beta1",
-  ]
-  pruneopts = "UT"
-  revision = "6d5b1d3d0e40676e77c55b4305e54d0d06ba6f7a"
-  version = "kubernetes-1.13.2"
-
-[[projects]]
   branch = "master"
   digest = "1:22abb5d4204ab1a0dcc9cda64906a31c43965ff5159e8b9f766c9d2a162dbed5"
   name = "k8s.io/kube-openapi"
@@ -1182,7 +1166,8 @@
     "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1",
     "github.com/giantswarm/apiextensions/pkg/clientset/versioned",
     "github.com/giantswarm/apiextensions/pkg/clientset/versioned/fake",
-    "github.com/giantswarm/e2e-harness/pkg/framework",
+    "github.com/giantswarm/e2e-harness/pkg/release",
+    "github.com/giantswarm/e2esetup/k8s",
     "github.com/giantswarm/e2etemplates/pkg/chartvalues",
     "github.com/giantswarm/helmclient",
     "github.com/giantswarm/microendpoint/endpoint/healthz",
