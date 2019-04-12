@@ -3,6 +3,7 @@
 package setup
 
 import (
+	"github.com/giantswarm/e2e-harness/pkg/harness"
 	"github.com/giantswarm/e2e-harness/pkg/release"
 	"github.com/giantswarm/e2esetup/k8s"
 	"github.com/giantswarm/helmclient"
