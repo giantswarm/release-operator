@@ -47,7 +47,7 @@ func (r *Resource) newAppCR(name, repository, version string) *applicationv1alph
 			},
 		},
 		Spec: applicationv1alpha1.AppSpec{
-			Catalog: r.appCatalog,
+			Catalog: key.AppCatalog,
 			KubeConfig: applicationv1alpha1.AppSpecKubeConfig{
 				InCluster: true,
 			},

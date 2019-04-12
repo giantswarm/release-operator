@@ -21,8 +21,6 @@ type Config struct {
 	G8sClient versioned.Interface
 	K8sClient kubernetes.Interface
 	Logger    micrologger.Logger
-
-	AppCatalog string
 }
 
 // Resource implements the app resource.
@@ -36,8 +34,6 @@ type Resource struct {
 	g8sClient versioned.Interface
 	k8sClient kubernetes.Interface
 	logger    micrologger.Logger
-
-	appCatalog string
 }
 
 // New creates a new configured app resource.
@@ -52,16 +48,10 @@ func New(config Config) (*Resource, error) {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
 
-	if config.AppCatalog == "" {
-		return nil, microerror.Maskf(invalidConfigError, "%T.AppCatalog must not be empty", config)
-	}
-
 	r := &Resource{
 		g8sClient: config.G8sClient,
 		k8sClient: config.K8sClient,
 		logger:    config.Logger,
-
-		appCatalog: config.AppCatalog,
 	}
 
 	return r, nil
