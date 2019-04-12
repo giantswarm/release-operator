@@ -26,8 +26,6 @@ type ReleaseConfig struct {
 	K8sClient    kubernetes.Interface
 	K8sExtClient apiextensionsclient.Interface
 	Logger       micrologger.Logger
-
-	AppCatalog string
 }
 
 type Release struct {
@@ -76,8 +74,6 @@ func NewRelease(config ReleaseConfig) (*Release, error) {
 			G8sClient: config.G8sClient,
 			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
-
-			AppCatalog: config.AppCatalog,
 		}
 
 		resourceSet, err = release.NewResourceSet(c)

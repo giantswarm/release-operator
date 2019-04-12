@@ -3,13 +3,11 @@ package flag
 import (
 	"github.com/giantswarm/microkit/flag"
 
-	"github.com/giantswarm/release-operator/flag/release"
 	"github.com/giantswarm/release-operator/flag/service"
 )
 
 // Flag provides data structure for service command line flags.
 type Flag struct {
-	Release release.Release
 	Service service.Service
 }
 

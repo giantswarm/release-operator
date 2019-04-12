@@ -265,8 +265,6 @@ func Test_resourceStateGetter_getDesiredComponents(t *testing.T) {
 				stateGetter = &resourceStateGetter{
 					g8sClient: fakeG8sClient,
 					logger:    microloggertest.New(),
-
-					appCatalog: "test-app-catalog",
 				}
 			}
 
