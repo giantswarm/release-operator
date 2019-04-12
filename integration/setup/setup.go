@@ -90,7 +90,7 @@ func setup(ctx context.Context, m *testing.M, config Config) (int, error) {
 		if !env.CircleCI() && !env.KeepResources() {
 			defer func() {
 				deleteConditions := []release.ConditionFunc{
-					//config.Release.Condition().PodNotFond(ctx, podNamespace, podLabelSelector),
+					config.Release.Condition().PodNotFound(ctx, podNamespace, podLabelSelector),
 				}
 
 				err := config.Release.EnsureDeleted(ctx, releaseName, deleteConditions...)
