@@ -37,7 +37,7 @@ func (r *resourceStateGetter) GetDesiredState(ctx context.Context, obj interface
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("computing desired app CRs for release %#q components", cr.Name))
 
 		for _, c := range desiredComponents {
-			appCR := newAppCR(appCRName(c), c.Name, c.Version, key.AppCatalog)
+			appCR := newAppCR(appCRName(c), c.Name, c.Version)
 			desiredAppCRs = append(desiredAppCRs, appCR)
 		}
 
@@ -91,7 +91,7 @@ func (r *resourceStateGetter) getDesiredComponents(ctx context.Context, cr *rele
 	return desiredComponents, nil
 }
 
-func newAppCR(crName, appName, appVersion, appCatalog string) *applicationv1alpha1.App {
+func newAppCR(crName, appName, appVersion string) *applicationv1alpha1.App {
 	appCR := &applicationv1alpha1.App{
 		TypeMeta: applicationv1alpha1.NewAppTypeMeta(),
 		ObjectMeta: metav1.ObjectMeta{
@@ -104,7 +104,7 @@ func newAppCR(crName, appName, appVersion, appCatalog string) *applicationv1alph
 			},
 		},
 		Spec: applicationv1alpha1.AppSpec{
-			Catalog: appCatalog,
+			Catalog: key.AppCatalog,
 			KubeConfig: applicationv1alpha1.AppSpecKubeConfig{
 				InCluster: true,
 			},
