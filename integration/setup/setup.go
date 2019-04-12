@@ -49,6 +49,14 @@ func setup(ctx context.Context, m *testing.M, config Config) (int, error) {
 		}
 	}
 
+	// Install tiller.
+	{
+		err = config.HelmClient.EnsureTillerInstalled(ctx)
+		if err != nil {
+			return 0, microerror.Mask(err)
+		}
+	}
+
 	// Install release-operator.
 	{
 		releaseName := "release-operator"

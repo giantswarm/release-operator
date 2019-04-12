@@ -3,6 +3,7 @@
 package setup
 
 import (
+	"github.com/giantswarm/e2e-harness/pkg/harness"
 	"github.com/giantswarm/e2e-harness/pkg/release"
 	"github.com/giantswarm/e2esetup/k8s"
 	"github.com/giantswarm/helmclient"
@@ -16,6 +17,7 @@ const (
 )
 
 type Config struct {
+	HelmClient *helmclient.Client
 	K8sClients *k8s.Clients
 	K8sSetup   *k8s.Setup
 	Logger     micrologger.Logger
@@ -95,6 +97,7 @@ func NewConfig() (Config, error) {
 	}
 
 	c := Config{
+		HelmClient: helmClient,
 		K8sClients: k8sClients,
 		K8sSetup:   k8sSetup,
 		Logger:     logger,
