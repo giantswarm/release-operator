@@ -38,10 +38,6 @@ required = [
   branch = "master"
   name = "github.com/docker/distribution"
 
-[[override]]
-  branch = "release"
-  name = "github.com/giantswarm/e2e-harness"
-
 [[constraint]]
   branch = "master"
   name = "github.com/giantswarm/e2esetup"
