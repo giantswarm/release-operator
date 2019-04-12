@@ -10,6 +10,10 @@ import (
 )
 
 const (
+	// AppCatalog is the name of the app catalog where releases and release
+	// components are stored.
+	AppCatalog = "control-plane"
+
 	// Namespace is the namespace where App CRs are created.
 	Namespace = "giantswarm"
 
