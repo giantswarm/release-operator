@@ -61,6 +61,8 @@ func setup(ctx context.Context, m *testing.M, config Config) (int, error) {
 	{
 		releaseName := "release-operator"
 		chartInfo := release.NewChartInfo("release-operator-chart", env.CircleSHA())
+		podNamespace := "giantswarm"
+		podLabelSelector := "app=release-operator"
 
 		var values string
 		{
@@ -75,6 +77,7 @@ func setup(ctx context.Context, m *testing.M, config Config) (int, error) {
 		}
 
 		installConditions := []release.ConditionFunc{
+			config.Release.Condition().PodExists(ctx, podNamespace, podLabelSelector),
 			config.Release.Condition().CRDExists(ctx, releasev1alpha1.NewReleaseCRD()),
 			config.Release.Condition().CRDExists(ctx, releasev1alpha1.NewReleaseCycleCRD()),
 		}
@@ -87,8 +90,7 @@ func setup(ctx context.Context, m *testing.M, config Config) (int, error) {
 		if !env.CircleCI() && !env.KeepResources() {
 			defer func() {
 				deleteConditions := []release.ConditionFunc{
-					config.Release.Condition().CRDNotFound(ctx, releasev1alpha1.NewReleaseCRD()),
-					config.Release.Condition().CRDNotFound(ctx, releasev1alpha1.NewReleaseCycleCRD()),
+					//config.Release.Condition().PodNotFond(ctx, podNamespace, podLabelSelector),
 				}
 
 				err := config.Release.EnsureDeleted(ctx, releaseName, deleteConditions...)
