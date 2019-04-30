@@ -10,3 +10,4 @@ release-operator
 .e2e-harness
 
 integration/test/**/*-e2e
+integration/test/**/*-logs.txt
