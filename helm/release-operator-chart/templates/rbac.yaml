@@ -10,23 +10,19 @@ rules:
     verbs:
       - "*"
   - apiGroups:
-      - core.giantswarm.io
-    resources:
-      - chartconfigs
-    verbs:
-      - "*"
-  - apiGroups:
-      - core.giantswarm.io
+      - release.giantswarm.io
     resources:
       - releases
     verbs:
-      - get
-      - list
-      - patch
-      - update
-      - watch
+      - "*"
   - apiGroups:
-      - core.giantswarm.io
+      - release.giantswarm.io
+    resources:
+      - releasecycles
+    verbs:
+      - "*"
+  - apiGroups:
+      - release.giantswarm.io
     resources:
       - releases/status
     verbs:
@@ -34,13 +30,13 @@ rules:
       - patch
       - update
   - apiGroups:
-      - ""
+      - release.giantswarm.io
     resources:
-      - secrets
-      - configmaps
+      - releasecycles/status
     verbs:
-      - "get"
-      - "list"
+      - create
+      - patch
+      - update
   - nonResourceURLs:
       - "/"
       - "/healthz"
