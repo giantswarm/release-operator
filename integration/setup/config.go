@@ -61,8 +61,8 @@ func NewConfig() (Config, error) {
 	var k8sSetup *k8s.Setup
 	{
 		c := k8s.SetupConfig{
-			K8sClient: k8sClients.K8sClient(),
-			Logger:    logger,
+			Clients: k8sClients,
+			Logger:  logger,
 		}
 
 		k8sSetup, err = k8s.NewSetup(c)
