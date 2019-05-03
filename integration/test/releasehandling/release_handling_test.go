@@ -49,10 +49,6 @@ var releaseCR = &releasev1alpha1.Release{
 //	- Checks if the CR has ".status.cycle.phase: upcoming" status reconciled.
 //
 func TestReleaseHandling(t *testing.T) {
-	//
-	{
-	}
-
 	// Create the CR and make sure it doesn't have labels.
 	{
 		obj, err := config.K8sClients.G8sClient().ReleaseV1alpha1().Releases().Create(releaseCR)
@@ -60,8 +56,8 @@ func TestReleaseHandling(t *testing.T) {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
 
-		if !reflect.DeepEqual(obj.Labels, nil) {
-			t.Fatalf("\n\n%s\n", cmp.Diff(obj.Labels, nil))
+		if !reflect.DeepEqual(obj.Labels, map[string]string{}) {
+			t.Fatalf("\n\n%s\n", cmp.Diff(obj.Labels, map[string]string{}))
 		}
 	}
 
