@@ -3,14 +3,12 @@
 package releasehandling
 
 import (
-	"reflect"
 	"testing"
 	"time"
 
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/microerror"
-	"github.com/google/go-cmp/cmp"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -56,8 +54,8 @@ func TestReleaseHandling(t *testing.T) {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
 
-		if !reflect.DeepEqual(obj.Labels, map[string]string{}) {
-			t.Fatalf("\n\n%s\n", cmp.Diff(obj.Labels, map[string]string{}))
+		if len(obj.Labels) != 0 {
+			t.Fatalf("len(obj.Labels) = %d, want 0", len(obj.Labels))
 		}
 	}
 
