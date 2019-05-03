@@ -8,6 +8,7 @@ import (
 	"os"
 	"testing"
 
+	applicationv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/e2e-harness/pkg/release"
 	"github.com/giantswarm/e2etemplates/pkg/chartvalues"
@@ -43,7 +44,26 @@ func setup(ctx context.Context, m *testing.M, config Config) (int, error) {
 			defer func() {
 				err := config.K8sSetup.EnsureNamespaceDeleted(ctx, key.Namespace)
 				if err != nil {
-					config.Logger.LogCtx(ctx, "level", "error", "message", fmt.Sprintf("failed to delete namespace %#q", key.Namespace), "stack", fmt.Sprintf("%#v", err))
+					config.Logger.LogCtx(ctx, "level", "error", "message", fmt.Sprintf("failed to delete Namespace %#q", key.Namespace), "stack", fmt.Sprintf("%#v", err))
+				}
+			}()
+		}
+	}
+
+	// Create App CRD
+	{
+		crd := applicationv1alpha1.NewAppCRD()
+
+		err := config.K8sSetup.EnsureCRDCreated(ctx, crd)
+		if err != nil {
+			return 0, microerror.Mask(err)
+		}
+
+		if !env.CircleCI() && !env.KeepResources() {
+			defer func() {
+				err := config.K8sSetup.EnsureCRDDeleted(ctx, crd)
+				if err != nil {
+					config.Logger.LogCtx(ctx, "level", "error", "message", fmt.Sprintf("failed to delete CRD %#q", crd.Name), "stack", fmt.Sprintf("%#v", err))
 				}
 			}()
 		}
