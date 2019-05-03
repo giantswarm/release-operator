@@ -51,6 +51,11 @@ jobs:
       E2E_TEST_DIR: "integration/test/basic"
     <<: *e2eTest
 
+  e2eTestReleaseHandling:
+    environment:
+      E2E_TEST_DIR: "integration/test/releasehandling"
+    <<: *e2eTest
+
   deploy:
     machine: true
     steps:
@@ -71,6 +76,9 @@ workflows:
       - e2eTestBasic:
           requires:
           - build
+      - e2eTestReleaseHandling:
+          requires:
+          - build
 
       - deploy:
           filters:
@@ -78,3 +86,4 @@ workflows:
               only: master
           requires:
           - e2eTestBasic
+          - e2eTestReleaseHandling
