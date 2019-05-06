@@ -30,6 +30,8 @@ type Config struct {
 // installed by app-operator.
 // Note: releases are never removed, so removing a release cycle CR has no effect
 // 	 on the previously installed release.
+// Note: releases are never updated, since their values are derived from release
+// 	 cycle name which is by definition immutable.
 type Resource struct {
 	g8sClient versioned.Interface
 	k8sClient kubernetes.Interface
