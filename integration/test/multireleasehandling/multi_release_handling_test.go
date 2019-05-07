@@ -70,6 +70,18 @@ var releaseCR2 = &releasev1alpha1.Release{
 	},
 }
 
+var releaseCycleCR1 = &releasev1alpha1.ReleaseCycle{
+	TypeMeta: releasev1alpha1.NewReleaseCycleTypeMeta(),
+	ObjectMeta: metav1.ObjectMeta{
+		Name: "aws.v6.1.0",
+	},
+	Spec: releasev1alpha1.ReleaseCycleSpec{
+		DisabledDate: releasev1alpha1.DeepCopyDate{Time: time.Date(2019, 4, 8, 0, 0, 0, 0, time.UTC)},
+		EnabledDate:  releasev1alpha1.DeepCopyDate{Time: time.Date(2019, 1, 8, 0, 0, 0, 0, time.UTC)},
+		Phase:        releasev1alpha1.CyclePhaseEOL,
+	},
+}
+
 // TestMultiReleaseHandling runs following steps:
 //
 //	- Creates a Release CR 1.
@@ -77,6 +89,10 @@ var releaseCR2 = &releasev1alpha1.Release{
 //	  the Release CR 1.
 //	- Checks if App CRs for all components of Release CR 1 and Release CR
 //	  2 are created.
+//	- Creates the ReleaseCycle for the Release CR 1 marking it as EOL
+//	  release.
+//	- Checks if App CRs for all components of Release CR 1 not shared with
+//	  the Release CR 2 are deleted.
 //
 func TestMultiReleaseHandling(t *testing.T) {
 	// Create the Release CR 1.
@@ -96,7 +112,7 @@ func TestMultiReleaseHandling(t *testing.T) {
 		}
 	}
 
-	// Check if App CRs  for all components of Release CR 1 and Release CR
+	// Check if App CRs for all components of Release CR 1 and Release CR
 	// 2 are created.
 	{
 		o := func() error {
@@ -112,6 +128,47 @@ func TestMultiReleaseHandling(t *testing.T) {
 
 			expectedAppCRNames := []string{
 				"aws-operator.4.6.0",
+				"aws-operator.4.7.0",
+				"cert-operator.0.1.0",
+			}
+
+			if !reflect.DeepEqual(appCRNames, expectedAppCRNames) {
+				return microerror.Maskf(waitError, "\n\n%s\n", cmp.Diff(appCRNames, expectedAppCRNames))
+			}
+
+			return nil
+		}
+		b := backoff.NewMaxRetries(30, 5*time.Second)
+
+		err := backoff.Retry(o, b)
+		if err != nil {
+			t.Fatalf("err == %v, want %v", err, nil)
+		}
+	}
+
+	// Create the ReleaseCycle for the Release CR 1 marking it as EOL release.
+	{
+		_, err := config.K8sClients.G8sClient().ReleaseV1alpha1().ReleaseCycles().Create(releaseCycleCR1)
+		if err != nil {
+			t.Fatalf("err == %v, want %v", err, nil)
+		}
+	}
+
+	// Check if App CRs for all components of Release CR 1 not shared with
+	// the Release CR 2 are deleted.
+	{
+		o := func() error {
+			list, err := config.K8sClients.G8sClient().ApplicationV1alpha1().Apps("").List(metav1.ListOptions{})
+			if err != nil {
+				return microerror.Mask(err)
+			}
+
+			var appCRNames []string
+			for _, obj := range list.Items {
+				appCRNames = append(appCRNames, obj.Name)
+			}
+
+			expectedAppCRNames := []string{
 				"aws-operator.4.7.0",
 				"cert-operator.0.1.0",
 			}
