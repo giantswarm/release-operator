@@ -3,12 +3,14 @@
 package releasehandling
 
 import (
+	"reflect"
 	"testing"
 	"time"
 
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/microerror"
+	"github.com/google/go-cmp/cmp"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -113,35 +115,31 @@ func TestReleaseHandling(t *testing.T) {
 		}
 	}
 
-	// Verify that aws-operator.4.6.0 app CR exists.
+	// Verifies App CRs for the Release CR components exist.
 	{
 		o := func() error {
-			_, err := config.K8sClients.G8sClient().ApplicationV1alpha1().Apps("giantswarm").Get("aws-operator.4.6.0", metav1.GetOptions{})
+			list, err := config.K8sClients.G8sClient().ApplicationV1alpha1().Apps("").List(metav1.ListOptions{})
 			if err != nil {
 				return microerror.Mask(err)
 			}
 
-			return nil
-		}
-		b := backoff.NewMaxRetries(30, 1*time.Second)
+			var appCRNames []string
+			for _, obj := range list.Items {
+				appCRNames = append(appCRNames, obj.Name)
+			}
 
-		err := backoff.Retry(o, b)
-		if err != nil {
-			t.Fatalf("err == %v, want %v", err, nil)
-		}
-	}
+			expectedAppCRNames := []string{
+				"aws-operator.4.6.0",
+				"cert-operator.0.1.0",
+			}
 
-	// Verify that cert-operator.0.1.0 app CR exists.
-	{
-		o := func() error {
-			_, err := config.K8sClients.G8sClient().ApplicationV1alpha1().Apps("giantswarm").Get("cert-operator.0.1.0", metav1.GetOptions{})
-			if err != nil {
-				return microerror.Mask(err)
+			if !reflect.DeepEqual(appCRNames, expectedAppCRNames) {
+				return microerror.Maskf(waitError, "\n\n%s\n", cmp.Diff(appCRNames, expectedAppCRNames))
 			}
 
 			return nil
 		}
-		b := backoff.NewMaxRetries(30, 1*time.Second)
+		b := backoff.NewMaxRetries(30, 5*time.Second)
 
 		err := backoff.Retry(o, b)
 		if err != nil {
