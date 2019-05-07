@@ -45,7 +45,7 @@ var releaseCR = &releasev1alpha1.Release{
 //	- Creates a Release CR.
 //	- Checks if the CR has "release-operator.giantswarm.io/release-cycle-phase: upcoming" label reconciled.
 //	- Checks if the CR has ".status.cycle.phase: upcoming" status reconciled.
-//	- Verify aws-operator.4.6.0 app exists.
+//	- Verifies App CRs for the Release CR components exist.
 //	- Verify cert-operator.0.1.0 app exists.
 //
 func TestReleaseHandling(t *testing.T) {
