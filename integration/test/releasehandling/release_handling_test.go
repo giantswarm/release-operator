@@ -285,7 +285,7 @@ func TestReleaseHandling(t *testing.T) {
 		}
 	}
 
-	// Verify that release status was reconciled from release cycle.
+	// Verify that release was reconciled, status and label should be updated with values from release cycle.
 	{
 		o := func() error {
 			obj, err := config.K8sClients.G8sClient().ReleaseV1alpha1().Releases().Get(releaseCR.Name, metav1.GetOptions{})
@@ -303,6 +303,16 @@ func TestReleaseHandling(t *testing.T) {
 
 			if obj.Status.Cycle.Phase != releasev1alpha1.CyclePhaseEnabled {
 				return microerror.Maskf(waitError, "obj.Status.Cycle.Phase = %#v, want %#v", obj.Status.Cycle.Phase, releasev1alpha1.CyclePhaseUpcoming)
+			}
+
+			if obj.Labels == nil {
+				return microerror.Maskf(waitError, "obj.Labels = %#v, want non-nil", obj.Labels)
+			}
+
+			k := "release-operator.giantswarm.io/release-cycle-phase"
+			v := obj.Labels[k]
+			if v != releasev1alpha1.CyclePhaseEnabled.String() {
+				return microerror.Maskf(waitError, "obj.Labels[%q] = %q, want %q", obj.Labels[k], releasev1alpha1.CyclePhaseUpcoming.String())
 			}
 
 			return nil
