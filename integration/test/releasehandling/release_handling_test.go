@@ -186,7 +186,7 @@ func TestReleaseHandling(t *testing.T) {
 			}
 
 			if obj.Status.Cycle.Phase != releasev1alpha1.CyclePhaseEnabled {
-				return microerror.Maskf(waitError, "obj.Status.Cycle.Phase = %#v, want %#v", obj.Status.Cycle.Phase, releasev1alpha1.CyclePhaseUpcoming)
+				return microerror.Maskf(waitError, "obj.Status.Cycle.Phase = %#v, want %#v", obj.Status.Cycle.Phase, releasev1alpha1.CyclePhaseEnabled)
 			}
 
 			if obj.Labels == nil {
@@ -196,7 +196,7 @@ func TestReleaseHandling(t *testing.T) {
 			k := "release-operator.giantswarm.io/release-cycle-phase"
 			v := obj.Labels[k]
 			if v != releasev1alpha1.CyclePhaseEnabled.String() {
-				return microerror.Maskf(waitError, "obj.Labels[%q] = %q, want %q", obj.Labels[k], releasev1alpha1.CyclePhaseUpcoming.String())
+				return microerror.Maskf(waitError, "obj.Labels[%q] = %q, want %q", obj.Labels[k], releasev1alpha1.CyclePhaseEnabled.String())
 			}
 
 			return nil
