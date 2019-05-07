@@ -37,6 +37,12 @@ rules:
       - create
       - patch
       - update
+  - apiGroups:
+      - application.giantswarm.io
+    resources:
+      - apps
+    verbs:
+      - "*"
   - nonResourceURLs:
       - "/"
       - "/healthz"
