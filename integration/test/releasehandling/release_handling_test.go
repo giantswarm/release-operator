@@ -45,6 +45,8 @@ var releaseCR = &releasev1alpha1.Release{
 //	- Creates a Release CR.
 //	- Checks if the CR has "release-operator.giantswarm.io/release-cycle-phase: upcoming" label reconciled.
 //	- Checks if the CR has ".status.cycle.phase: upcoming" status reconciled.
+//	- Verify aws-operator.4.6.0 app exists.
+//	- Verify cert-operator.0.1.0 app exists.
 //
 func TestReleaseHandling(t *testing.T) {
 	// Create the CR and make sure it doesn't have labels.
@@ -100,6 +102,42 @@ func TestReleaseHandling(t *testing.T) {
 
 			if obj.Status.Cycle.Phase != releasev1alpha1.CyclePhaseUpcoming {
 				return microerror.Maskf(waitError, "obj.Status.Cycle.Phase = %#v, want %q", obj.Status.Cycle.Phase, releasev1alpha1.CyclePhaseUpcoming)
+			}
+
+			return nil
+		}
+		b := backoff.NewMaxRetries(30, 1*time.Second)
+
+		err := backoff.Retry(o, b)
+		if err != nil {
+			t.Fatalf("err == %v, want %v", err, nil)
+		}
+	}
+
+	// Verify that aws-operator.4.6.0 app CR exists.
+	{
+		o := func() error {
+			_, err := config.K8sClients.G8sClient().ApplicationV1alpha1().Apps("giantswarm").Get("aws-operator.4.6.0", metav1.GetOptions{})
+			if err != nil {
+				return microerror.Mask(err)
+			}
+
+			return nil
+		}
+		b := backoff.NewMaxRetries(30, 1*time.Second)
+
+		err := backoff.Retry(o, b)
+		if err != nil {
+			t.Fatalf("err == %v, want %v", err, nil)
+		}
+	}
+
+	// Verify that cert-operator.0.1.0 app CR exists.
+	{
+		o := func() error {
+			_, err := config.K8sClients.G8sClient().ApplicationV1alpha1().Apps("giantswarm").Get("cert-operator.0.1.0", metav1.GetOptions{})
+			if err != nil {
+				return microerror.Mask(err)
 			}
 
 			return nil
