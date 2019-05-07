@@ -51,6 +51,11 @@ jobs:
       E2E_TEST_DIR: "integration/test/basic"
     <<: *e2eTest
 
+  e2eTestMultiReleaseHandling:
+    environment:
+      E2E_TEST_DIR: "integration/test/multireleasehandling"
+    <<: *e2eTest
+
   e2eTestReleaseHandling:
     environment:
       E2E_TEST_DIR: "integration/test/releasehandling"
@@ -76,6 +81,9 @@ workflows:
       - e2eTestBasic:
           requires:
           - build
+      - e2eTestMultiReleaseHandling:
+          requires:
+          - build
       - e2eTestReleaseHandling:
           requires:
           - build
@@ -86,4 +94,5 @@ workflows:
               only: master
           requires:
           - e2eTestBasic
+          - e2eTestMultiReleaseHandling
           - e2eTestReleaseHandling
