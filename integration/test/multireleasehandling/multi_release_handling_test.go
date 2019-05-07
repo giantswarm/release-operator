@@ -122,7 +122,7 @@ func TestMultiReleaseHandling(t *testing.T) {
 
 			return nil
 		}
-		b := backoff.NewMaxRetries(150, 5*time.Second)
+		b := backoff.NewMaxRetries(30, 5*time.Second)
 
 		err := backoff.Retry(o, b)
 		if err != nil {
