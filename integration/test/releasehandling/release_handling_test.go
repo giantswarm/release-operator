@@ -209,7 +209,7 @@ func TestReleaseHandling(t *testing.T) {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
 
-		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating ReleaseCycle CR %#q", releaseCycleCR.Name))
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("created ReleaseCycle CR %#q", releaseCycleCR.Name))
 	}
 
 	// After creating ReleaseCycle with "enabled" phase the
@@ -242,6 +242,8 @@ func TestReleaseHandling(t *testing.T) {
 		if err != nil {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
+
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("checked Release CR %#q labels", releaseCR.Name))
 	}
 
 	// Verify that release was reconciled, status and label should be
