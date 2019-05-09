@@ -14,6 +14,8 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/google/go-cmp/cmp"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/giantswarm/release-operator/integration/env"
 )
 
 var releaseCR1 = &releasev1alpha1.Release{
@@ -113,6 +115,10 @@ func TestMultiReleaseHandling(t *testing.T) {
 		}
 
 		defer func() {
+			if env.CircleCI() || env.KeepResources() {
+				return
+			}
+
 			config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("cleaning up Release CR %#q", releaseCR1.Name))
 
 			err := config.K8sClients.G8sClient().ReleaseV1alpha1().Releases().Delete(releaseCR1.Name, &metav1.DeleteOptions{})
@@ -137,6 +143,10 @@ func TestMultiReleaseHandling(t *testing.T) {
 		}
 
 		defer func() {
+			if env.CircleCI() || env.KeepResources() {
+				return
+			}
+
 			config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("cleaning up Release CR %#q", releaseCR2.Name))
 
 			err := config.K8sClients.G8sClient().ReleaseV1alpha1().Releases().Delete(releaseCR2.Name, &metav1.DeleteOptions{})
@@ -201,6 +211,10 @@ func TestMultiReleaseHandling(t *testing.T) {
 		}
 
 		defer func() {
+			if env.CircleCI() || env.KeepResources() {
+				return
+			}
+
 			config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("cleaning up ReleaseCycle CR %#q", releaseCycleCR1.Name))
 
 			err := config.K8sClients.G8sClient().ReleaseV1alpha1().ReleaseCycles().Delete(releaseCycleCR1.Name, &metav1.DeleteOptions{})
