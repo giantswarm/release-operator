@@ -57,7 +57,11 @@ var releaseCycleCR = &releasev1alpha1.ReleaseCycle{
 	},
 }
 
-// TestReleaseHandling runs following steps:
+// TestReleaseHandling tests the Release CR reconciliation.
+//
+// It checks for Release status, labels, and components App CRs.
+//
+// It runs following steps:
 //
 //	- Creates a Release CR.
 //	- Checks if the CR has "release-operator.giantswarm.io/release-cycle-phase: upcoming" label reconciled.
