@@ -3,13 +3,16 @@
 package releasehandling
 
 import (
-	"reflect"
+	"context"
+	"fmt"
+	"sort"
 	"testing"
 	"time"
 
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/release-operator/integration/env"
 	"github.com/google/go-cmp/cmp"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -64,8 +67,12 @@ var releaseCycleCR = &releasev1alpha1.ReleaseCycle{
 //	- Verifies Release status is enabled.
 //
 func TestReleaseHandling(t *testing.T) {
+	ctx := context.Background()
+
 	// Create the CR and make sure it doesn't have labels.
 	{
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating Release CR %#q", releaseCR.Name))
+
 		obj, err := config.K8sClients.G8sClient().ReleaseV1alpha1().Releases().Create(releaseCR)
 		if err != nil {
 			t.Fatalf("err == %v, want %v", err, nil)
@@ -74,12 +81,31 @@ func TestReleaseHandling(t *testing.T) {
 		if len(obj.Labels) != 0 {
 			t.Fatalf("len(obj.Labels) = %d, want 0", len(obj.Labels))
 		}
+
+		defer func() {
+			if env.CircleCI() || env.KeepResources() {
+				return
+			}
+
+			config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("cleaning up Release CR %#q", releaseCR.Name))
+
+			err := config.K8sClients.G8sClient().ReleaseV1alpha1().Releases().Delete(releaseCR.Name, &metav1.DeleteOptions{})
+			if err != nil {
+				config.Logger.LogCtx(ctx, "level", "warning", "message", fmt.Sprintf("failed to clean up Release CR %#q", releaseCR.Name), "stack", fmt.Sprintf("%#v", err))
+			}
+
+			config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("cleaned up Release CR %#q", releaseCR.Name))
+		}()
+
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("created Release CR %#q", releaseCR.Name))
 	}
 
 	// There is no corresponding ReleaseCycle CR so
 	// "release-operator.giantswarm.io/release-cycle-phase: upcoming" label
 	// should be reconciled on the created CR.
 	{
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("checking Release CR %#q labels", releaseCR.Name))
+
 		o := func() error {
 			obj, err := config.K8sClients.G8sClient().ReleaseV1alpha1().Releases().Get(releaseCR.Name, metav1.GetOptions{})
 			if err != nil {
@@ -104,11 +130,15 @@ func TestReleaseHandling(t *testing.T) {
 		if err != nil {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
+
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("checked Release CR %#q labels", releaseCR.Name))
 	}
 
 	// There is no corresponding ReleaseCycle CR so ".status.cycle.phase:
 	// upcoming" status should be reconciled on the created CR.
 	{
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("checking Release CR %#q status", releaseCR.Name))
+
 		o := func() error {
 			obj, err := config.K8sClients.G8sClient().ReleaseV1alpha1().Releases().Get(releaseCR.Name, metav1.GetOptions{})
 			if err != nil {
@@ -127,10 +157,14 @@ func TestReleaseHandling(t *testing.T) {
 		if err != nil {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
+
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("checked Release CR %#q status", releaseCR.Name))
 	}
 
 	// Verifies App CRs for the Release CR components exist.
 	{
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("checking App CRs for Release CR %#q components", releaseCR.Name))
+
 		o := func() error {
 			list, err := config.K8sClients.G8sClient().ApplicationV1alpha1().Apps("").List(metav1.ListOptions{})
 			if err != nil {
@@ -147,8 +181,11 @@ func TestReleaseHandling(t *testing.T) {
 				"cert-operator.0.1.0",
 			}
 
-			if !reflect.DeepEqual(appCRNames, expectedAppCRNames) {
-				return microerror.Maskf(waitError, "\n\n%s\n", cmp.Diff(appCRNames, expectedAppCRNames))
+			sort.Strings(appCRNames)
+			sort.Strings(expectedAppCRNames)
+
+			if !cmp.Equal(appCRNames, expectedAppCRNames) {
+				return microerror.Maskf(waitError, "\n\n%s\nappCRNames = %#v\nexpectedAppCRNames = %#v\n\n", cmp.Diff(appCRNames, expectedAppCRNames), appCRNames, expectedAppCRNames)
 			}
 
 			return nil
@@ -159,6 +196,8 @@ func TestReleaseHandling(t *testing.T) {
 		if err != nil {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
+
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("checked App CRs for Release CR %#q components", releaseCR.Name))
 	}
 
 	// Mark the release as enabled by creating a release cycle with phase=enabled.
