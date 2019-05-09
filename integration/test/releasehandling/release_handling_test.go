@@ -45,7 +45,7 @@ var releaseCR = &releasev1alpha1.Release{
 	},
 }
 
-var releaseCycleCR = &releasev1alpha1.ReleaseCycle{
+var releaseCycleCREnabled = &releasev1alpha1.ReleaseCycle{
 	TypeMeta: releasev1alpha1.NewReleaseCycleTypeMeta(),
 	ObjectMeta: metav1.ObjectMeta{
 		Name: "aws.v6.1.0",
@@ -54,6 +54,18 @@ var releaseCycleCR = &releasev1alpha1.ReleaseCycle{
 		DisabledDate: releasev1alpha1.DeepCopyDate{time.Date(2019, 1, 12, 0, 0, 0, 0, time.UTC)},
 		EnabledDate:  releasev1alpha1.DeepCopyDate{time.Date(2019, 1, 8, 0, 0, 0, 0, time.UTC)},
 		Phase:        releasev1alpha1.CyclePhaseEnabled,
+	},
+}
+
+var releaseCycleCREOL = &releasev1alpha1.ReleaseCycle{
+	TypeMeta: releasev1alpha1.NewReleaseCycleTypeMeta(),
+	ObjectMeta: metav1.ObjectMeta{
+		Name: "aws.v6.1.0",
+	},
+	Spec: releasev1alpha1.ReleaseCycleSpec{
+		DisabledDate: releasev1alpha1.DeepCopyDate{time.Date(2019, 4, 8, 0, 0, 0, 0, time.UTC)},
+		EnabledDate:  releasev1alpha1.DeepCopyDate{time.Date(2019, 1, 8, 0, 0, 0, 0, time.UTC)},
+		Phase:        releasev1alpha1.CyclePhaseEOL,
 	},
 }
 
@@ -206,14 +218,14 @@ func TestReleaseHandling(t *testing.T) {
 
 	// Create the ReleaseCycle for the Release CR marking it as "enabled" release.
 	{
-		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating ReleaseCycle CR %#q", releaseCycleCR.Name))
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating ReleaseCycle CR %#q", releaseCycleCREnabled.Name))
 
-		_, err := config.K8sClients.G8sClient().ReleaseV1alpha1().ReleaseCycles().Create(releaseCycleCR)
+		_, err := config.K8sClients.G8sClient().ReleaseV1alpha1().ReleaseCycles().Create(releaseCycleCREnabled)
 		if err != nil {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
 
-		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("created ReleaseCycle CR %#q", releaseCycleCR.Name))
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("created ReleaseCycle CR %#q", releaseCycleCREnabled.Name))
 	}
 
 	// After creating ReleaseCycle with "enabled" phase the
@@ -261,8 +273,8 @@ func TestReleaseHandling(t *testing.T) {
 				return microerror.Mask(err)
 			}
 
-			if !cmp.Equal(obj.Status.Cycle, releaseCycleCR.Spec) {
-				return microerror.Maskf(waitError, "\n\n%s\nobj.Status.Cycle = %#v\nreleaseCycleCR.Spec = %#v\n\n", cmp.Diff(obj.Status.Cycle, releaseCycleCR.Spec), obj.Status.Cycle, releaseCycleCR.Spec)
+			if !cmp.Equal(obj.Status.Cycle, releaseCycleCREnabled.Spec) {
+				return microerror.Maskf(waitError, "\n\n%s\nobj.Status.Cycle = %#v\nreleaseCycleCR.Spec = %#v\n\n", cmp.Diff(obj.Status.Cycle, releaseCycleCREnabled.Spec), obj.Status.Cycle, releaseCycleCREnabled.Spec)
 			}
 
 			return nil
@@ -279,7 +291,7 @@ func TestReleaseHandling(t *testing.T) {
 
 	// Mark the release as enabled by creating a release cycle with phase=enabled.
 	{
-		_, err := config.K8sClients.G8sClient().ReleaseV1alpha1().ReleaseCycles().Create(releaseCycleCR)
+		_, err := config.K8sClients.G8sClient().ReleaseV1alpha1().ReleaseCycles().Create(releaseCycleCREnabled)
 		if err != nil {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
@@ -327,22 +339,25 @@ func TestReleaseHandling(t *testing.T) {
 
 	// Update the release to eol by updating the release cycle with phase=eol.
 	{
-		c, err := config.K8sClients.G8sClient().ReleaseV1alpha1().ReleaseCycles().Get(releaseCycleCR.GetName(), metav1.GetOptions{})
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("updating ReleaseCycle CR %#q", releaseCycleCREnabled.Name))
+
+		c, err := config.K8sClients.G8sClient().ReleaseV1alpha1().ReleaseCycles().Get(releaseCycleCREnabled.GetName(), metav1.GetOptions{})
 		if err != nil {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
 
-		c.Spec.Phase = releasev1alpha1.CyclePhaseEOL
-		c.Spec.DisabledDate = releasev1alpha1.DeepCopyDate{time.Date(2019, 4, 8, 0, 0, 0, 0, time.UTC)}
-		c.Spec.EnabledDate = releasev1alpha1.DeepCopyDate{time.Date(2019, 1, 8, 0, 0, 0, 0, time.UTC)}
+		u := releaseCycleCREOL.DeepCopy()
+		u.ObjectMeta = c.ObjectMeta
 
-		_, err = config.K8sClients.G8sClient().ReleaseV1alpha1().ReleaseCycles().Update(c)
+		_, err = config.K8sClients.G8sClient().ReleaseV1alpha1().ReleaseCycles().Update(u)
 		if err != nil {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
+
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("updated ReleaseCycle CR %#q", u.Name))
 	}
 
-	// Verify that release was reconciled, status and label should be updated with values from release cycle.
+	// Verify that release was reconciled, status should be updated with values from release cycle.
 	{
 		o := func() error {
 			obj, err := config.K8sClients.G8sClient().ReleaseV1alpha1().Releases().Get(releaseCR.Name, metav1.GetOptions{})
@@ -350,16 +365,36 @@ func TestReleaseHandling(t *testing.T) {
 				return microerror.Mask(err)
 			}
 
-			if !obj.Status.Cycle.DisabledDate.Equal(time.Date(2019, 4, 8, 0, 0, 0, 0, time.UTC)) {
-				return microerror.Maskf(waitError, "obj.Status.Cycle.DisabledDate = %s, want %s", obj.Status.Cycle.DisabledDate, time.Date(2019, 4, 8, 0, 0, 0, 0, time.UTC))
+			if !cmp.Equal(obj.Status.Cycle, releaseCycleCREOL.Spec) {
+				return microerror.Maskf(waitError, "\n\n%s\nobj.Status.Cycle = %#v\nreleaseCycleCREOL.Spec = %#v\n\n", cmp.Diff(obj.Status.Cycle, releaseCycleCREOL.Spec), obj.Status.Cycle, releaseCycleCREOL.Spec)
 			}
 
-			if !obj.Status.Cycle.EnabledDate.Equal(time.Date(2019, 1, 8, 0, 0, 0, 0, time.UTC)) {
-				return microerror.Maskf(waitError, "obj.Status.Cycle.EnabledDate = %s, want %s", obj.Status.Cycle.EnabledDate, time.Date(2019, 1, 8, 0, 0, 0, 0, time.UTC))
+			if obj.Labels == nil {
+				return microerror.Maskf(waitError, "obj.Labels = %#v, want non-nil", obj.Labels)
 			}
 
-			if obj.Status.Cycle.Phase != releasev1alpha1.CyclePhaseEOL {
-				return microerror.Maskf(waitError, "obj.Status.Cycle.Phase = %#v, want %#v", obj.Status.Cycle.Phase, releasev1alpha1.CyclePhaseEOL)
+			k := "release-operator.giantswarm.io/release-cycle-phase"
+			v := obj.Labels[k]
+			if v != releasev1alpha1.CyclePhaseEOL.String() {
+				return microerror.Maskf(waitError, "obj.Labels[%q] = %q, want %q", obj.Labels[k], releasev1alpha1.CyclePhaseEOL.String())
+			}
+
+			return nil
+		}
+		b := backoff.NewMaxRetries(150, 1*time.Second)
+
+		err := backoff.Retry(o, b)
+		if err != nil {
+			t.Fatalf("err == %v, want %v", err, nil)
+		}
+	}
+
+	// Verify that release was reconciled, label should be updated with values from release cycle.
+	{
+		o := func() error {
+			obj, err := config.K8sClients.G8sClient().ReleaseV1alpha1().Releases().Get(releaseCR.Name, metav1.GetOptions{})
+			if err != nil {
+				return microerror.Mask(err)
 			}
 
 			if obj.Labels == nil {
