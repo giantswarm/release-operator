@@ -85,7 +85,8 @@ var releaseCycleCR1 = &releasev1alpha1.ReleaseCycle{
 }
 
 // TestMultiReleaseHandling makes sure that App CRs for components shared
-// between EOL and non-EOL Release CRs are not removed.
+// between different Release CRs are not removed when one of them transitions
+// to its final EOL phase.
 //
 // It runs following steps:
 //
