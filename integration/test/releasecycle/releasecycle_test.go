@@ -72,20 +72,16 @@ func TestReleaseAppCRCreate(t *testing.T) {
 			}
 
 			if !reflect.DeepEqual(appCR.GetName(), expectedAppCR.GetName()) {
-				t.Fatalf("obj.GetName() = %#v, want %#v", appCR.GetName(), expectedAppCR.GetName())
-				return microerror.Mask(waitError)
+				return microerror.Maskf(waitError, "obj.GetName() = %#v, want %#v", appCR.GetName(), expectedAppCR.GetName())
 			}
 			if !reflect.DeepEqual(appCR.GetNamespace(), expectedAppCR.GetNamespace()) {
-				t.Fatalf("obj.GetNamespace() = %#v, want %#v", appCR.GetNamespace(), expectedAppCR.GetNamespace())
-				return microerror.Mask(waitError)
+				return microerror.Maskf(waitError, "obj.GetNamespace() = %#v, want %#v", appCR.GetNamespace(), expectedAppCR.GetNamespace())
 			}
 			if !reflect.DeepEqual(appCR.GetLabels(), expectedAppCR.GetLabels()) {
-				t.Fatalf(">>> obj.GetLabels()\n%#v\n>>> want\n%#v\n", appCR.GetLabels(), expectedAppCR.GetLabels())
-				return microerror.Mask(waitError)
+				return microerror.Maskf(waitError, ">>> obj.GetLabels()\n%#v\n>>> want\n%#v\n", appCR.GetLabels(), expectedAppCR.GetLabels())
 			}
 			if !reflect.DeepEqual(appCR.Spec, expectedAppCR.Spec) {
-				t.Fatalf(">>> obj.Spec\n%#v\n>>> want\n%#v\n", appCR.Spec, expectedAppCR.Spec)
-				return microerror.Mask(waitError)
+				return microerror.Maskf(waitError, ">>> obj.Spec\n%#v\n>>> want\n%#v\n", appCR.Spec, expectedAppCR.Spec)
 			}
 
 			return nil
