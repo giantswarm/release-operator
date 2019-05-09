@@ -85,8 +85,7 @@ var releaseCycleCR1 = &releasev1alpha1.ReleaseCycle{
 }
 
 // TestMultiReleaseHandling makes sure that App CRs for components shared
-// between different Release CRs are not removed when one Release CRs
-// transitions to its final EOL phase.
+// between EOL and non-EOL Release CRs are not removed.
 //
 // It runs following steps:
 //
@@ -176,15 +175,14 @@ func TestMultiReleaseHandling(t *testing.T) {
 			sort.Strings(expectedAppCRNames)
 
 			if !cmp.Equal(appCRNames, expectedAppCRNames) {
-				return microerror.Maskf(waitError, "\n\n%s\nappCRNames=%#v\nexpectedAppCRNames=%#v\n\n", cmp.Diff(appCRNames, expectedAppCRNames), appCRNames, expectedAppCRNames)
+				return microerror.Maskf(waitError, "\n\n%s\nappCRNames = %#v\nexpectedAppCRNames = %#v\n\n", cmp.Diff(appCRNames, expectedAppCRNames), appCRNames, expectedAppCRNames)
 			}
 
 			return nil
 		}
 		b := backoff.NewMaxRetries(35, 6*time.Second)
-		n := backoff.NewNotifier(config.Logger, ctx)
 
-		err := backoff.RetryNotify(o, b, n)
+		err := backoff.Retry(o, b)
 		if err != nil {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
@@ -241,15 +239,14 @@ func TestMultiReleaseHandling(t *testing.T) {
 			sort.Strings(expectedAppCRNames)
 
 			if !cmp.Equal(appCRNames, expectedAppCRNames) {
-				return microerror.Maskf(waitError, "\n\n%s\nappCRNames=%#v\nexpectedAppCRNames=%#v\n\n", cmp.Diff(appCRNames, expectedAppCRNames), appCRNames, expectedAppCRNames)
+				return microerror.Maskf(waitError, "\n\n%s\nappCRNames = %#v\nexpectedAppCRNames = %#v\n\n", cmp.Diff(appCRNames, expectedAppCRNames), appCRNames, expectedAppCRNames)
 			}
 
 			return nil
 		}
 		b := backoff.NewMaxRetries(35, 6*time.Second)
-		n := backoff.NewNotifier(config.Logger, ctx)
 
-		err := backoff.RetryNotify(o, b, n)
+		err := backoff.Retry(o, b)
 		if err != nil {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
