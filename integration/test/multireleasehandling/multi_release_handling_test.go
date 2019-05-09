@@ -82,7 +82,10 @@ var releaseCycleCR1 = &releasev1alpha1.ReleaseCycle{
 	},
 }
 
-// TestMultiReleaseHandling runs following steps:
+// TestMultiReleaseHandling makes sure that App CRs for components shared
+// between EOL and non-EOL Release CRs are not removed.
+//
+// It runs following steps:
 //
 //	- Creates a Release CR 1.
 //	- Creates a Release CR 2 sharing a component (cert-operator@0.1.0) with
@@ -126,6 +129,7 @@ func TestMultiReleaseHandling(t *testing.T) {
 				appCRNames = append(appCRNames, obj.Name)
 			}
 
+			// TODO sort
 			expectedAppCRNames := []string{
 				"aws-operator.4.6.0",
 				"aws-operator.4.7.0",
@@ -168,9 +172,11 @@ func TestMultiReleaseHandling(t *testing.T) {
 				appCRNames = append(appCRNames, obj.Name)
 			}
 
+			// TODO sort
 			expectedAppCRNames := []string{
 				"aws-operator.4.7.0",
 				"cert-operator.0.1.0",
+				"release-aws.v6.1.0",
 			}
 
 			if !reflect.DeepEqual(appCRNames, expectedAppCRNames) {
