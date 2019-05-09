@@ -3,7 +3,7 @@
 package releasehandling
 
 import (
-	"reflect"
+	"sort"
 	"testing"
 	"time"
 
@@ -129,14 +129,16 @@ func TestMultiReleaseHandling(t *testing.T) {
 				appCRNames = append(appCRNames, obj.Name)
 			}
 
-			// TODO sort
 			expectedAppCRNames := []string{
 				"aws-operator.4.6.0",
 				"aws-operator.4.7.0",
 				"cert-operator.0.1.0",
 			}
 
-			if !reflect.DeepEqual(appCRNames, expectedAppCRNames) {
+			sort.Strings(appCRNames)
+			sort.Strings(expectedAppCRNames)
+
+			if !cmp.Equal(appCRNames, expectedAppCRNames) {
 				return microerror.Maskf(waitError, "\n\n%s\n", cmp.Diff(appCRNames, expectedAppCRNames))
 			}
 
@@ -172,14 +174,16 @@ func TestMultiReleaseHandling(t *testing.T) {
 				appCRNames = append(appCRNames, obj.Name)
 			}
 
-			// TODO sort
 			expectedAppCRNames := []string{
 				"aws-operator.4.7.0",
 				"cert-operator.0.1.0",
 				"release-aws.v6.1.0",
 			}
 
-			if !reflect.DeepEqual(appCRNames, expectedAppCRNames) {
+			sort.Strings(appCRNames)
+			sort.Strings(expectedAppCRNames)
+
+			if !cmp.Equal(appCRNames, expectedAppCRNames) {
 				return microerror.Maskf(waitError, "\n\n%s\n", cmp.Diff(appCRNames, expectedAppCRNames))
 			}
 
