@@ -88,7 +88,7 @@ func TestReleaseAppCRCreate(t *testing.T) {
 				return microerror.Mask(waitError)
 			}
 
-			return err
+			return nil
 		}
 		b := backoff.NewMaxRetries(30, 1*time.Second)
 
