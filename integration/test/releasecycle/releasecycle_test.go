@@ -71,12 +71,6 @@ func TestReleaseAppCRCreate(t *testing.T) {
 				return microerror.Mask(err)
 			}
 
-			if !reflect.DeepEqual(appCR.GetName(), expectedAppCR.GetName()) {
-				return microerror.Maskf(waitError, "obj.GetName() = %#v, want %#v", appCR.GetName(), expectedAppCR.GetName())
-			}
-			if !reflect.DeepEqual(appCR.GetNamespace(), expectedAppCR.GetNamespace()) {
-				return microerror.Maskf(waitError, "obj.GetNamespace() = %#v, want %#v", appCR.GetNamespace(), expectedAppCR.GetNamespace())
-			}
 			if !reflect.DeepEqual(appCR.GetLabels(), expectedAppCR.GetLabels()) {
 				return microerror.Maskf(waitError, ">>> obj.GetLabels()\n%#v\n>>> want\n%#v\n", appCR.GetLabels(), expectedAppCR.GetLabels())
 			}
