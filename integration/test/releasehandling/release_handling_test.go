@@ -391,7 +391,7 @@ func TestReleaseHandling(t *testing.T) {
 
 			return nil
 		}
-		b := backoff.NewMaxRetries(30, 5*time.Second)
+		b := backoff.NewMaxRetries(65, 6*time.Second)
 
 		err := backoff.Retry(o, b)
 		if err != nil {
