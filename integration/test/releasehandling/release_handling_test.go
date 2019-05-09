@@ -45,12 +45,30 @@ var releaseCR = &releasev1alpha1.Release{
 	},
 }
 
-// TestReleaseHandling runs following steps:
+var releaseCycleCR = &releasev1alpha1.ReleaseCycle{
+	TypeMeta: releasev1alpha1.NewReleaseCycleTypeMeta(),
+	ObjectMeta: metav1.ObjectMeta{
+		Name: "aws.v6.1.0",
+	},
+	Spec: releasev1alpha1.ReleaseCycleSpec{
+		DisabledDate: releasev1alpha1.DeepCopyDate{time.Date(2019, 1, 12, 0, 0, 0, 0, time.UTC)},
+		EnabledDate:  releasev1alpha1.DeepCopyDate{time.Date(2019, 1, 8, 0, 0, 0, 0, time.UTC)},
+		Phase:        releasev1alpha1.CyclePhaseEnabled,
+	},
+}
+
+// TestReleaseHandling tests the Release CR reconciliation.
+//
+// It checks for Release status, labels, and components App CRs.
+//
+// It runs following steps:
 //
 //	- Creates a Release CR.
 //	- Checks if the CR has "release-operator.giantswarm.io/release-cycle-phase: upcoming" label reconciled.
 //	- Checks if the CR has ".status.cycle.phase: upcoming" status reconciled.
 //	- Verifies App CRs for the Release CR components exist.
+//	- Marks the Release as enabled.
+//	- Verifies Release status is enabled.
 //
 func TestReleaseHandling(t *testing.T) {
 	ctx := context.Background()
@@ -184,5 +202,78 @@ func TestReleaseHandling(t *testing.T) {
 		}
 
 		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("checked App CRs for Release CR %#q components", releaseCR.Name))
+	}
+
+	// Create the ReleaseCycle for the Release CR marking it as "enabled" release.
+	{
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating ReleaseCycle CR %#q", releaseCycleCR.Name))
+
+		_, err := config.K8sClients.G8sClient().ReleaseV1alpha1().ReleaseCycles().Create(releaseCycleCR)
+		if err != nil {
+			t.Fatalf("err == %v, want %v", err, nil)
+		}
+
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("created ReleaseCycle CR %#q", releaseCycleCR.Name))
+	}
+
+	// After creating ReleaseCycle with "enabled" phase the
+	// "release-operator.giantswarm.io/release-cycle-phase: enabled" label
+	// should be reconciled on the created CR.
+	{
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("checking Release CR %#q labels", releaseCR.Name))
+
+		o := func() error {
+			obj, err := config.K8sClients.G8sClient().ReleaseV1alpha1().Releases().Get(releaseCR.Name, metav1.GetOptions{})
+			if err != nil {
+				return microerror.Mask(err)
+			}
+
+			if obj.Labels == nil {
+				return microerror.Maskf(waitError, "obj.Labels = %#v, want non-nil", obj.Labels)
+			}
+
+			k := "release-operator.giantswarm.io/release-cycle-phase"
+			v := obj.Labels[k]
+			if v != releasev1alpha1.CyclePhaseEnabled.String() {
+				return microerror.Maskf(waitError, "obj.Labels[%q] = %q, want %q", obj.Labels[k], releasev1alpha1.CyclePhaseEnabled.String())
+			}
+
+			return nil
+		}
+		b := backoff.NewMaxRetries(35, 6*time.Second)
+
+		err := backoff.Retry(o, b)
+		if err != nil {
+			t.Fatalf("err == %v, want %v", err, nil)
+		}
+
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("checked Release CR %#q labels", releaseCR.Name))
+	}
+
+	// Verify that release was reconciled, status and label should be
+	// updated with values from release cycle.
+	{
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("check if Release CR %#q status was updated", releaseCR.Name))
+
+		o := func() error {
+			obj, err := config.K8sClients.G8sClient().ReleaseV1alpha1().Releases().Get(releaseCR.Name, metav1.GetOptions{})
+			if err != nil {
+				return microerror.Mask(err)
+			}
+
+			if !cmp.Equal(obj.Status.Cycle, releaseCycleCR.Spec) {
+				return microerror.Maskf(waitError, "\n\n%s\nobj.Status.Cycle = %#v\nreleaseCycleCR.Spec = %#v\n\n", cmp.Diff(obj.Status.Cycle, releaseCycleCR.Spec), obj.Status.Cycle, releaseCycleCR.Spec)
+			}
+
+			return nil
+		}
+		b := backoff.NewMaxRetries(35, 6*time.Second)
+
+		err := backoff.Retry(o, b)
+		if err != nil {
+			t.Fatalf("err == %v, want %v", err, nil)
+		}
+
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("checked if Release CR %#q was updated", releaseCR.Name))
 	}
 }
