@@ -382,7 +382,7 @@ func TestReleaseHandling(t *testing.T) {
 		}
 	}
 
-	// Verifies there is no App CRs.
+	// Verifies that components App CRs are gone.
 	{
 		o := func() error {
 			list, err := config.K8sClients.G8sClient().ApplicationV1alpha1().Apps("").List(metav1.ListOptions{})
@@ -390,8 +390,16 @@ func TestReleaseHandling(t *testing.T) {
 				return microerror.Mask(err)
 			}
 
-			if len(list.Items) > 0 {
-				return microerror.Maskf(waitError, "%d Apps found, want %d", len(list.Items), 0)
+			expectedAppCRNames := []string{
+				"aws-operator.4.6.0",
+				"cert-operator.0.1.0",
+			}
+			for _, obj := range list.Items {
+				for _, name := range expectedAppCRNames {
+					if obj.GetName() == name {
+						return microerror.Maskf(waitError, "not expected to found App CR %s", obj.GetName())
+					}
+				}
 			}
 
 			return nil
