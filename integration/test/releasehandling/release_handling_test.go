@@ -369,7 +369,7 @@ func TestReleaseHandling(t *testing.T) {
 
 	// Verifies that components App CRs are gone.
 	{
-		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("checking if App CR were removed", releaseCR.Name))
+		config.Logger.LogCtx(ctx, "level", "debug", "message", "checking if App CR were removed")
 
 		o := func() error {
 			list, err := config.K8sClients.G8sClient().ApplicationV1alpha1().Apps("").List(metav1.ListOptions{})
@@ -398,6 +398,6 @@ func TestReleaseHandling(t *testing.T) {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
 
-		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("checked if App CR were removed", releaseCR.Name))
+		config.Logger.LogCtx(ctx, "level", "debug", "message", "checked if App CR were removed")
 	}
 }
