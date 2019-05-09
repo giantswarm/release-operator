@@ -200,32 +200,28 @@ func TestReleaseHandling(t *testing.T) {
 		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("checked App CRs for Release CR %#q components", releaseCR.Name))
 	}
 
-	// Mark the release as enabled by creating a release cycle with phase=enabled.
+	// Create the ReleaseCycle for the Release CR marking it as "enabled" release.
 	{
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating ReleaseCycle CR %#q", releaseCycleCR.Name))
+
 		_, err := config.K8sClients.G8sClient().ReleaseV1alpha1().ReleaseCycles().Create(releaseCycleCR)
 		if err != nil {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
+
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating ReleaseCycle CR %#q", releaseCycleCR.Name))
 	}
 
-	// Verify that release was reconciled, status and label should be updated with values from release cycle.
+	// After creating ReleaseCycle with "enabled" phase the
+	// "release-operator.giantswarm.io/release-cycle-phase: enabled" label
+	// should be reconciled on the created CR.
 	{
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("checking Release CR %#q labels", releaseCR.Name))
+
 		o := func() error {
 			obj, err := config.K8sClients.G8sClient().ReleaseV1alpha1().Releases().Get(releaseCR.Name, metav1.GetOptions{})
 			if err != nil {
 				return microerror.Mask(err)
-			}
-
-			if !obj.Status.Cycle.DisabledDate.Equal(time.Date(2019, 1, 12, 0, 0, 0, 0, time.UTC)) {
-				return microerror.Maskf(waitError, "obj.Status.Cycle.DisabledDate = %s, want %s", obj.Status.Cycle.DisabledDate, time.Date(2019, 1, 12, 0, 0, 0, 0, time.UTC))
-			}
-
-			if !obj.Status.Cycle.EnabledDate.Equal(time.Date(2019, 1, 8, 0, 0, 0, 0, time.UTC)) {
-				return microerror.Maskf(waitError, "obj.Status.Cycle.EnabledDate = %s, want %s", obj.Status.Cycle.EnabledDate, time.Date(2019, 1, 8, 0, 0, 0, 0, time.UTC))
-			}
-
-			if obj.Status.Cycle.Phase != releasev1alpha1.CyclePhaseEnabled {
-				return microerror.Maskf(waitError, "obj.Status.Cycle.Phase = %#v, want %#v", obj.Status.Cycle.Phase, releasev1alpha1.CyclePhaseEnabled)
 			}
 
 			if obj.Labels == nil {
@@ -246,5 +242,32 @@ func TestReleaseHandling(t *testing.T) {
 		if err != nil {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
+	}
+
+	// Verify that release was reconciled, status and label should be
+	// updated with values from release cycle.
+	{
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("check if Release CR %#q status was updated", releaseCR.Name))
+
+		o := func() error {
+			obj, err := config.K8sClients.G8sClient().ReleaseV1alpha1().Releases().Get(releaseCR.Name, metav1.GetOptions{})
+			if err != nil {
+				return microerror.Mask(err)
+			}
+
+			if !cmp.Equal(obj.Status.Cycle, releaseCycleCR.Spec) {
+				return microerror.Maskf(waitError, "\n\n%s\nobj.Status.Cycle = %#v\nreleaseCycleCR.Spec = %#v\n\n", cmp.Diff(obj.Status.Cycle, releaseCycleCR.Spec), obj.Status.Cycle, releaseCycleCR.Spec)
+			}
+
+			return nil
+		}
+		b := backoff.NewMaxRetries(35, 6*time.Second)
+
+		err := backoff.Retry(o, b)
+		if err != nil {
+			t.Fatalf("err == %v, want %v", err, nil)
+		}
+
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("checked if Release CR %#q was updated", releaseCR.Name))
 	}
 }
