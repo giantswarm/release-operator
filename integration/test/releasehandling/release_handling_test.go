@@ -279,8 +279,7 @@ func TestReleaseHandling(t *testing.T) {
 
 	// Mark the release as enabled by creating a release cycle with phase=enabled.
 	{
-		var err error
-		releaseCycleCR, err = config.K8sClients.G8sClient().ReleaseV1alpha1().ReleaseCycles().Create(releaseCycleCR)
+		_, err := config.K8sClients.G8sClient().ReleaseV1alpha1().ReleaseCycles().Create(releaseCycleCR)
 		if err != nil {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
@@ -328,12 +327,16 @@ func TestReleaseHandling(t *testing.T) {
 
 	// Update the release to eol by updating the release cycle with phase=eol.
 	{
-		c := releaseCycleCR.DeepCopy()
+		c, err := config.K8sClients.G8sClient().ReleaseV1alpha1().ReleaseCycles().Get(releaseCycleCR.GetName(), metav1.GetOptions{})
+		if err != nil {
+			t.Fatalf("err == %v, want %v", err, nil)
+		}
+
 		c.Spec.Phase = releasev1alpha1.CyclePhaseEOL
 		c.Spec.DisabledDate = releasev1alpha1.DeepCopyDate{time.Date(2019, 4, 8, 0, 0, 0, 0, time.UTC)}
 		c.Spec.EnabledDate = releasev1alpha1.DeepCopyDate{time.Date(2019, 1, 8, 0, 0, 0, 0, time.UTC)}
 
-		_, err := config.K8sClients.G8sClient().ReleaseV1alpha1().ReleaseCycles().Update(c)
+		_, err = config.K8sClients.G8sClient().ReleaseV1alpha1().ReleaseCycles().Update(c)
 		if err != nil {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
