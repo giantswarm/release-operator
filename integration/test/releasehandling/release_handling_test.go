@@ -323,16 +323,6 @@ func TestReleaseHandling(t *testing.T) {
 				return microerror.Maskf(waitError, "\n\n%s\nobj.Status.Cycle = %#v\nreleaseCycleCREOL.Spec = %#v\n\n", cmp.Diff(obj.Status.Cycle, releaseCycleCREOL.Spec), obj.Status.Cycle, releaseCycleCREOL.Spec)
 			}
 
-			if obj.Labels == nil {
-				return microerror.Maskf(waitError, "obj.Labels = %#v, want non-nil", obj.Labels)
-			}
-
-			k := "release-operator.giantswarm.io/release-cycle-phase"
-			v := obj.Labels[k]
-			if v != releasev1alpha1.CyclePhaseEOL.String() {
-				return microerror.Maskf(waitError, "obj.Labels[%q] = %q, want %q", obj.Labels[k], releasev1alpha1.CyclePhaseEOL.String())
-			}
-
 			return nil
 		}
 		b := backoff.NewMaxRetries(150, 1*time.Second)
