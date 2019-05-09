@@ -66,7 +66,7 @@ func TestReleaseAppCRCreate(t *testing.T) {
 	// Verifies that release App CR was correctly reconciled.
 	{
 		o := func() (err error) {
-			appCR, err := config.K8sClients.G8sClient().ApplicationV1alpha1().Apps(key.Namespace).Get("release-aws.v6.1.0", v1.GetOptions{})
+			appCR, err := config.K8sClients.G8sClient().ApplicationV1alpha1().Apps(expectedAppCR.Namespace).Get(expectedAppCR.Name, v1.GetOptions{})
 			if err != nil {
 				return microerror.Mask(err)
 			}
