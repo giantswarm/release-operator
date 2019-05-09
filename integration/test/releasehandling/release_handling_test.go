@@ -384,7 +384,7 @@ func TestReleaseHandling(t *testing.T) {
 			for _, obj := range list.Items {
 				for _, name := range expectedAppCRNames {
 					if obj.GetName() == name {
-						return microerror.Maskf(waitError, "not expected to found App CR %s", obj.GetName())
+						return microerror.Maskf(waitError, "not expected to find App CR %s", obj.GetName())
 					}
 				}
 			}
