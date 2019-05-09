@@ -59,7 +59,7 @@ func TestReleaseHandling(t *testing.T) {
 	{
 		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating Release CR %#q", releaseCR.Name))
 
-		_, err := config.K8sClients.G8sClient().ReleaseV1alpha1().Releases().Create(releaseCR)
+		obj, err := config.K8sClients.G8sClient().ReleaseV1alpha1().Releases().Create(releaseCR)
 		if err != nil {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
