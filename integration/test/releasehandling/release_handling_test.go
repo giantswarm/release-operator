@@ -3,12 +3,14 @@
 package releasehandling
 
 import (
+	"reflect"
 	"testing"
 	"time"
 
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/microerror"
+	"github.com/google/go-cmp/cmp"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -45,6 +47,7 @@ var releaseCR = &releasev1alpha1.Release{
 //	- Creates a Release CR.
 //	- Checks if the CR has "release-operator.giantswarm.io/release-cycle-phase: upcoming" label reconciled.
 //	- Checks if the CR has ".status.cycle.phase: upcoming" status reconciled.
+//	- Verifies App CRs for the Release CR components exist.
 //
 func TestReleaseHandling(t *testing.T) {
 	// Create the CR and make sure it doesn't have labels.
@@ -105,6 +108,38 @@ func TestReleaseHandling(t *testing.T) {
 			return nil
 		}
 		b := backoff.NewMaxRetries(30, 1*time.Second)
+
+		err := backoff.Retry(o, b)
+		if err != nil {
+			t.Fatalf("err == %v, want %v", err, nil)
+		}
+	}
+
+	// Verifies App CRs for the Release CR components exist.
+	{
+		o := func() error {
+			list, err := config.K8sClients.G8sClient().ApplicationV1alpha1().Apps("").List(metav1.ListOptions{})
+			if err != nil {
+				return microerror.Mask(err)
+			}
+
+			var appCRNames []string
+			for _, obj := range list.Items {
+				appCRNames = append(appCRNames, obj.Name)
+			}
+
+			expectedAppCRNames := []string{
+				"aws-operator.4.6.0",
+				"cert-operator.0.1.0",
+			}
+
+			if !reflect.DeepEqual(appCRNames, expectedAppCRNames) {
+				return microerror.Maskf(waitError, "\n\n%s\n", cmp.Diff(appCRNames, expectedAppCRNames))
+			}
+
+			return nil
+		}
+		b := backoff.NewMaxRetries(30, 5*time.Second)
 
 		err := backoff.Retry(o, b)
 		if err != nil {
