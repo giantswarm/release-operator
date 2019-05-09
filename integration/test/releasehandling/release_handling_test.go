@@ -359,6 +359,8 @@ func TestReleaseHandling(t *testing.T) {
 
 	// Verify that release was reconciled, status should be updated with values from release cycle.
 	{
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("checking if Release CR status %#q was updated", releaseCR.Name))
+
 		o := func() error {
 			obj, err := config.K8sClients.G8sClient().ReleaseV1alpha1().Releases().Get(releaseCR.Name, metav1.GetOptions{})
 			if err != nil {
@@ -387,10 +389,14 @@ func TestReleaseHandling(t *testing.T) {
 		if err != nil {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
+
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("checked if Release CR status %#q was updated", releaseCR.Name))
 	}
 
 	// Verify that release was reconciled, label should be updated with values from release cycle.
 	{
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("checking if Release CR labels %#q were updated", releaseCR.Name))
+
 		o := func() error {
 			obj, err := config.K8sClients.G8sClient().ReleaseV1alpha1().Releases().Get(releaseCR.Name, metav1.GetOptions{})
 			if err != nil {
@@ -415,10 +421,14 @@ func TestReleaseHandling(t *testing.T) {
 		if err != nil {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
+
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("checked if Release CR labels %#q were updated", releaseCR.Name))
 	}
 
 	// Verifies that components App CRs are gone.
 	{
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("checking if App CR were removed", releaseCR.Name))
+
 		o := func() error {
 			list, err := config.K8sClients.G8sClient().ApplicationV1alpha1().Apps("").List(metav1.ListOptions{})
 			if err != nil {
@@ -445,5 +455,7 @@ func TestReleaseHandling(t *testing.T) {
 		if err != nil {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
+
+		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("checked if App CR were removed", releaseCR.Name))
 	}
 }
