@@ -164,6 +164,7 @@ func TestMultiReleaseHandling(t *testing.T) {
 
 		err := backoff.Retry(o, b)
 		if err != nil {
+			config.Logger.LogCtx(ctx, "level", "error", "message", fmt.Sprintf("failed to check App CRs created for Release CRs components"))
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
 
@@ -217,6 +218,7 @@ func TestMultiReleaseHandling(t *testing.T) {
 
 		err := backoff.Retry(o, b)
 		if err != nil {
+			config.Logger.LogCtx(ctx, "level", "error", "message", fmt.Sprintf("failed to check App CRs created for Release CRs components"))
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
 
