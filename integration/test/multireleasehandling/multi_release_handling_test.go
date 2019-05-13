@@ -14,8 +14,6 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/google/go-cmp/cmp"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	"github.com/giantswarm/release-operator/integration/env"
 )
 
 var releaseCR1 = &releasev1alpha1.Release{
@@ -114,21 +112,6 @@ func TestMultiReleaseHandling(t *testing.T) {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
 
-		defer func() {
-			if env.CircleCI() || env.KeepResources() {
-				return
-			}
-
-			config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("cleaning up Release CR %#q", releaseCR1.Name))
-
-			err := config.K8sClients.G8sClient().ReleaseV1alpha1().Releases().Delete(releaseCR1.Name, &metav1.DeleteOptions{})
-			if err != nil {
-				config.Logger.LogCtx(ctx, "level", "warning", "message", fmt.Sprintf("failed to clean up Release CR %#q", releaseCR1.Name), "stack", fmt.Sprintf("%#v", err))
-			}
-
-			config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("cleaned up Release CR %#q", releaseCR1.Name))
-		}()
-
 		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("created Release CR %#q", releaseCR1.Name))
 	}
 
@@ -141,21 +124,6 @@ func TestMultiReleaseHandling(t *testing.T) {
 		if err != nil {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
-
-		defer func() {
-			if env.CircleCI() || env.KeepResources() {
-				return
-			}
-
-			config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("cleaning up Release CR %#q", releaseCR2.Name))
-
-			err := config.K8sClients.G8sClient().ReleaseV1alpha1().Releases().Delete(releaseCR2.Name, &metav1.DeleteOptions{})
-			if err != nil {
-				config.Logger.LogCtx(ctx, "level", "warning", "message", fmt.Sprintf("failed to clean up Release CR %#q", releaseCR2.Name), "stack", fmt.Sprintf("%#v", err))
-			}
-
-			config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("cleaned up Release CR %#q", releaseCR2.Name))
-		}()
 
 		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("created Release CR %#q", releaseCR2.Name))
 	}
@@ -210,21 +178,6 @@ func TestMultiReleaseHandling(t *testing.T) {
 		if err != nil {
 			t.Fatalf("err == %v, want %v", err, nil)
 		}
-
-		defer func() {
-			if env.CircleCI() || env.KeepResources() {
-				return
-			}
-
-			config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("cleaning up ReleaseCycle CR %#q", releaseCycleCR1.Name))
-
-			err := config.K8sClients.G8sClient().ReleaseV1alpha1().ReleaseCycles().Delete(releaseCycleCR1.Name, &metav1.DeleteOptions{})
-			if err != nil {
-				config.Logger.LogCtx(ctx, "level", "warning", "message", fmt.Sprintf("failed to clean up ReleaseCycle CR %#q", releaseCycleCR1.Name), "stack", fmt.Sprintf("%#v", err))
-			}
-
-			config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("cleaned up ReleaseCycle CR %#q", releaseCycleCR1.Name))
-		}()
 
 		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("created ReleaseCycle CR %#q", releaseCycleCR1.Name))
 	}
