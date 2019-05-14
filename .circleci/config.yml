@@ -26,7 +26,64 @@ e2eTest: &e2eTest
         command: ./e2e-harness teardown
         when: always
 
-version: 2
+version: 2.1
+
+orbs:
+  app-catalog:
+    executors:
+      my-executor:
+        docker:
+          - image: circleci/golang:1.12.4
+  
+    commands:
+      create-tarball:
+        steps:
+          - run:
+              name: "Creates a tarball file"
+              command: |
+                set -o errexit
+                set -o nounset
+                set -o pipefail
+      
+                readonly HELM_DIR=helm/${CIRCLE_PROJECT_REPONAME}-chart
+                readonly HELM_URL=https://storage.googleapis.com/kubernetes-helm
+                readonly HELM_TARBALL=helm-v2.11.0-linux-amd64.tar.gz
+      
+                echo_green() {
+                  echo -e "\e[32m${1}"
+                }
+                echo_red() {
+                  echo -e "\e[31m${1}"
+                }
+                echo_yellow() {
+                  echo -e "\e[33m${1}"
+                }
+
+                setup_helm_client() {
+                  echo "Setting up Helm client..."
+                  curl --user-agent curl-ci-sync -sSL -o "${HELM_TARBALL}" "${HELM_URL}/${HELM_TARBALL}"
+                  tar xzfv "${HELM_TARBALL}"
+                  PATH="$(pwd)/linux-amd64/:$PATH"
+                  helm init --client-only
+                }
+
+                echo "Setting up Helm package..."
+                setup_helm_client
+
+                sed -i -e "s/\[\[ \.SHA \]\]/${CIRCLE_SHA1}/g" $(find $HELM_DIR -type f)
+
+                echo $(grep -nr $CIRCLE_SHA1 $HELM_DIR)
+                helm package ${HELM_DIR}
+
+                echo_green "ok: Created helm package"        
+    jobs:
+      checkout:
+        executor: my-executor
+        steps:
+          - checkout
+          - create-tarball
+
+
 jobs:
   build:
     machine: true
@@ -76,11 +133,12 @@ jobs:
 
     - run: ./architect deploy
 
-
 workflows:
-  version: 2
+  version: 2.1
   build_e2e:
     jobs:
+      - app-catalog/checkout
+          
       - build
 
       - e2eTestBasic:
@@ -105,3 +163,4 @@ workflows:
           - e2eTestMultiReleaseHandling
           - e2eTestReleaseHandling
           - e2eTestReleaseCycle
+
