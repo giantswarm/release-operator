@@ -58,7 +58,7 @@ orbs:
                   readonly repo=<<parameters.repository>>
                   readonly github_access_token=<<parameters.token>>
 
-                  git clone -q --depth=1 "https://${github_access_token}@github.com/giantswarm/${repo}.git" master .app-catalog
+                  git clone -q --depth=1 "https://${github_access_token}@github.com/giantswarm/${repo}.git" .app-catalog
                   echo_green "ok: catalog giantswarm/${repo} checkedout to .app-catalog directory"
 
                   echo "ls .app-catalog"
