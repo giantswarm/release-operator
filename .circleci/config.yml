@@ -31,7 +31,7 @@ version: 2.1
 orbs:
   app-catalog:
     commands:
-      checkout:
+      checkout-catalog:
         parameters:
           repository:
             type: "string"
@@ -70,6 +70,12 @@ orbs:
       my-executor:
         docker:
           - image: circleci/golang:1.12.4
+
+    jobs:
+      checkout:
+        executor: my-executor
+        steps:
+          - checkout-catalog
 
 jobs:
   build:
