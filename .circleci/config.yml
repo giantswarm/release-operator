@@ -31,14 +31,12 @@ version: 2.1
 orbs:
   app-catalog:
     commands:
-      checkout-catalog:
+      checkout-command:
         parameters:
           repository:
             type: "string"
-            description: "Name of the Github repository inside giantswarm organization hosting the App Catalog."
           token:
             type: "string"
-            description: "Github access token with read/write permissions to the repository hosting the App Catalog."
         steps:
           - run:
               name: "Checkout App Catalog repository to the .app-catalog directory"
@@ -74,8 +72,15 @@ orbs:
     jobs:
       checkout:
         executor: my-executor
+        parameters:
+          repository:
+            description: "Name of the Github repository inside giantswarm organization hosting the App Catalog."
+            type: "string"
+          token:
+            description: "Github access token with read/write permissions to the repository hosting the App Catalog."
+            type: "string"
         steps:
-          - checkout-catalog
+          - checkout-command
 
 jobs:
   build:
