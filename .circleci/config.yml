@@ -82,7 +82,7 @@ orbs:
         steps:
           - checkout-command:
               repository: <<parameters.repository>>
-              token: <<parametes.token>>
+              token: <<parameters.token>>
 
 
 jobs:
