@@ -26,7 +26,51 @@ e2eTest: &e2eTest
         command: ./e2e-harness teardown
         when: always
 
-version: 2
+version: 2.1
+
+orbs:
+  app-catalog:
+    commands:
+      checkout:
+        parameters:
+          repository:
+            type: "string"
+            description: "Name of the Github repository inside giantswarm organization hosting the App Catalog."
+          token:
+            type: "string"
+            description: "Github access token with read/write permissions to the repository hosting the App Catalog."
+        steps:
+          - run:
+              name: "Checkout App Catalog repository to the .app-catalog directory"
+              command: |
+                  set -o errexit
+                  set -o nounset
+                  set -o pipefail
+
+                  echo_green() {
+                      echo -e "\e[32m${1}"
+                  }
+                  echo_red() {
+                      echo -e "\e[31m${1}"
+                  }
+                  echo_yellow() {
+                      echo -e "\e[33m${1}"
+                  }
+
+                  readonly repo=<<parameters.reponame>>
+                  readonly github_access_token=<<parameters.token>>
+
+                  git pull -q "https://${github_access_token}@github.com/giantswarm/${repo}.git" master .app-catalog
+                  echo_green "ok: catalog giantswarm/${repo} checkedout to .app-catalog directory"
+
+                  echo "ls .app-catalog"
+                  ls .app-catalog
+
+    executors:
+      my-executor:
+        docker:
+          - image: circleci/golang:1.12.4
+
 jobs:
   build:
     machine: true
@@ -78,9 +122,13 @@ jobs:
 
 
 workflows:
-  version: 2
-  build_e2e:
+  build-and-e2e-test:
     jobs:
+      - app-catalog/checkout:
+          name: "app-catalog-checkout"
+          repository: "magic-catalog"
+          token: ${GITHUB_BOT_TOKEN}
+
       - build
 
       - e2eTestBasic:
