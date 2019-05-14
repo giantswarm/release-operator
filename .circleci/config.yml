@@ -55,7 +55,7 @@ orbs:
                       echo -e "\e[33m${1}"
                   }
 
-                  readonly repo=<<parameters.reponame>>
+                  readonly repo=<<parameters.repository>>
                   readonly github_access_token=<<parameters.token>>
 
                   git pull -q "https://${github_access_token}@github.com/giantswarm/${repo}.git" master .app-catalog
@@ -80,7 +80,10 @@ orbs:
             description: "Github access token with read/write permissions to the repository hosting the App Catalog."
             type: "string"
         steps:
-          - checkout-command
+          - checkout-command:
+              repository: <<parameters.repository>>
+              token: <<parametes.token>>
+
 
 jobs:
   build:
