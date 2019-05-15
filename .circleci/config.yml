@@ -35,8 +35,6 @@ orbs:
         parameters:
           repository:
             type: "string"
-          token:
-            type: "string"
         steps:
           - run:
               name: "Checkout App Catalog repository to the .app-catalog directory"
@@ -60,7 +58,6 @@ orbs:
                   chmod 0600 ~/.ssh/id_rsa
 
                   readonly repo=<<parameters.repository>>
-                  readonly github_access_token=<<parameters.token>>
 
                   readonly org="giantswarm"
                   readonly dir=".app-catalog"
@@ -82,13 +79,9 @@ orbs:
           repository:
             description: "Name of the Github repository inside giantswarm organization hosting the App Catalog."
             type: "string"
-          token:
-            description: "Github access token with read/write permissions to the repository hosting the App Catalog."
-            type: "string"
         steps:
           - checkout-command:
               repository: <<parameters.repository>>
-              token: <<parameters.token>>
 
 
 jobs:
@@ -147,7 +140,6 @@ workflows:
       - app-catalog/checkout:
           name: "app-catalog-checkout"
           repository: "magic-catalog"
-          token: ${APP_CATALOG_GITHUB_TOKEN}
 
       - build
 
