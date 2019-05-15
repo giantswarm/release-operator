@@ -55,6 +55,8 @@ orbs:
                       echo -e "\e[33m${1}\e[0m"
                   }
 
+                  echo ${CATALOGBOT_SSH_KEY_PRIVATE_BASE64} | base64 -d > ~/.ssh/id_rsa
+
                   readonly repo=<<parameters.repository>>
                   readonly github_access_token=<<parameters.token>>
 
@@ -62,13 +64,9 @@ orbs:
                   readonly dir=".app-catalog"
                   readonly branch="master"
 
-                  mkdir ${dir}
-                  cd ${dir}
-                  git init -q
-                  git pull -q --depth=1 "https://${github_access_token}@github.com/${org}/${repo}.git" ${branch}
-                  cd ..
+                  git clone -q --depth=1 -b "${branch}" "git@github.com:giantswarm/magic-catalog.git" "${dir}"
 
-                  echo_green "ok: tip of the catalog ${org}/${repo}@${branch} pulled into ${dir} directory"
+                  echo_green "ok: tip of the catalog ${org}/${repo}@${branch} cloned ${dir} directory"
 
     executors:
       my-executor:
