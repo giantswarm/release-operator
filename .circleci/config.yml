@@ -68,10 +68,7 @@ orbs:
                   git pull -q --depth=1 "https://${github_access_token}@github.com/${org}/${repo}.git" ${branch}
                   cd ..
 
-                  echo_green "ok: tip of the catalog ${org}/${repo}@${branch} checked out to ${dir} directory"
-
-                  echo "ls .app-catalog"
-                  ls .app-catalog
+                  echo_green "ok: tip of the catalog ${org}/${repo}@${branch} pulled into ${dir} directory"
 
     executors:
       my-executor:
@@ -150,7 +147,7 @@ workflows:
       - app-catalog/checkout:
           name: "app-catalog-checkout"
           repository: "magic-catalog"
-          token: ${PAWEL_TOKEN}
+          token: ${APP_CATALOG_GITHUB_TOKEN}
 
       - build
 
