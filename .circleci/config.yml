@@ -60,6 +60,10 @@ orbs:
                   echo ${CATALOGBOT_SSH_KEY_PRIVATE_BASE64} | base64 -d > ~/.ssh/id_rsa
                   chmod 0600 ~/.ssh/id_rsa
 
+                  # Use git+ssh instead of https.
+                  git config --global url."ssh://git@github.com".insteadOf "https://github.com"
+                  git config --global gc.auto 0
+
                   readonly repo=<<parameters.repository>>
 
                   readonly org="giantswarm"
