@@ -58,8 +58,17 @@ orbs:
                   readonly repo=<<parameters.repository>>
                   readonly github_access_token=<<parameters.token>>
 
-                  git clone -q --depth=1 "https://${github_access_token}@github.com/giantswarm/${repo}.git" .app-catalog
-                  echo_green "ok: catalog giantswarm/${repo} checkedout to .app-catalog directory"
+                  readonly org="giantswarm"
+                  readonly dir=".app-catalog"
+                  readonly branch="master"
+
+                  mkdir ${dir}
+                  cd ${dir}
+                  git init -q
+                  git pull -q --depth=1 "https://${github_access_token}@github.com/${org}/${repo}.git" ${branch}
+                  cd ..
+
+                  echo_green "ok: tip of the catalog ${org}/${repo}@${branch} checked out to ${dir} directory"
 
                   echo "ls .app-catalog"
                   ls .app-catalog
@@ -141,7 +150,7 @@ workflows:
       - app-catalog/checkout:
           name: "app-catalog-checkout"
           repository: "magic-catalog"
-          token: ${GITHUB_BOT_TOKEN}
+          token: ${PAWEL_TOKEN}
 
       - build
 
