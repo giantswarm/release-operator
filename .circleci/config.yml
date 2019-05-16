@@ -60,7 +60,7 @@ orbs:
                 }
 
                 setup_helm_client() {
-                  echo "Setting up Helm client..."
+                  echo "installing helm binary"
                   curl --user-agent curl-ci-sync -sSL -o "${HELM_TARBALL}" "${HELM_URL}/${HELM_TARBALL}"
                   tar xzfv "${HELM_TARBALL}"
                   PATH="$(pwd)/linux-amd64/:$PATH"
