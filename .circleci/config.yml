@@ -53,16 +53,16 @@ orbs:
                       echo -e "\e[33m${1}\e[0m"
                   }
 
-                  # Setup catalogbot user SSH access.
-                  mkdir -p ~/.ssh
-                  echo "github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==" >> ~/.ssh/known_hosts
-                  echo "" >> ~/.ssh/known_hosts
-                  echo ${CATALOGBOT_SSH_KEY_PRIVATE_BASE64} | base64 -d > ~/.ssh/id_rsa
-                  chmod 0600 ~/.ssh/id_rsa
+                  ## Setup catalogbot user SSH access.
+                  #mkdir -p ~/.ssh
+                  #echo "github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==" >> ~/.ssh/known_hosts
+                  #echo "" >> ~/.ssh/known_hosts
+                  #echo ${CATALOGBOT_SSH_KEY_PRIVATE_BASE64} | base64 -d > ~/.ssh/id_rsa
+                  #chmod 0600 ~/.ssh/id_rsa
 
-                  # Use git+ssh instead of https.
-                  git config --global url."ssh://git@github.com".insteadOf "https://github.com"
-                  git config --global gc.auto 0
+                  ## Use git+ssh instead of https.
+                  #git config --global url."ssh://git@github.com".insteadOf "https://github.com"
+                  #git config --global gc.auto 0
 
                   readonly repo=<<parameters.repository>>
 
@@ -87,6 +87,9 @@ orbs:
             description: "Name of the Github repository inside giantswarm organization hosting the App Catalog."
             type: "string"
         steps:
+          - add_ssh_keys:
+              fingerprints:
+                - "3c:63:85:36:77:d2:19:07:13:7c:35:1e:e0:b3:0e:a1"
           - checkout-command:
               repository: <<parameters.repository>>
 
