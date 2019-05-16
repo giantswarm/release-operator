@@ -90,7 +90,7 @@ orbs:
                   readonly dir=".app-catalog"
                   readonly branch="master"
 
-                  git clone -q --depth=1 --single-branch -b "${branch}" "git@github.com:giantswarm/magic-catalog.git" "${dir}"
+                  git clone -q --depth=1 --single-branch -b "${branch}" "git@github.com:${org}/${repo}.git" "${dir}"
                   echo_green "ok: tip of the catalog ${org}/${repo}@${branch} cloned ${dir} directory"
 
     executors:
