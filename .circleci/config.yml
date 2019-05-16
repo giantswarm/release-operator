@@ -70,7 +70,7 @@ orbs:
 
                 setup_helm_client
 
-                sed -i -e "s/\[\[ \.SHA \]\]/${CIRCLE_SHA1}/g" $(find $HELM_DIR -type f)
+                sed -i -e "s/\[\[ \.VERSION \]\]/${CIRCLE_SHA1}/g" $(find $HELM_DIR -type f)
 
                 echo $(grep -nr $CIRCLE_SHA1 $HELM_DIR)
                 helm package ${HELM_DIR}
