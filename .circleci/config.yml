@@ -75,7 +75,7 @@ orbs:
                 echo $(grep -nr $CIRCLE_SHA1 $HELM_DIR)
                 helm package ${HELM_DIR}
 
-                echo_green "ok: Created helm package"        
+                echo_green "ok: created chart tarball"        
     jobs:
       checkout:
         executor: my-executor
