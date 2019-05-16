@@ -68,7 +68,6 @@ orbs:
                   echo "installed helm binary"
                 }
 
-                echo "Setting up Helm package..."
                 setup_helm_client
 
                 sed -i -e "s/\[\[ \.SHA \]\]/${CIRCLE_SHA1}/g" $(find $HELM_DIR -type f)
