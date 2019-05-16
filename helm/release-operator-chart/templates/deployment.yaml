@@ -38,7 +38,7 @@ spec:
       serviceAccountName: release-operator
       containers:
       - name: release-operator
-        image: quay.io/giantswarm/release-operator:[[ .SHA ]]
+        image: quay.io/giantswarm/release-operator:[[ .VERSION ]]
         args:
         - daemon
         - --config.dirs=/var/run/release-operator/configmap/

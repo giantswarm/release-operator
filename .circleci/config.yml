@@ -44,11 +44,7 @@ orbs:
                 set -o errexit
                 set -o nounset
                 set -o pipefail
-      
-                readonly HELM_DIR=helm/${CIRCLE_PROJECT_REPONAME}-chart
-                readonly HELM_URL=https://storage.googleapis.com/kubernetes-helm
-                readonly HELM_TARBALL=helm-v2.11.0-linux-amd64.tar.gz
-      
+
                 echo_green() {
                   echo -e "\e[32m${1}\e[0m"
                 }
@@ -58,11 +54,15 @@ orbs:
                 echo_yellow() {
                   echo -e "\e[33m${1}\e[0m"
                 }
-
+                
+                readonly helm_dir=helm/${CIRCLE_PROJECT_REPONAME}-chart
+                readonly helm_url=https://storage.googleapis.com/kubernetes-helm
+                readonly helm_tarball=helm-v2.11.0-linux-amd64.tar.gz
+      
                 setup_helm_client() {
                   echo "installing helm binary"
-                  curl --user-agent curl-ci-sync -sSL -o "${HELM_TARBALL}" "${HELM_URL}/${HELM_TARBALL}"
-                  tar xzfv "${HELM_TARBALL}"
+                  curl --user-agent curl-ci-sync -sSL -o "${helm_tarball}" "${helm_url}/${helm_tarball}"
+                  tar xzfv "${helm_tarball}"
                   PATH="$(pwd)/linux-amd64/:$PATH"
                   helm init --client-only
                   echo "installed helm binary"
@@ -70,10 +70,10 @@ orbs:
 
                 setup_helm_client
 
-                sed -i -e "s/\[\[ \.VERSION \]\]/${CIRCLE_SHA1}/g" $(find $HELM_DIR -type f)
+                sed -i -e "s/\[\[ \.VERSION \]\]/${CIRCLE_SHA1}/g" $(find $helm_dir -type f)
 
-                echo $(grep -nr $CIRCLE_SHA1 $HELM_DIR)
-                helm package ${HELM_DIR}
+                echo $(grep -nr $CIRCLE_SHA1 $helm_dir)
+                helm package ${helm_dir}
 
                 echo_green "ok: created chart tarball"        
     jobs:
