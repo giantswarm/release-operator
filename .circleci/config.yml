@@ -65,6 +65,7 @@ orbs:
                   tar xzfv "${HELM_TARBALL}"
                   PATH="$(pwd)/linux-amd64/:$PATH"
                   helm init --client-only
+                  echo "installed helm binary"
                 }
 
                 echo "Setting up Helm package..."
