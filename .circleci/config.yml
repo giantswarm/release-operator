@@ -50,7 +50,7 @@ orbs:
                 readonly HELM_TARBALL=helm-v2.11.0-linux-amd64.tar.gz
       
                 echo_green() {
-                  echo -e "\e[32m${1}"
+                  echo -e "\e[32m${1}\e[0m"
                 }
                 echo_red() {
                   echo -e "\e[31m${1}\e[0m"
