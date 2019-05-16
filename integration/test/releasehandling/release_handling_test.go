@@ -12,7 +12,6 @@ import (
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/release-operator/integration/env"
 	"github.com/google/go-cmp/cmp"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -97,21 +96,6 @@ func TestReleaseHandling(t *testing.T) {
 		if len(obj.Labels) != 0 {
 			t.Fatalf("len(obj.Labels) = %d, want 0", len(obj.Labels))
 		}
-
-		defer func() {
-			if env.CircleCI() || env.KeepResources() {
-				return
-			}
-
-			config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("cleaning up Release CR %#q", releaseCR.Name))
-
-			err := config.K8sClients.G8sClient().ReleaseV1alpha1().Releases().Delete(releaseCR.Name, &metav1.DeleteOptions{})
-			if err != nil {
-				config.Logger.LogCtx(ctx, "level", "warning", "message", fmt.Sprintf("failed to clean up Release CR %#q", releaseCR.Name), "stack", fmt.Sprintf("%#v", err))
-			}
-
-			config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("cleaned up Release CR %#q", releaseCR.Name))
-		}()
 
 		config.Logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("created Release CR %#q", releaseCR.Name))
 	}
