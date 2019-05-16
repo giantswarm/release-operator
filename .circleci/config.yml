@@ -31,6 +31,37 @@ version: 2.1
 orbs:
   app-catalog:
     commands:
+      prepare-git-ssh-command:
+        steps:
+          - run:
+              name: "Prepare git+ssh setup for catalogbot user"
+              command: |
+                  set -o errexit
+                  set -o nounset
+                  set -o pipefail
+
+                  echo_green() {
+                      echo -e "\e[32m${1}\e[0m"
+                  }
+                  echo_red() {
+                      echo -e "\e[31m${1}\e[0m"
+                  }
+                  echo_yellow() {
+                      echo -e "\e[33m${1}\e[0m"
+                  }
+
+                  mkdir -p ~/.ssh
+                  echo "github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==" >> ~/.ssh/known_hosts
+                  echo "" >> ~/.ssh/known_hosts
+                  printf "Host github.com\n  IdentitiesOnly yes\n  IdentityFile $HOME/.ssh/id_rsa" > ~/.ssh/config
+                  echo ${CATALOGBOT_SSH_KEY_PRIVATE_BASE64} | base64 -d > ~/.ssh/id_rsa
+                  chmod 0600 ~/.ssh/id_rsa
+
+                  git config --global url."ssh://git@github.com".insteadOf "https://github.com"
+                  git config --global gc.auto 0
+
+                  echo_green "ok: set up git+ssh access for catalogbot user"
+
       checkout-command:
         parameters:
           repository:
@@ -53,18 +84,6 @@ orbs:
                       echo -e "\e[33m${1}\e[0m"
                   }
 
-                  # Setup catalogbot user SSH access.
-                  mkdir -p ~/.ssh
-                  echo "github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==" >> ~/.ssh/known_hosts
-                  echo "" >> ~/.ssh/known_hosts
-                  printf "Host github.com\n  IdentitiesOnly yes\n  IdentityFile $HOME/.ssh/id_rsa" > ~/.ssh/config
-                  echo ${CATALOGBOT_SSH_KEY_PRIVATE_BASE64} | base64 -d > ~/.ssh/id_rsa
-                  chmod 0600 ~/.ssh/id_rsa
-
-                  # Use git+ssh instead of https.
-                  git config --global url."ssh://git@github.com".insteadOf "https://github.com"
-                  git config --global gc.auto 0
-
                   readonly repo=<<parameters.repository>>
 
                   readonly org="giantswarm"
@@ -72,7 +91,6 @@ orbs:
                   readonly branch="master"
 
                   git clone -q --depth=1 --single-branch -b "${branch}" "git@github.com:giantswarm/magic-catalog.git" "${dir}"
-
                   echo_green "ok: tip of the catalog ${org}/${repo}@${branch} cloned ${dir} directory"
 
     executors:
@@ -88,6 +106,7 @@ orbs:
             description: "Name of the Github repository inside giantswarm organization hosting the App Catalog."
             type: "string"
         steps:
+          - prepare-git-ssh-command
           - checkout-command:
               repository: <<parameters.repository>>
 
