@@ -56,7 +56,7 @@ orbs:
                   echo -e "\e[31m${1}"
                 }
                 echo_yellow() {
-                  echo -e "\e[33m${1}"
+                  echo -e "\e[33m${1}\e[0m"
                 }
 
                 setup_helm_client() {
