@@ -30,6 +30,7 @@ version: 2.1
 
 orbs:
   app-catalog:
+    working_directory: ~/project
     executors:
       my-executor:
         docker:
@@ -40,6 +41,8 @@ orbs:
         steps:
           - run:
               name: "Creates a tarball file"
+              attach_workspace:
+                at: ~/project
               command: |
                 set -o errexit
                 set -o nounset
@@ -58,6 +61,8 @@ orbs:
                 readonly helm_dir=helm/${CIRCLE_PROJECT_REPONAME}-chart
                 readonly helm_url=https://storage.googleapis.com/kubernetes-helm
                 readonly helm_tarball=helm-v2.11.0-linux-amd64.tar.gz
+
+                readonly last_tag=$(git describe --tags $(git rev-list --tags --max-count=1))
       
                 setup_helm_client() {
                   echo "installing helm binary"
@@ -70,18 +75,34 @@ orbs:
 
                 setup_helm_client
 
-                sed -i -e "s/\[\[ \.VERSION \]\]/${CIRCLE_SHA1}/g" $(find $helm_dir -type f)
+                if [ $last_tag ];then
+                    version=${last_tag//v}"-"${CIRCLE_SHA1}
+                else
+                    version="0.0.0-"${CIRCLE_SHA1}
+                fi
+
+                echo ${version}
+                sed -i -e "s/\[\[ \.VERSION \]\]/${version}/g" $(find $helm_dir -type f)
 
                 echo $(grep -nr $CIRCLE_SHA1 $helm_dir)
-                helm package ${helm_dir}
+                helm package ${helm_dir} -d ~/project
 
-                echo_green "ok: created chart tarball"        
+                echo_green "ok: created chart tarball"  
+      use-tarball:
+        steps:
+          - run:
+              name: "Uses a tarball file"
+              attach_workspace:
+                at: ~/project
+              command: |
+                ls -la  ~/project/
     jobs:
       checkout:
         executor: my-executor
         steps:
           - checkout
           - create-tarball
+          - use-tarball
 
 
 jobs:
@@ -138,7 +159,7 @@ workflows:
   build_e2e:
     jobs:
       - app-catalog/checkout
-          
+
       - build
 
       - e2eTestBasic:
