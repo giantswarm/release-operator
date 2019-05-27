@@ -26,84 +26,11 @@ e2eTest: &e2eTest
         command: ./e2e-harness teardown
         when: always
 
+
 version: 2.1
 
 orbs:
-  app-catalog:
-    working_directory: ~/project
-    executors:
-      my-executor:
-        docker:
-          - image: circleci/golang:1.12.4
-  
-    commands:
-      create-tarball:
-        steps:
-          - run:
-              name: "Creates a tarball file"
-              attach_workspace:
-                at: ~/project
-              command: |
-                set -o errexit
-                set -o nounset
-                set -o pipefail
-
-                echo_green() {
-                  echo -e "\e[32m${1}\e[0m"
-                }
-                echo_red() {
-                  echo -e "\e[31m${1}\e[0m"
-                }
-                echo_yellow() {
-                  echo -e "\e[33m${1}\e[0m"
-                }
-                
-                readonly helm_dir=helm/${CIRCLE_PROJECT_REPONAME}-chart
-                readonly helm_url=https://storage.googleapis.com/kubernetes-helm
-                readonly helm_tarball=helm-v2.11.0-linux-amd64.tar.gz
-
-                readonly last_tag=$(git describe --tags $(git rev-list --tags --max-count=1))
-      
-                setup_helm_client() {
-                  echo "installing helm binary"
-                  curl --user-agent curl-ci-sync -sSL -o "${helm_tarball}" "${helm_url}/${helm_tarball}"
-                  tar xzfv "${helm_tarball}"
-                  PATH="$(pwd)/linux-amd64/:$PATH"
-                  helm init --client-only
-                  echo "installed helm binary"
-                }
-
-                setup_helm_client
-
-                if [ $last_tag ];then
-                    version=${last_tag//v}"-"${CIRCLE_SHA1}
-                else
-                    version="0.0.0-"${CIRCLE_SHA1}
-                fi
-
-                echo ${version}
-                sed -i -e "s/\[\[ \.VERSION \]\]/${version}/g" $(find $helm_dir -type f)
-
-                echo $(grep -nr $CIRCLE_SHA1 $helm_dir)
-                helm package ${helm_dir} -d ~/project
-
-                echo_green "ok: created chart tarball"  
-      use-tarball:
-        steps:
-          - run:
-              name: "Uses a tarball file"
-              attach_workspace:
-                at: ~/project
-              command: |
-                ls -la  ~/project/
-    jobs:
-      checkout:
-        executor: my-executor
-        steps:
-          - checkout
-          - create-tarball
-          - use-tarball
-
+  catalog: giantswarm/catalog@dev:alpha
 
 jobs:
   build:
@@ -158,9 +85,10 @@ workflows:
   version: 2.1
   build_e2e:
     jobs:
-      - app-catalog/checkout
-
       - build
+      - catalog/helm_package:
+          requires:
+            - build
 
       - e2eTestBasic:
           requires:
