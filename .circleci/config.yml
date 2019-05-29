@@ -81,7 +81,7 @@ orbs:
           - prepare-git-ssh-command
           - push-command:
               app_catalog: <<parameters.app_catalog>>
-              app_catalog_test: <<parameters.appcatalog_test>>
+              app_catalog_test: <<parameters.app_catalog_test>>
 
 
 jobs:
