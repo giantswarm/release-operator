@@ -71,10 +71,10 @@ orbs:
       push:
         executor: my-executor
         parameters:
-          appcatalog_name:
+          app_catalog:
             description: "Name of the Github repository inside giantswarm organization hosting the App Catalog for tagged builds."
             type: "string"
-          appcatalog_name_test:
+          app_catalog_test:
             description: "Name of the Github repository inside giantswarm organization hosting the App Catalog for test builds."
             type: "string"
         steps:
