@@ -50,13 +50,17 @@ orbs:
           - run: |
               git config --global gc.auto 0
 
-      checkout-command:
+      push-command:
         parameters:
-          repository:
+          app_catalog:
+            type: "string"
+          app_catalog_test:
             type: "string"
         steps:
           - run: |
-              git clone -q --depth=1 --single-branch -b master "git@github.com:giantswarm/<<parameters.repository>>.git" .app_catalog 
+              [ -z ${CIRCLE_TAG} ] && echo -n <<parameters.app_catalog_test>> || echo -n <<parameters.app_catalog>> > .app_catalog_name
+          - run: |
+              git clone -q --depth=1 --single-branch -b master "git@github.com:giantswarm/$(cat .app_catalog_name).git" .app_catalog 
 
     executors:
       my-executor:
@@ -64,17 +68,20 @@ orbs:
           - image: circleci/golang:1.12.4
 
     jobs:
-      checkout:
+      push:
         executor: my-executor
         parameters:
-          repository:
-            description: "Name of the Github repository inside giantswarm organization hosting the App Catalog."
+          appcatalog_name:
+            description: "Name of the Github repository inside giantswarm organization hosting the App Catalog for tagged builds."
+            type: "string"
+          appcatalog_name_test:
+            description: "Name of the Github repository inside giantswarm organization hosting the App Catalog for test builds."
             type: "string"
         steps:
-          # TODO: - prepare-chart-tarball-comand
           - prepare-git-ssh-command
-          - checkout-command:
-              repository: <<parameters.repository>>
+          - push-command:
+              app_catalog: <<parameters.app_catalog>>
+              app_catalog_test: <<parameters.appcatalog_test>>
 
 
 jobs:
@@ -130,9 +137,10 @@ jobs:
 workflows:
   build-and-e2e-test:
     jobs:
-      - app-catalog/checkout:
-          name: "app-catalog-checkout"
-          repository: "magic-catalog"
+      - app-catalog/push:
+          name: "app-catalog-push"
+          app_catalog: "magic-catalog"
+          app_catalog_test: "magic-catalog"
 
       - build
 
