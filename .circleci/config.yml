@@ -54,7 +54,7 @@ orbs:
             type: "string"
         steps:
           - run: |
-              git clone -q --depth=1 --single-branch -b master "git@github.com:giantswarm/${repo}.git" "${dir}"
+              git clone -q --depth=1 --single-branch -b master "git@github.com:giantswarm/<<parameters.repository>>.git" .app_catalog 
 
     executors:
       my-executor:
