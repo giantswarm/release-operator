@@ -77,15 +77,6 @@ orbs:
                       echo_red "error: tarball name doesn't match regexp ${regexp}" >&2
                       exit 1
                   fi
-    then
-        name="${BASH_REMATCH[1]}"
-        echo "${name}.jpg"    # concatenate strings
-        name="${name}.jpg"    # same thing stored in a variable
-    else
-        echo "$f doesn't match" >&2 # this could get noisy if there are a lot of non-matching files
-    fi
-
-                  -0.0.1.tgz
 
                   readonly repo=<<parameters.repository>>
 
