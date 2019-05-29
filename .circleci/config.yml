@@ -58,7 +58,7 @@ orbs:
             type: "string"
         steps:
           - run: |
-              [ -z ${CIRCLE_TAG} ] && echo -n <<parameters.app_catalog_test>> || echo -n <<parameters.app_catalog>> > .app_catalog_name
+              [ -z ${CIRCLE_TAG} ] && echo -n <<parameters.app_catalog_test>> > .app_catalog_name || echo -n <<parameters.app_catalog>> > .app_catalog_name
           - run: |
               git clone -q --depth=1 --single-branch -b master "git@github.com:giantswarm/$(cat .app_catalog_name).git" .app_catalog 
 
