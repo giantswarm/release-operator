@@ -53,39 +53,8 @@ orbs:
           repository:
             type: "string"
         steps:
-          - run:
-              name: "Checkout App Catalog repository to the .app-catalog directory"
-              command: |
-                  set -o errexit
-                  set -o nounset
-                  set -o pipefail
-
-                  echo_green() {
-                      echo -e "\e[32m${1}\e[0m"
-                  }
-                  echo_red() {
-                      echo -e "\e[31m${1}\e[0m"
-                  }
-                  echo_yellow() {
-                      echo -e "\e[33m${1}\e[0m"
-                  }
-
-                  # TODO move tarball
-                  regex="^.*-[0-9]+\.[0-9]+\.[0-9]+\.tgz$"
-                  if [[ $f =~ $regex ]]; then
-                  else
-                      echo_red "error: tarball name doesn't match regexp ${regexp}" >&2
-                      exit 1
-                  fi
-
-                  readonly repo=<<parameters.repository>>
-
-                  readonly org="giantswarm"
-                  readonly dir=".app-catalog"
-                  readonly branch="master"
-
-                  git clone -q --depth=1 --single-branch -b "${branch}" "git@github.com:${org}/${repo}.git" "${dir}"
-                  echo_green "ok: tip of the catalog ${org}/${repo}@${branch} cloned ${dir} directory"
+          - run: |
+              git clone -q --depth=1 --single-branch -b master "git@github.com:giantswarm/${repo}.git" "${dir}"
 
     executors:
       my-executor:
