@@ -104,8 +104,6 @@ orbs:
           - prepare-git-ssh-command
           - checkout-command:
               repository: <<parameters.repository>>
-          # TODO: - move-tarball-comamand
-          - push-command
 
 
 jobs:
