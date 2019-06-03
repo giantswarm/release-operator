@@ -56,7 +56,20 @@ orbs:
           - run: |
               [ -z ${CIRCLE_TAG} ] && echo -n '<<parameters.app_catalog_test>>' > .app_catalog_name || echo -n '<<parameters.app_catalog>>' > .app_catalog_name
           - run: |
+              # TODO do it for all charts in ./helm dir.
+              [ -d ./helm/${CIRCLE_PROJECT_REPONAME}-chart ] && mv ./helm/${CIRCLE_PROJECT_REPONAME}{-chart,} || true
+          - run: |
+              # TODO do it for all charts in ./helm dir.
+              architect helm template --dir ./helm/${CIRCLE_PROJECT_REPONAME}
+          - run: |
               git clone -q --depth=1 --single-branch -b master "git@github.com:giantswarm/$(cat .app_catalog_name).git" .app_catalog 
+          - run: |
+              # TODO do it for all charts in ./helm dir.
+              helm package ./helm/release-operator-chart ./helm/${CIRCLE_PROJECT_REPONAME} .app_catalog
+          - run: |
+              cd .app_catalog && git add -A
+
+
 
     executors:
       architect:
