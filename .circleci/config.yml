@@ -65,7 +65,7 @@ orbs:
               git clone -q --depth=1 --single-branch -b master "git@github.com:giantswarm/$(cat .app_catalog_name).git" .app_catalog 
           - run: |
               # TODO do it for all charts in ./helm dir.
-              helm package ./helm/release-operator-chart ./helm/${CIRCLE_PROJECT_REPONAME} .app_catalog
+              helm package ./helm/release-operator-chart ./helm/${CIRCLE_PROJECT_REPONAME} --destination .app_catalog
           - run: |
               cd .app_catalog && git add -A
 
