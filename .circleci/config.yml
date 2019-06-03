@@ -63,13 +63,13 @@ orbs:
               git clone -q --depth=1 --single-branch -b master "git@github.com:giantswarm/$(cat .app_catalog_name).git" .app_catalog 
 
     executors:
-      my-executor:
+      architect:
         docker:
-          - image: circleci/golang:1.12.4
+          - image: quay.io/giantswarm/architect:latest
 
     jobs:
       push:
-        executor: my-executor
+        executor: architect 
         parameters:
           app_catalog:
             description: "Name of the Github repository inside giantswarm organization hosting the App Catalog for tagged builds."
