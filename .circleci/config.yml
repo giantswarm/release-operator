@@ -31,10 +31,19 @@ version: 2.1
 orbs:
   app-catalog:
     commands:
+      tools-info-command:
+        steps:
+          - run: |
+              architect version
+          - run: |
+              echo $BASH_VERSION
+          - run: |
+              git version
+          - run: |
+              helm version -c
+
       prepare-git-ssh-command:
         steps:
-          # TODO try to move it down
-          - checkout
           - run: |
               [ ! -z "${CATALOGBOT_SSH_KEY_PRIVATE_BASE64}" ] && exit 0 || echo "CATALOGBOT_SSH_KEY_PRIVATE_BASE64 env variable must not be empty" ; exit 1
           - run: |
@@ -54,26 +63,25 @@ orbs:
             type: "string"
           app_catalog_test:
             type: "string"
+          chart:
+            type: "string"
         steps:
           - run: |
               [ -z ${CIRCLE_TAG} ] && echo -n '<<parameters.app_catalog_test>>' > .app_catalog_name || echo -n '<<parameters.app_catalog>>' > .app_catalog_name
           - run: |
-              # TODO do it for all charts in ./helm dir.
-              [ -d ./helm/${CIRCLE_PROJECT_REPONAME}-chart ] && mv ./helm/${CIRCLE_PROJECT_REPONAME}-chart ./helm/${CIRCLE_PROJECT_REPONAME} || true
+              [[ <<parameters.chart>> == ${CIRCLE_PROJECT_REPONAME}* ]] && exit 0 || echo "chart parameter value must start with ${CIRCLE_PROJECT_REPONAME}" ; exit 1
           - run: |
-              # TODO do it for all charts in ./helm dir.
-              architect helm template --dir ./helm/${CIRCLE_PROJECT_REPONAME}
+              architect helm template --dir ./helm/<<parameters.chart>>
           - run: |
               git clone -q --depth=1 --single-branch -b master "git@github.com:giantswarm/$(cat .app_catalog_name).git" .app_catalog 
           - run: |
-              # TODO do it for all charts in ./helm dir.
-              helm package --save=false ./helm/${CIRCLE_PROJECT_REPONAME} --destination .app_catalog
+              helm package --save=false ./helm/<<parameters.chart>> --destination .app_catalog
           - run: |
               helm repo index --url https://giantswarm.github.com/$(cat .catalog_name) .app_catalog
           - run: |
               cd .app_catalog && git add -A
           - run: |
-              cd .app_catalog && git commit -m "add ${CIRCLE_PROJECT_REPONAME}:$(architect project version)"
+              cd .app_catalog && git commit -m "add <<parameters.chart>>:$(architect project version)"
           - run: |
               cd .app_catalog && git push
 
@@ -81,7 +89,8 @@ orbs:
     executors:
       architect:
         docker:
-          - image: quay.io/giantswarm/architect:latest
+          - entrypoint: /bin/bash
+            image: quay.io/giantswarm/architect:latest
 
     jobs:
       push:
@@ -93,7 +102,12 @@ orbs:
           app_catalog_test:
             description: "Name of the Github repository inside giantswarm organization hosting the App Catalog for test builds."
             type: "string"
+          chart:
+            description: "Name of the chart inside helm directory to push to the App Catalog."
+            type: "string"
         steps:
+          - checkout # This is build-in CircleCI command.
+          - tools-info-command
           - prepare-git-ssh-command
           - push-command:
               app_catalog: <<parameters.app_catalog>>
@@ -157,6 +171,7 @@ workflows:
           name: "app-catalog-push"
           app_catalog: "magic-catalog"
           app_catalog_test: "magic-catalog"
+          chart: "release-operator-chart"
 
       - build
 
