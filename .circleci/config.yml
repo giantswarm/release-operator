@@ -85,7 +85,7 @@ orbs:
           - run: |
               cd .app_catalog && git add -A
           - run: |
-              cd .app_catalog && git commit -m "add <<parameters.chart>>:$(architect project version)"
+              cd .app_catalog && git commit -m "add $(git status --porcelain | cut -c4- | grep <<parameters.chart>>)"
           - run: |
               cd .app_catalog && git push
 
