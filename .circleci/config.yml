@@ -59,7 +59,7 @@ orbs:
               [ -z ${CIRCLE_TAG} ] && echo -n '<<parameters.app_catalog_test>>' > .app_catalog_name || echo -n '<<parameters.app_catalog>>' > .app_catalog_name
           - run: |
               # TODO do it for all charts in ./helm dir.
-              [ -d ./helm/${CIRCLE_PROJECT_REPONAME}-chart ] && mv ./helm/${CIRCLE_PROJECT_REPONAME}{-chart,} || true
+              [ -d ./helm/${CIRCLE_PROJECT_REPONAME}-chart ] && mv ./helm/${CIRCLE_PROJECT_REPONAME}-chart ./helm/${CIRCLE_PROJECT_REPONAME} || true
           - run: |
               # TODO do it for all charts in ./helm dir.
               architect helm template --dir ./helm/${CIRCLE_PROJECT_REPONAME}
