@@ -33,6 +33,7 @@ orbs:
     commands:
       prepare-git-ssh-command:
         steps:
+          # TODO try to move it down
           - checkout
           - run: |
               [ ! -z "${CATALOGBOT_SSH_KEY_PRIVATE_BASE64}" ] && exit 0 || echo "CATALOGBOT_SSH_KEY_PRIVATE_BASE64 env variable must not be empty" ; exit 1
@@ -66,14 +67,15 @@ orbs:
               git clone -q --depth=1 --single-branch -b master "git@github.com:giantswarm/$(cat .app_catalog_name).git" .app_catalog 
           - run: |
               # TODO do it for all charts in ./helm dir.
-              helm package ./helm/release-operator-chart ./helm/${CIRCLE_PROJECT_REPONAME} --destination .app_catalog
+              helm package --save=false ./helm/release-operator-chart ./helm/${CIRCLE_PROJECT_REPONAME} --destination .app_catalog
           - run: |
               helm repo index --url https://giantswarm.github.com/$(cat .catalog_name) .app_catalog
           - run: |
               cd .app_catalog && git add -A
           - run: |
-              # TODO `architect project version` would be useful here.
-              cd .app_catalog && git commit -m "add ${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}"
+              cd .app_catalog && git commit -m "add ${CIRCLE_PROJECT_REPONAME}:$(architect project version)"
+          - run: |
+              cd .app_catalog && git push
 
 
     executors:
