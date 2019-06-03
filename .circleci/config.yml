@@ -56,6 +56,10 @@ orbs:
               git config --global url."ssh://git@github.com".insteadOf "https://github.com"
           - run: |
               git config --global gc.auto 0
+          - run: |
+              git config --global user.email "catalogbot@giantswarm.io"
+          - run: |
+              git config --global user.name "CatalogBot"
 
       push-command:
         parameters:
@@ -84,7 +88,6 @@ orbs:
               cd .app_catalog && git commit -m "add <<parameters.chart>>:$(architect project version)"
           - run: |
               cd .app_catalog && git push
-
 
     executors:
       architect:
