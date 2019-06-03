@@ -55,6 +55,7 @@ orbs:
         steps:
           - run: |
               [ -z ${CIRCLE_TAG} ] && echo -n '<<parameters.app_catalog_test>>' > .app_catalog_name || echo -n '<<parameters.app_catalog>>' > .app_catalog_name
+          - checkout
           - run: |
               # TODO do it for all charts in ./helm dir.
               [ -d ./helm/${CIRCLE_PROJECT_REPONAME}-chart ] && mv ./helm/${CIRCLE_PROJECT_REPONAME}{-chart,} || true
@@ -67,8 +68,12 @@ orbs:
               # TODO do it for all charts in ./helm dir.
               helm package ./helm/release-operator-chart ./helm/${CIRCLE_PROJECT_REPONAME} --destination .app_catalog
           - run: |
+              helm repo index --url https://giantswarm.github.com/$(cat .catalog_name) .app_catalog
+          - run: |
               cd .app_catalog && git add -A
-
+          - run: |
+              # TODO `architect project version` would be useful here.
+              cd .app_catalog && git commit -m "add ${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}"
 
 
     executors:
