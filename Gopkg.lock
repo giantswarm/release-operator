@@ -232,11 +232,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:79f54a2f18a165a7f4310ff5ec6ae87e5352e31a5ac2b0e84e8913ba22cfa841"
+  digest = "1:612ce4bc875c67e8d372a12b4b432dd55dfdaf3bc0268e808192bad4a02a5ebf"
   name = "github.com/giantswarm/microerror"
   packages = ["."]
   pruneopts = "UT"
-  revision = "dc32fd459f94c7f9f938366135f6a19b3f9c63a9"
+  revision = "f446cc816a48d6626ddce3ecd966c8b6be3a1985"
 
 [[projects]]
   branch = "master"
