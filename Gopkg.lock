@@ -199,7 +199,7 @@
   name = "github.com/giantswarm/exporterkit"
   packages = ["collector"]
   pruneopts = "UT"
-  revision = "3c367b3fab44e69ff2657b7ba61ac7eb93f8c86b"
+  revision = "91937adfdcba979fffe88a82277cfc08805d5f88"
 
 [[projects]]
   branch = "master"
@@ -259,7 +259,7 @@
     "tls",
   ]
   pruneopts = "UT"
-  revision = "864e4cc9c80644e48e8ac3168b6aafb5cbd0e5bb"
+  revision = "ae70e65c60f81ba9442376702b7666b261a1895a"
 
 [[projects]]
   branch = "master"
@@ -295,7 +295,7 @@
     "informer/collector",
   ]
   pruneopts = "UT"
-  revision = "dc60ddf19e89ce0a1ade4a52e94258734bf82dab"
+  revision = "593866f913df6120d60d12c92d04fa0dbc3c5b93"
 
 [[projects]]
   branch = "master"
@@ -610,8 +610,7 @@
   version = "v3.0.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:83cafe4aa5ad67688af16001c10cfc9c0c511b44fe06db16edd7d49ef99e8362"
+  digest = "1:e89f2cdede55684adbe44b5566f55838ad2aee1dff348d14b73ccf733607b671"
   name = "github.com/prometheus/client_golang"
   packages = [
     "prometheus",
@@ -619,7 +618,8 @@
     "prometheus/promhttp",
   ]
   pruneopts = "UT"
-  revision = "6aba2189ebe6959268894366998500defefa2907"
+  revision = "2641b987480bca71fb39738eb8c8b0d577cb1d76"
+  version = "v0.9.4"
 
 [[projects]]
   branch = "master"
