@@ -36,6 +36,9 @@ spec:
           - key: config.yml
             path: config.yml
       serviceAccountName: release-operator
+      securityContext:
+        runAsUser: {{ .Values.userID }}
+        runAsGroup: {{ .Values.groupID }}
       containers:
       - name: release-operator
         image: quay.io/giantswarm/release-operator:[[ .SHA ]]
