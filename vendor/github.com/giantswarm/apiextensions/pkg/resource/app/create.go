@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	"github.com/giantswarm/microerror"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+
+	"github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 )
 
 // ApplyCreateChange ensures the App CR is created in the k8s api.

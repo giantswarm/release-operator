@@ -113,7 +113,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:73215600773eac8399396c41e888a01d9f64a5ebdf8d3c381533f8793c2f2326"
+  digest = "1:21b2e183f32d0a915b0c1a46eeda819b5fa049c5ff812f7a2509e3cfa49e4814"
   name = "github.com/giantswarm/apiextensions"
   packages = [
     "pkg/apis/application/v1alpha1",
@@ -134,9 +134,10 @@
     "pkg/clientset/versioned/typed/provider/v1alpha1/fake",
     "pkg/clientset/versioned/typed/release/v1alpha1",
     "pkg/clientset/versioned/typed/release/v1alpha1/fake",
+    "pkg/resource/app",
   ]
   pruneopts = "UT"
-  revision = "5294df621fba91f5e5b45730904a377623752242"
+  revision = "60518c8c0e8902a8919127ee4c3fb2c8f7929422"
 
 [[projects]]
   branch = "master"
@@ -1171,6 +1172,8 @@
     "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1",
     "github.com/giantswarm/apiextensions/pkg/clientset/versioned",
     "github.com/giantswarm/apiextensions/pkg/clientset/versioned/fake",
+    "github.com/giantswarm/apiextensions/pkg/resource/app",
+    "github.com/giantswarm/backoff",
     "github.com/giantswarm/e2e-harness/pkg/harness",
     "github.com/giantswarm/e2e-harness/pkg/release",
     "github.com/giantswarm/e2esetup/k8s",

@@ -3,11 +3,10 @@ package app
 import (
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
+	"github.com/giantswarm/apiextensions/pkg/resource/app"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
-
-	"github.com/giantswarm/release-operator/pkg/controller/resource/app"
 )
 
 const (

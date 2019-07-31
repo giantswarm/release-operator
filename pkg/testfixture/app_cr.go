@@ -34,12 +34,12 @@ func NewAppCRFromFilled(modifyFunc func(*applicationv1alpha1.App)) *applicationv
 			},
 			Name:      "test-spec-name",
 			Namespace: "test-spec-namespace",
-			UserConfig: applicationv1alpha1.AppSpecConfig{
-				ConfigMap: applicationv1alpha1.AppSpecConfigConfigMap{
+			UserConfig: applicationv1alpha1.AppSpecUserConfig{
+				ConfigMap: applicationv1alpha1.AppSpecUserConfigConfigMap{
 					Name:      "test-spec-userconfig-configmap-name",
 					Namespace: "test-spec-userconfig-configmap-namespace",
 				},
-				Secret: applicationv1alpha1.AppSpecConfigSecret{
+				Secret: applicationv1alpha1.AppSpecUserConfigSecret{
 					Name:      "test-spec-userconfig-secret-name",
 					Namespace: "test-spec-userconfig-secret-namespace",
 				},

@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	"github.com/giantswarm/microerror"
+
+	"github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 )
 
 func (r *Resource) ApplyUpdateChange(ctx context.Context, obj, updateChange interface{}) error {
