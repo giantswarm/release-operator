@@ -1,3 +1,24 @@
-namespace: giantswarm
-userID: 1000
-groupID: 1000
+image:
+  registry: "quay.io"
+  repository: "giantswarm/release-operator"
+  tag: "[[ .SHA ]]"
+pod:
+  user:
+    id: 1000
+  group:
+    id: 1000
+resource:
+  configMap:
+    name: "release-operator-configmap"
+  default:
+    name: "release-operator"
+    namespace: "giantswarm"
+  networkPolicy:
+    name: "release-operator-network-policy"
+  psp:
+    name: "release-operator-psp"
+  pullSecret:
+    name: "release-operator-pull-secret"
+  service:
+    port: 8000
+    protocol: "TCP"
