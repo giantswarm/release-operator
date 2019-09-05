@@ -1,10 +1,10 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: release-operator
-  namespace: {{ .Values.namespace }}
+  name: {{ .Values.resource.default.name }}
+  namespace: {{ .Values.resource.default.namespace }}
   labels:
-    app: release-operator
+    app: {{ .Values.resource.default.name }}
 spec:
   replicas: 1
   strategy:
@@ -12,7 +12,7 @@ spec:
   template:
     metadata:
       labels:
-        app: release-operator
+        app: {{ .Values.resource.default.name }}
       annotations:
         releasetime: {{ $.Release.Time }}
     spec:
@@ -25,29 +25,29 @@ spec:
                 - key: app
                   operator: In
                   values:
-                  - release-operator
+                  - {{ .Values.resource.default.name }}
               topologyKey: kubernetes.io/hostname
             weight: 100
       volumes:
-      - name: release-operator-configmap
+      - name: {{ .Values.resource.configMap.name }}
         configMap:
-          name: release-operator-configmap
+          name:  {{ .Values.resource.configMap.name }}
           items:
           - key: config.yml
             path: config.yml
-      serviceAccountName: release-operator
+      serviceAccountName: {{ .Values.resource.default.name }}
       securityContext:
-        runAsUser: {{ .Values.userID }}
-        runAsGroup: {{ .Values.groupID }}
+        runAsUser: {{ .Values.pod.user.id }}
+        runAsGroup: {{ .Values.pod.group.id }}
       containers:
       - name: release-operator
-        image: quay.io/giantswarm/release-operator:[[ .SHA ]]
+        image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         args:
         - daemon
         - --config.dirs=/var/run/release-operator/configmap/
         - --config.files=config
         volumeMounts:
-        - name: release-operator-configmap
+        - name: {{ .Values.resource.configMap.name }}
           mountPath: /var/run/release-operator/configmap/
         livenessProbe:
           httpGet:
@@ -63,4 +63,4 @@ spec:
             cpu: 100m
             memory: 150Mi
       imagePullSecrets:
-      - name: release-operator-pull-secret
+      - name: {{ .Values.resource.pullSecret.name }}
