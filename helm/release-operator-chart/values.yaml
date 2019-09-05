@@ -17,6 +17,8 @@ resource:
     name: "release-operator-network-policy"
   psp:
     name: "release-operator-psp"
+  pullSecret:
+    name: "release-operator-pull-secret"
   service:
     port: 8000
-    protocol: TCP
+    protocol: "TCP"
