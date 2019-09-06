@@ -85,6 +85,7 @@ func mainWithError() (err error) {
 			GitCommit:   project.GitSHA(),
 			Name:        project.Name(),
 			Source:      project.Source(),
+			Version:     project.Version(),
 		}
 
 		newCommand, err = command.New(c)
