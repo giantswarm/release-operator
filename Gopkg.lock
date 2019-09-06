@@ -200,7 +200,7 @@
   name = "github.com/giantswarm/exporterkit"
   packages = ["collector"]
   pruneopts = "UT"
-  revision = "3c367b3fab44e69ff2657b7ba61ac7eb93f8c86b"
+  revision = "9749deade60f7624620aa7158a4f38c87ea23795"
 
 [[projects]]
   branch = "master"
@@ -241,7 +241,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:83013eaf386dd720e63ab59999d7ea22390fae720bc7c7d3fa31a8c07efb9894"
+  digest = "1:5a83c09d3255d3a9311f988a46068e99f537de547899fa3956ec4c51b439d0b2"
   name = "github.com/giantswarm/microkit"
   packages = [
     "command",
@@ -260,7 +260,7 @@
     "tls",
   ]
   pruneopts = "UT"
-  revision = "864e4cc9c80644e48e8ac3168b6aafb5cbd0e5bb"
+  revision = "4eef9bd9640621debcdfa90dee993cb6898d18cf"
 
 [[projects]]
   branch = "master"
@@ -276,7 +276,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:06d85b7a32fefc8d774db32228e925c01fc7d95b209486d135cb51ccddcaf6c1"
+  digest = "1:575cc0b4417c44e1753c7bc0de70d29b3e8ef92eb2d0f58e3a86ab7de29fec62"
   name = "github.com/giantswarm/operatorkit"
   packages = [
     "client/k8scrdclient",
@@ -286,17 +286,18 @@
     "controller/context/reconciliationcanceledcontext",
     "controller/context/resourcecanceledcontext",
     "controller/context/updateallowedcontext",
-    "controller/resource/internal",
-    "controller/resource/metricsresource",
-    "controller/resource/retryresource",
     "flag/service/kubernetes",
     "flag/service/kubernetes/tls",
     "flag/service/kubernetes/watch",
     "informer",
     "informer/collector",
+    "resource",
+    "resource/wrapper/internal",
+    "resource/wrapper/metricsresource",
+    "resource/wrapper/retryresource",
   ]
   pruneopts = "UT"
-  revision = "dc60ddf19e89ce0a1ade4a52e94258734bf82dab"
+  revision = "8a0fbd0dde5a82821baa1dbbea5d925bfbe7f37d"
 
 [[projects]]
   branch = "master"
@@ -611,8 +612,7 @@
   version = "v3.0.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:83cafe4aa5ad67688af16001c10cfc9c0c511b44fe06db16edd7d49ef99e8362"
+  digest = "1:e89f2cdede55684adbe44b5566f55838ad2aee1dff348d14b73ccf733607b671"
   name = "github.com/prometheus/client_golang"
   packages = [
     "prometheus",
@@ -620,7 +620,8 @@
     "prometheus/promhttp",
   ]
   pruneopts = "UT"
-  revision = "6aba2189ebe6959268894366998500defefa2907"
+  revision = "2641b987480bca71fb39738eb8c8b0d577cb1d76"
+  version = "v0.9.4"
 
 [[projects]]
   branch = "master"
@@ -1192,10 +1193,11 @@
     "github.com/giantswarm/operatorkit/client/k8srestconfig",
     "github.com/giantswarm/operatorkit/controller",
     "github.com/giantswarm/operatorkit/controller/context/reconciliationcanceledcontext",
-    "github.com/giantswarm/operatorkit/controller/resource/metricsresource",
-    "github.com/giantswarm/operatorkit/controller/resource/retryresource",
     "github.com/giantswarm/operatorkit/flag/service/kubernetes",
     "github.com/giantswarm/operatorkit/informer",
+    "github.com/giantswarm/operatorkit/resource",
+    "github.com/giantswarm/operatorkit/resource/wrapper/metricsresource",
+    "github.com/giantswarm/operatorkit/resource/wrapper/retryresource",
     "github.com/google/go-cmp/cmp",
     "github.com/spf13/viper",
     "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset",

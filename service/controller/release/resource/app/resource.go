@@ -7,6 +7,7 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
+	"github.com/giantswarm/operatorkit/resource"
 )
 
 const (
@@ -22,7 +23,7 @@ type Config struct {
 // releases and deleting App CRs for components in EOL releases. App CRs for
 // components existing in both EOL and non-EOL releases are not deleted by the
 // returned resource.
-func New(config Config) (controller.Resource, error) {
+func New(config Config) (resource.Interface, error) {
 	if config.G8sClient == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.G8sClient must not be empty", config)
 	}
