@@ -1,23 +1,37 @@
-package metricsresource
+package retryresource
 
 import (
 	"context"
+	"time"
 
+	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/micrologger"
 
 	"github.com/giantswarm/operatorkit/controller"
-	"github.com/giantswarm/operatorkit/controller/resource/internal"
+	"github.com/giantswarm/operatorkit/resource"
+	"github.com/giantswarm/operatorkit/resource/wrapper/internal"
 )
 
 // crudResourceWrapper is a specialized wrapper which wraps
 // *controller.CRUDResource.
 type crudResourceWrapper struct {
-	resource controller.Resource
+	logger   micrologger.Logger
+	resource resource.Interface
+
+	backOff backoff.Interface
 }
 
 func newCRUDResourceWrapper(config Config) (*crudResourceWrapper, error) {
+	if config.Logger == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
+	}
 	if config.Resource == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Resource must not be empty", config)
+	}
+
+	if config.BackOff == nil {
+		config.BackOff = backoff.NewExponential(2*time.Minute, 10*time.Second)
 	}
 
 	// Wrap underlying resource Ops with retry logic. Underlying resource
@@ -34,9 +48,10 @@ func newCRUDResourceWrapper(config Config) (*crudResourceWrapper, error) {
 		}
 
 		c := crudResourceOpsWrapperConfig{
-			Ops: underlyingCRUD.CRUDResourceOps,
+			Logger: config.Logger,
+			Ops:    underlyingCRUD.CRUDResourceOps,
 
-			ResourceName: config.Resource.Name(),
+			BackOff: config.BackOff,
 		}
 
 		wrappedOps, err := newCRUDResourceWrapperOps(c)
@@ -48,7 +63,12 @@ func newCRUDResourceWrapper(config Config) (*crudResourceWrapper, error) {
 	}
 
 	r := &crudResourceWrapper{
+		logger: config.Logger.With(
+			"underlyingResource", config.Resource.Name(),
+		),
 		resource: config.Resource,
+
+		backOff: config.BackOff,
 	}
 
 	return r, nil
@@ -81,6 +101,6 @@ func (r *crudResourceWrapper) Name() string {
 }
 
 // Wrapped implements internal.Wrapper interface.
-func (r *crudResourceWrapper) Wrapped() controller.Resource {
+func (r *crudResourceWrapper) Wrapped() resource.Interface {
 	return r.resource
 }

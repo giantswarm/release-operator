@@ -7,8 +7,9 @@ import (
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
-	"github.com/giantswarm/operatorkit/controller/resource/metricsresource"
-	"github.com/giantswarm/operatorkit/controller/resource/retryresource"
+	"github.com/giantswarm/operatorkit/resource"
+	"github.com/giantswarm/operatorkit/resource/wrapper/metricsresource"
+	"github.com/giantswarm/operatorkit/resource/wrapper/retryresource"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/release-operator/service/controller/release/controllercontext"
@@ -26,7 +27,7 @@ type ResourceSetConfig struct {
 func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 	var err error
 
-	var statusResource controller.Resource
+	var statusResource resource.Interface
 	{
 		c := status.Config{
 			G8sClient: config.G8sClient,
@@ -40,7 +41,7 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 		}
 	}
 
-	var labelResource controller.Resource
+	var labelResource resource.Interface
 	{
 		c := label.Config{
 			G8sClient: config.G8sClient,
@@ -53,7 +54,7 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 		}
 	}
 
-	var appResource controller.Resource
+	var appResource resource.Interface
 	{
 		c := app.Config{
 			G8sClient: config.G8sClient,
@@ -66,7 +67,7 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 		}
 	}
 
-	resources := []controller.Resource{
+	resources := []resource.Interface{
 		statusResource,
 		labelResource,
 		appResource,
