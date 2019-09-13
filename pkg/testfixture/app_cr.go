@@ -7,7 +7,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func NewAppCRFromFilled(modifyFunc func(*applicationv1alpha1.App)) *applicationv1alpha1.App {
+func NewAppCRFromFilled(modifyFunc func(v *applicationv1alpha1.App)) *applicationv1alpha1.App {
 	appCR := &applicationv1alpha1.App{
 		TypeMeta: applicationv1alpha1.NewAppTypeMeta(),
 		ObjectMeta: metav1.ObjectMeta{
