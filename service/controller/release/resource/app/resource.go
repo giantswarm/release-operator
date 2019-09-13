@@ -3,11 +3,11 @@ package app
 import (
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
-	"github.com/giantswarm/apiextensions/pkg/resource/app"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/operatorkit/resource"
+	"github.com/giantswarm/resource/appresource"
 )
 
 const (
@@ -38,9 +38,9 @@ func New(config Config) (resource.Interface, error) {
 		logger:    config.Logger,
 	}
 
-	var appResource *app.Resource
+	var appResource *appresource.Resource
 	{
-		c := app.Config{
+		c := appresource.Config{
 			G8sClient:   config.G8sClient,
 			Logger:      config.Logger,
 			StateGetter: stateGetter,
@@ -48,7 +48,7 @@ func New(config Config) (resource.Interface, error) {
 			Name: Name,
 		}
 
-		appResource, err = app.New(c)
+		appResource, err = appresource.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

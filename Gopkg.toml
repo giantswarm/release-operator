@@ -67,6 +67,10 @@ required = [
   name = "github.com/giantswarm/operatorkit"
 
 [[constraint]]
+  branch = "master"
+  name = "github.com/giantswarm/resource"
+
+[[constraint]]
   version = "=0.2.0"
   name = "github.com/google/go-cmp"
 
