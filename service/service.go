@@ -96,6 +96,7 @@ func New(config Config) (*Service, error) {
 			GitCommit:   project.GitSHA(),
 			Name:        project.Name(),
 			Source:      project.Source(),
+			Version:     project.Version(),
 		}
 
 		versionService, err = version.New(versionConfig)
