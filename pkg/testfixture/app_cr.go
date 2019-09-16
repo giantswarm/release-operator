@@ -7,7 +7,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func NewAppCRFromFilled(modifyFunc func(*applicationv1alpha1.App)) *applicationv1alpha1.App {
+func NewAppCRFromFilled(modifyFunc func(v *applicationv1alpha1.App)) *applicationv1alpha1.App {
 	appCR := &applicationv1alpha1.App{
 		TypeMeta: applicationv1alpha1.NewAppTypeMeta(),
 		ObjectMeta: metav1.ObjectMeta{
@@ -16,7 +16,7 @@ func NewAppCRFromFilled(modifyFunc func(*applicationv1alpha1.App)) *applicationv
 		},
 		Spec: applicationv1alpha1.AppSpec{
 			Catalog: "test-spec-catalog",
-			Config: applicationv1alpha1.AppSpecConfig{
+			Config: &applicationv1alpha1.AppSpecConfig{
 				ConfigMap: applicationv1alpha1.AppSpecConfigConfigMap{
 					Name:      "test-spec-config-configmap-name",
 					Namespace: "test-spec-config-configmap-namespace",
@@ -27,14 +27,14 @@ func NewAppCRFromFilled(modifyFunc func(*applicationv1alpha1.App)) *applicationv
 				},
 			},
 			KubeConfig: applicationv1alpha1.AppSpecKubeConfig{
-				Secret: applicationv1alpha1.AppSpecKubeConfigSecret{
+				Secret: &applicationv1alpha1.AppSpecKubeConfigSecret{
 					Name:      "test-spec-kubeconfig-secret-name",
 					Namespace: "test-spec-kubeconfig-secret-namespace",
 				},
 			},
 			Name:      "test-spec-name",
 			Namespace: "test-spec-namespace",
-			UserConfig: applicationv1alpha1.AppSpecUserConfig{
+			UserConfig: &applicationv1alpha1.AppSpecUserConfig{
 				ConfigMap: applicationv1alpha1.AppSpecUserConfigConfigMap{
 					Name:      "test-spec-userconfig-configmap-name",
 					Namespace: "test-spec-userconfig-configmap-namespace",
@@ -48,7 +48,7 @@ func NewAppCRFromFilled(modifyFunc func(*applicationv1alpha1.App)) *applicationv
 		},
 		Status: applicationv1alpha1.AppStatus{
 			AppVersion: "test-status",
-			Release: applicationv1alpha1.AppStatusRelease{
+			Release: &applicationv1alpha1.AppStatusRelease{
 				LastDeployed: applicationv1alpha1.DeepCopyTime{
 					Time: time.Date(2019, 2, 12, 12, 4, 0, 0, time.UTC),
 				},
