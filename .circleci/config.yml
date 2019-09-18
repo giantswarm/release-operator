@@ -25,8 +25,149 @@ e2eTest: &e2eTest
         name: Finish with cleanup, no matter if the test succeeded or not
         command: ./e2e-harness teardown
         when: always
+orbs:
+  integration-test:
+    executors:
+      machine-executor:
+        machine: true
+    commands:
+      copy-architect-binaries:
+        steps:
 
-version: 2
+# --- Installing architect: start
+          - run:
+              name: "Create architect container"
+              command: |
+                docker container create quay.io/giantswarm/architect:latest > .architect_container_id
+          - run:
+              name: "Copy architect binary from architect container"
+              command: |
+                sudo docker cp $(cat .architect_container_id):/usr/bin/architect /usr/local/bin/
+          - run:
+              name: "Remove architect container"
+              command: |
+                docker container rm $(cat .architect_container_id)
+          - run:
+              name: "Remove working files"
+              command: |
+                rm .architect_container_id
+          - run:
+              name: "Check architect version"
+              command: |
+                architect version
+# --- Installing architect: end
+
+# --- Installing Go: start
+          # TODO Skip steps till `save_cache` if cache is restored and we have proper version of Go installed.
+          #- restore_cache:
+          #    keys:
+          #      - machine-executor-go-1-13-4
+          - run:
+              name: "Remove old Go"
+              command: |
+                sudo rm -rf /usr/local/go
+          - run:
+              name: "Download Go"
+              command: |
+                wget https://dl.google.com/go/go1.13.4.linux-amd64.tar.gz
+          - run:
+              name: "Check downloaded Go checksum"
+              command: |
+                [[ "$(sha256sum go1.13.4.linux-amd64.tar.gz | cut -d ' ' -f 1)" == "692d17071736f74be04a72a06dab9cac1cd759377bd85316e52b2227604c004c" ]]
+          - run:
+              name: "Install Go"
+              command: |
+                sudo tar -C /usr/local -xzf go1.13.4.linux-amd64.tar.gz
+          - run:
+              name: "Remove downloaded Go files"
+              command: |
+                rm go1.13.4.linux-amd64.tar.gz
+          #- save_cache:
+          #    key: machine-executor-go-1-13-4
+          #    paths:
+          #      - "/usr/local/go"
+
+          #- run: 
+          #    name: "Configure GOPATH environment variable"
+          #    command: |
+          #      echo 'export GOPATH=/opt/go' >> $BASH_ENV
+          #- run: 
+          #    name: "Configure PATH environment variable"
+          #    command: |
+          #      echo 'export PATH=$GOPATH/bin:/opt/go/bin:$PATH' >> $BASH_ENV
+          - run: 
+              name: "Check Go version"
+              command: |
+                go version
+          - run: ls -la .
+# --- Installing Go: end
+
+      dospecialthings:
+        parameters:
+          env:
+            type: string
+          test-dir:
+            type: string
+        steps:
+          - run:
+              name: "Install kind"
+              command: |
+                CGO_ENABLED=0 GO111MODULE="on" go get sigs.k8s.io/kind@v0.5.1
+          - run: 
+              name: "Create Kubernetes cluster"
+              command: |
+                kind create cluster
+          - run:
+              name: "Create .env file"
+              command: |
+                echo '<< parameters.env >>' | sed -e 's/^\(.\)/export \1/' > .env
+          - run:
+              name: "Display .env file"
+              command: |
+                cat .env
+          - run:
+              # TODO remove this part after switch to Go modules.
+              name: "Move code to $GOPATH"
+              command: |
+                mkdir -p $GOPATH/src/github.com/${CIRCLE_PROJECT_USERNAME} && mv ~/project $GOPATH/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+          - run:
+              name: "Run test"
+              command: |
+                cd $GOPATH/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME} && source .env && CGO_ENABLED=0 E2E_KUBECONFIG=$(kind get kubeconfig-path --name="kind") go test -v -tags k8srequired << parameters.test-dir >>
+          - run:
+              name: "Export logs"
+              command: |
+                kind export logs ./kind/logs
+          - store_artifacts:
+              path: ./kind/logs
+              destination: logs
+    jobs:
+      myjob:
+        environment:
+          GOPATH: /go
+        parameters:
+          env:
+            default: ""
+            description: |
+              Environment variables configuration. Must be in following format:
+
+                  VAR_A="VALUE_A"
+                  VAR_B="VALUE_B"
+            type: string
+          test-dir:
+            description: "Tested package directory."
+            type: string
+        executor: machine-executor
+        steps:
+          - copy-architect-binaries
+          - checkout
+          - attach_workspace:
+              at: .
+          - dospecialthings:
+              env: << parameters.env >>
+              test-dir: << parameters.test-dir >>
+
+version: 2.1
 jobs:
   build:
     machine: true
@@ -81,27 +222,10 @@ workflows:
   version: 2
   build_e2e:
     jobs:
-      - build
-
-      - e2eTestBasic:
-          requires:
-          - build
-      - e2eTestMultiReleaseHandling:
-          requires:
-          - build
-      - e2eTestReleaseHandling:
-          requires:
-          - build
-      - e2eTestReleaseCycle:
-          requires:
-          - build
-
-      - deploy:
-          filters:
-            branches:
-              only: master
-          requires:
-          - e2eTestBasic
-          - e2eTestMultiReleaseHandling
-          - e2eTestReleaseHandling
-          - e2eTestReleaseCycle
+      - integration-test/myjob:
+          env: |
+            E2E_TEST_DIR="./integration/test/basic"
+            A=TEST
+          test-dir: "./integration/test/basic"
+          #requires:
+          #  - build
