@@ -29,7 +29,7 @@ var releaseCycleCR = &releasev1alpha1.ReleaseCycle{
 var expectedAppCR = &applicationv1alpha1.App{
 	ObjectMeta: metav1.ObjectMeta{
 		Labels: map[string]string{
-			"app-operator.giantswarm.io/version": "1.0.0-" + env.CircleSHA(),
+			"app-operator.giantswarm.io/version": "0.0.0-" + env.CircleSHA(),
 			"giantswarm.io/managed-by":           "release-operator",
 			"giantswarm.io/service-type":         "managed",
 		},
