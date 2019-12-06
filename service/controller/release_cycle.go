@@ -1,15 +1,12 @@
 package controller
 
 import (
-	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
-	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
+	"github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+	"github.com/giantswarm/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/operatorkit/client/k8scrdclient"
 	"github.com/giantswarm/operatorkit/controller"
-	"github.com/giantswarm/operatorkit/informer"
-	apiextensionsclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
-	"k8s.io/client-go/kubernetes"
+	"k8s.io/apimachinery/pkg/runtime"
 
 	"github.com/giantswarm/release-operator/pkg/project"
 	"github.com/giantswarm/release-operator/service/controller/releasecycle"
@@ -20,10 +17,8 @@ var (
 )
 
 type ReleaseCycleConfig struct {
-	G8sClient    versioned.Interface
-	K8sClient    kubernetes.Interface
-	K8sExtClient apiextensionsclient.Interface
-	Logger       micrologger.Logger
+	K8sClient k8sclient.Interface
+	Logger    micrologger.Logger
 }
 
 type ReleaseCycle struct {
@@ -31,46 +26,17 @@ type ReleaseCycle struct {
 }
 
 func NewReleaseCycle(config ReleaseCycleConfig) (*ReleaseCycle, error) {
-	if config.G8sClient == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.G8sClient must not be empty", config)
+	if config.K8sClient == nil {
+		return nil, microerror.Maskf(invalidConfigError, "%T.K8sClient must not be empty", config)
 	}
 
 	var err error
 
-	var crdClient *k8scrdclient.CRDClient
-	{
-		c := k8scrdclient.Config{
-			K8sExtClient: config.K8sExtClient,
-			Logger:       config.Logger,
-		}
-
-		crdClient, err = k8scrdclient.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var newInformer *informer.Informer
-	{
-		c := informer.Config{
-			Logger:  config.Logger,
-			Watcher: config.G8sClient.Release().ReleaseCycles(),
-
-			RateWait:     informer.DefaultRateWait,
-			ResyncPeriod: informer.DefaultResyncPeriod,
-		}
-
-		newInformer, err = informer.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
 	var resourceSet *controller.ResourceSet
 	{
 		c := releasecycle.ResourceSetConfig{
-			G8sClient: config.G8sClient,
-			K8sClient: config.K8sClient,
+			G8sClient: config.K8sClient.G8sClient(),
+			K8sClient: config.K8sClient.K8sClient(),
 			Logger:    config.Logger,
 		}
 
@@ -83,16 +49,16 @@ func NewReleaseCycle(config ReleaseCycleConfig) (*ReleaseCycle, error) {
 	var releaseController *controller.Controller
 	{
 		c := controller.Config{
-			CRD:       releasev1alpha1.NewReleaseCycleCRD(),
-			CRDClient: crdClient,
-			Informer:  newInformer,
+			CRD:       v1alpha1.NewReleaseCycleCRD(),
+			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
+			Name:      releaseCycleControllerName,
 			ResourceSets: []*controller.ResourceSet{
 				resourceSet,
 			},
-			RESTClient: config.G8sClient.ReleaseV1alpha1().RESTClient(),
-
-			Name: releaseCycleControllerName,
+			NewRuntimeObjectFunc: func() runtime.Object {
+				return new(v1alpha1.ReleaseCycle)
+			},
 		}
 
 		releaseController, err = controller.New(c)
