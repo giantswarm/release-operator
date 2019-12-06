@@ -5,8 +5,8 @@ import (
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/operatorkit/controller"
 	"github.com/giantswarm/operatorkit/resource"
+	"github.com/giantswarm/operatorkit/resource/crud"
 	"github.com/giantswarm/resource/appresource"
 )
 
@@ -54,14 +54,14 @@ func New(config Config) (resource.Interface, error) {
 		}
 	}
 
-	var r *controller.CRUDResource
+	var r *crud.Resource
 	{
-		c := controller.CRUDResourceConfig{
+		c := crud.ResourceConfig{
+			CRUD:   appResource,
 			Logger: config.Logger,
-			Ops:    appResource,
 		}
 
-		r, err = controller.NewCRUDResource(c)
+		r, err = crud.NewResource(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
