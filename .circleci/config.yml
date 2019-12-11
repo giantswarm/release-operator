@@ -111,7 +111,7 @@ workflows:
       - e2eTestReleaseCycle:
           requires:
           - build
-            - architect/push-to-docker-legacy:
+      - architect/push-to-docker-legacy:
           name: push-release-operator-to-quay
           image: "quay.io/giantswarm/release-operator"
           username_envar: "QUAY_USERNAME"
