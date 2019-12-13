@@ -89,9 +89,10 @@ workflows:
       - e2eTestMultiReleaseHandling:
           requires:
           - build
-      - e2eTestReleaseHandling:
-          requires:
-          - build
+# TODO reenable and fix this flapping e2e integration test
+#      - e2eTestReleaseHandling:
+#          requires:
+#          - build
       - e2eTestReleaseCycle:
           requires:
           - build
@@ -103,5 +104,5 @@ workflows:
           requires:
           - e2eTestBasic
           - e2eTestMultiReleaseHandling
-          - e2eTestReleaseHandling
+#          - e2eTestReleaseHandling
           - e2eTestReleaseCycle
