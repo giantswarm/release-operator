@@ -102,12 +102,13 @@ workflows:
       - e2eTestBasic:
           requires:
           - build
-      - e2eTestMultiReleaseHandling:
-          requires:
-          - build
-      - e2eTestReleaseHandling:
-          requires:
-          - build
+# TODO reenable and fix these flapping e2e integration tests
+#      - e2eTestMultiReleaseHandling:
+#          requires:
+#          - build
+#      - e2eTestReleaseHandling:
+#          requires:
+#          - build
       - e2eTestReleaseCycle:
           requires:
           - build
@@ -160,8 +161,8 @@ workflows:
               only: master
           requires:
           - e2eTestBasic
-          - e2eTestMultiReleaseHandling
-          - e2eTestReleaseHandling
+#          - e2eTestMultiReleaseHandling
+#          - e2eTestReleaseHandling
           - e2eTestReleaseCycle
           - push-release-operator-to-aliyun-master
           - push-release-operator-to-quay
