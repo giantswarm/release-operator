@@ -63,10 +63,6 @@ orbs:
           #    keys:
           #      - machine-executor-go-1-13-4
           - run:
-              name: "DEBUG: go env (before removing)"
-              command: |
-                go env
-          - run:
               name: "Remove old Go"
               command: |
                 sudo rm -rf /usr/local/go
@@ -83,17 +79,13 @@ orbs:
               command: |
                 sudo tar -C /usr/local -xzf go1.13.4.linux-amd64.tar.gz
           - run:
-              name: "DEBUG: go env"
+              name: "Set go environtment"
               command: |
-                go env
+                go env -w GOBIN=/home/circleci/.go_workspace/bin
           - run:
-              name: "DEBUG: echo $PATH"
+              name: "Create $GOPATH directory"
               command: |
-                echo $PATH
-          - run:
-              name: "Create /go directory"
-              command: |
-                sudo mkdir /go && sudo chown $USER /go
+                sudo mkdir $(go env GOPATH) && sudo chown $USER $(go env GOPATH)
           - run:
               name: "Remove downloaded Go files"
               command: |
