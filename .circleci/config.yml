@@ -79,13 +79,13 @@ orbs:
               command: |
                 sudo tar -C /usr/local -xzf go1.13.4.linux-amd64.tar.gz
           - run:
-            name: "DEBUG: go env"
-            command: |
-              go env
+              name: "DEBUG: go env"
+              command: |
+                go env
           - run:
-            name: "DEBUG: echo $PATH"
-            command: |
-              echo $PATH
+              name: "DEBUG: echo $PATH"
+              command: |
+                echo $PATH
           - run:
               name: "Create /go directory"
               command: |
