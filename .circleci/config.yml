@@ -63,6 +63,10 @@ orbs:
           #    keys:
           #      - machine-executor-go-1-13-4
           - run:
+              name: "DEBUG: go env (before removing)"
+              command: |
+                go env
+          - run:
               name: "Remove old Go"
               command: |
                 sudo rm -rf /usr/local/go
