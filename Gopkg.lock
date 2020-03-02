@@ -300,7 +300,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:5ea4a83b027c56f8f5f5bae17671964275cbcd50115528ed9dc733f9330cac79"
+  digest = "1:af6e94d6164e1f08498a666f3cfa1ab0934d91d48142b450342c0e240bfa9084"
   name = "github.com/giantswarm/k8sclient"
   packages = [
     ".",
@@ -308,7 +308,7 @@
     "k8srestconfig",
   ]
   pruneopts = "UT"
-  revision = "6cb127468cd6b30eaf8030b875f796e34b481938"
+  revision = "1542917096d6cb2f12745ab24850a930a89dca6c"
 
 [[projects]]
   branch = "master"
@@ -396,14 +396,6 @@
   ]
   pruneopts = "UT"
   revision = "aa7ed959916171a1bc18c4f5ecf4b680c7e4af9e"
-
-[[projects]]
-  branch = "master"
-  digest = "1:c9ed61ebac47a063ed917404eb2a63558a672f2f4d1904584a2f2684a3acbf2e"
-  name = "github.com/giantswarm/resource"
-  packages = ["appresource"]
-  pruneopts = "UT"
-  revision = "efec931a0c230f01a9966dda1dd5864088546e09"
 
 [[projects]]
   branch = "master"
@@ -1873,15 +1865,12 @@
     "github.com/giantswarm/microkit/flag",
     "github.com/giantswarm/microkit/server",
     "github.com/giantswarm/micrologger",
-    "github.com/giantswarm/micrologger/microloggertest",
     "github.com/giantswarm/operatorkit/controller",
-    "github.com/giantswarm/operatorkit/controller/context/reconciliationcanceledcontext",
     "github.com/giantswarm/operatorkit/flag/service/kubernetes",
     "github.com/giantswarm/operatorkit/resource",
     "github.com/giantswarm/operatorkit/resource/crud",
     "github.com/giantswarm/operatorkit/resource/wrapper/metricsresource",
     "github.com/giantswarm/operatorkit/resource/wrapper/retryresource",
-    "github.com/giantswarm/resource/appresource",
     "github.com/google/go-cmp/cmp",
     "github.com/spf13/viper",
     "k8s.io/apimachinery/pkg/api/errors",
