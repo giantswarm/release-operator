@@ -14,9 +14,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/giantswarm/release-operator/service/controller/release/controllercontext"
-	"github.com/giantswarm/release-operator/service/controller/release/resource/app"
 	"github.com/giantswarm/release-operator/service/controller/release/resource/label"
-	"github.com/giantswarm/release-operator/service/controller/release/resource/status"
 )
 
 type ResourceSetConfig struct {
@@ -27,20 +25,6 @@ type ResourceSetConfig struct {
 
 func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 	var err error
-
-	var statusResource resource.Interface
-	{
-		c := status.Config{
-			G8sClient: config.G8sClient,
-			K8sClient: config.K8sClient,
-			Logger:    config.Logger,
-		}
-
-		statusResource, err = status.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
 
 	var labelResource resource.Interface
 	{
@@ -55,23 +39,8 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 		}
 	}
 
-	var appResource resource.Interface
-	{
-		c := app.Config{
-			G8sClient: config.G8sClient,
-			Logger:    config.Logger,
-		}
-
-		appResource, err = app.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
 	resources := []resource.Interface{
-		statusResource,
 		labelResource,
-		appResource,
 	}
 
 	{

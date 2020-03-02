@@ -1,5 +1,5 @@
 /*
-Copyright 2019 Giant Swarm GmbH.
+Copyright 2020 Giant Swarm GmbH.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -58,6 +58,10 @@ func (c *FakeCoreV1alpha1) DraughtsmanConfigs(namespace string) v1alpha1.Draught
 
 func (c *FakeCoreV1alpha1) FlannelConfigs(namespace string) v1alpha1.FlannelConfigInterface {
 	return &FakeFlannelConfigs{c, namespace}
+}
+
+func (c *FakeCoreV1alpha1) Ignitions(namespace string) v1alpha1.IgnitionInterface {
+	return &FakeIgnitions{c, namespace}
 }
 
 func (c *FakeCoreV1alpha1) IngressConfigs(namespace string) v1alpha1.IngressConfigInterface {
