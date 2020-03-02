@@ -207,12 +207,13 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:a15eeeca106bf7ebdb49f8fca2049998920ed4db120428826e6a41d3fa2abf66"
+  digest = "1:fa58d8d5c80c8173924eea8fc3673138a8ae1c8f37e84b6a770750fbdbeabe20"
   name = "github.com/giantswarm/apiextensions"
   packages = [
     "pkg/apis/application/v1alpha1",
     "pkg/apis/core/v1alpha1",
     "pkg/apis/example/v1alpha1",
+    "pkg/apis/infrastructure/v1alpha2",
     "pkg/apis/provider/v1alpha1",
     "pkg/apis/release/v1alpha1",
     "pkg/clientset/versioned",
@@ -224,13 +225,15 @@
     "pkg/clientset/versioned/typed/core/v1alpha1/fake",
     "pkg/clientset/versioned/typed/example/v1alpha1",
     "pkg/clientset/versioned/typed/example/v1alpha1/fake",
+    "pkg/clientset/versioned/typed/infrastructure/v1alpha2",
+    "pkg/clientset/versioned/typed/infrastructure/v1alpha2/fake",
     "pkg/clientset/versioned/typed/provider/v1alpha1",
     "pkg/clientset/versioned/typed/provider/v1alpha1/fake",
     "pkg/clientset/versioned/typed/release/v1alpha1",
     "pkg/clientset/versioned/typed/release/v1alpha1/fake",
   ]
   pruneopts = "UT"
-  revision = "a4fd7939e26e7e2cd681af032963a1597ffae781"
+  revision = "4652e9257038fa5a8d01af316d633b8ffddadbb6"
 
 [[projects]]
   branch = "master"
