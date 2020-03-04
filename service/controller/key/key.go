@@ -35,7 +35,7 @@ func IsDeleted(cr DeletionTimestampGetter) bool {
 
 // ReleaseVersion returns the version of the given release.
 func ReleaseVersion(releaseCR releasev1alpha1.Release) string {
-	return releaseCR.Spec.Version
+	return releaseCR.Name
 }
 
 // SplitReleaseName splits a release name into provider and version.
