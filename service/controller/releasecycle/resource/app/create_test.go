@@ -8,9 +8,10 @@ import (
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	versionedfake "github.com/giantswarm/apiextensions/pkg/clientset/versioned/fake"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/release-operator/service/controller/key"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kubernetesfake "k8s.io/client-go/kubernetes/fake"
+
+	"github.com/giantswarm/release-operator/service/controller/key"
 )
 
 func Test_newCreateChange(t *testing.T) {

@@ -28,7 +28,9 @@ func mainWithError() (err error) {
 	// Create a new logger that is used by all packages.
 	var newLogger micrologger.Logger
 	{
-		newLogger, err = micrologger.New(micrologger.Config{})
+		c := micrologger.Config{}
+
+		newLogger, err = micrologger.New(c)
 		if err != nil {
 			return microerror.Mask(err)
 		}
@@ -101,7 +103,10 @@ func mainWithError() (err error) {
 	daemonCommand.PersistentFlags().String(f.Service.Kubernetes.TLS.CrtFile, "", "Certificate file path to use to authenticate with Kubernetes.")
 	daemonCommand.PersistentFlags().String(f.Service.Kubernetes.TLS.KeyFile, "", "Key file path to use to authenticate with Kubernetes.")
 
-	newCommand.CobraCommand().Execute()
+	err = newCommand.CobraCommand().Execute()
+	if err != nil {
+		return microerror.Mask(err)
+	}
 
 	return nil
 }

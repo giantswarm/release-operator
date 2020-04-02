@@ -10,6 +10,11 @@ import (
 	"github.com/giantswarm/release-operator/pkg/testfixture"
 )
 
+const (
+	defaultApp       = "app"
+	defaultNamespace = "default"
+)
+
 func Test_getAppCR(t *testing.T) {
 	testCases := []struct {
 		name           string
@@ -23,22 +28,22 @@ func Test_getAppCR(t *testing.T) {
 			name: "case 0: same name different namespace",
 			inputAppCRs: []*applicationv1alpha1.App{
 				testfixture.NewAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
-					appCR.Name = "app"
-					appCR.Namespace = "default"
+					appCR.Name = defaultApp
+					appCR.Namespace = defaultNamespace
 				}),
 				testfixture.NewAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
-					appCR.Name = "app-1"
-					appCR.Namespace = "default"
+					appCR.Name = "app-8"
+					appCR.Namespace = defaultNamespace
 				}),
 				testfixture.NewAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
-					appCR.Name = "app"
+					appCR.Name = defaultApp
 					appCR.Namespace = "non-default"
 				}),
 			},
-			inputName:      "app",
+			inputName:      defaultApp,
 			inputNamespace: "non-default",
 			expectedAppCR: testfixture.NewAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
-				appCR.Name = "app"
+				appCR.Name = defaultApp
 				appCR.Namespace = "non-default"
 			}),
 			expectedOK: true,
@@ -48,15 +53,15 @@ func Test_getAppCR(t *testing.T) {
 			inputAppCRs: []*applicationv1alpha1.App{
 				testfixture.NewAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
 					appCR.Name = "app-0"
-					appCR.Namespace = "default"
+					appCR.Namespace = defaultNamespace
 				}),
 				testfixture.NewAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
 					appCR.Name = "app-1"
-					appCR.Namespace = "default"
+					appCR.Namespace = defaultNamespace
 				}),
 				testfixture.NewAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
 					appCR.Name = "app-2"
-					appCR.Namespace = "default"
+					appCR.Namespace = defaultNamespace
 				}),
 			},
 			inputName:      "app-2",
@@ -69,19 +74,19 @@ func Test_getAppCR(t *testing.T) {
 			inputAppCRs: []*applicationv1alpha1.App{
 				testfixture.NewAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
 					appCR.Name = "app-0"
-					appCR.Namespace = "default"
+					appCR.Namespace = defaultNamespace
 				}),
 				testfixture.NewAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
 					appCR.Name = "app-1"
-					appCR.Namespace = "default"
+					appCR.Namespace = defaultNamespace
 				}),
 				testfixture.NewAppCRFromFilled(func(appCR *applicationv1alpha1.App) {
 					appCR.Name = "app-2"
-					appCR.Namespace = "default"
+					appCR.Namespace = defaultNamespace
 				}),
 			},
-			inputName:      "app",
-			inputNamespace: "default",
+			inputName:      defaultApp,
+			inputNamespace: defaultNamespace,
 			expectedAppCR:  nil,
 			expectedOK:     false,
 		},
