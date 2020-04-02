@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/microkit/command"
 	microserver "github.com/giantswarm/microkit/server"
@@ -22,7 +20,7 @@ var (
 func main() {
 	err := mainWithError()
 	if err != nil {
-		panic(fmt.Sprintf("%#v\n", err))
+		panic(microerror.JSON(err))
 	}
 }
 
@@ -32,7 +30,7 @@ func mainWithError() (err error) {
 	{
 		newLogger, err = micrologger.New(micrologger.Config{})
 		if err != nil {
-			return microerror.Maskf(err, "micrologger.New")
+			return microerror.Mask(err)
 		}
 	}
 
@@ -50,7 +48,7 @@ func mainWithError() (err error) {
 
 			newService, err = service.New(serviceConfig)
 			if err != nil {
-				panic(fmt.Sprintf("%#v\n", microerror.Maskf(err, "service.New")))
+				panic(microerror.JSON(err))
 			}
 
 			go newService.Boot()
@@ -67,7 +65,7 @@ func mainWithError() (err error) {
 
 			newServer, err = server.New(c)
 			if err != nil {
-				panic(fmt.Sprintf("%#v\n", microerror.Maskf(err, "server.New")))
+				panic(microerror.JSON(err))
 			}
 		}
 
@@ -90,7 +88,7 @@ func mainWithError() (err error) {
 
 		newCommand, err = command.New(c)
 		if err != nil {
-			return microerror.Maskf(err, "command.New")
+			return microerror.Mask(err)
 		}
 	}
 
