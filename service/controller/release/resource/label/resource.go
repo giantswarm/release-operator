@@ -4,7 +4,6 @@ import (
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"k8s.io/client-go/kubernetes"
 )
 
 const (
@@ -25,7 +24,6 @@ type Config struct {
 // and second to update labels which generate separate events.
 type Resource struct {
 	g8sClient versioned.Interface
-	k8sClient kubernetes.Interface
 	logger    micrologger.Logger
 }
 
