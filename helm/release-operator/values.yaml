@@ -1,6 +1,6 @@
 image:
-  repository: "giantswarm/release-operator"
-  tag: "[[ .SHA ]]"
+  name: "giantswarm/release-operator"
+  tag: "[[ .Version ]]"
 Installation:
   V1:
     Registry:
