@@ -1,6 +1,0 @@
-apiVersion: v1
-name: release-operator
-description: The release-operator manages chart configs for new releases.
-home: https://github.com/giantswarm/release-operator
-version: [[ .Version ]]
-appVersion: [[ .AppVersion ]]
