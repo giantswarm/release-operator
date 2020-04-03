@@ -1,8 +1,6 @@
-package release
+package releasecycle
 
 import (
-	"context"
-
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -13,8 +11,7 @@ import (
 	"github.com/giantswarm/operatorkit/resource/wrapper/retryresource"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/giantswarm/release-operator/service/controller/release/controllercontext"
-	"github.com/giantswarm/release-operator/service/controller/release/resource/label"
+	"github.com/giantswarm/release-operator/service/controller/releasecycle/resource/app"
 )
 
 type ResourceSetConfig struct {
@@ -26,21 +23,27 @@ type ResourceSetConfig struct {
 func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 	var err error
 
-	var labelResource resource.Interface
+	var appResource resource.Interface
 	{
-		c := label.Config{
+		c := app.Config{
 			G8sClient: config.G8sClient,
+			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
 		}
 
-		labelResource, err = label.New(c)
+		ops, err := app.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+
+		appResource, err = toCRUDResource(config.Logger, ops)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
 	resources := []resource.Interface{
-		labelResource,
+		appResource,
 	}
 
 	{
@@ -63,18 +66,9 @@ func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 		}
 	}
 
-	initCtxFunc := func(ctx context.Context, obj interface{}) (context.Context, error) {
-		c := controllercontext.Context{}
-
-		ctx = controllercontext.NewContext(ctx, c)
-
-		return ctx, nil
-	}
-
 	var resourceSet *controller.ResourceSet
 	{
 		c := controller.ResourceSetConfig{
-			InitCtx:   initCtxFunc,
 			Logger:    config.Logger,
 			Resources: resources,
 		}

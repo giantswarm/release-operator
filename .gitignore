@@ -3,4 +3,11 @@
 
 # build result
 release-operator
-!helm/release-operator
+
+# don't apply earlier restrictions under vendor
+!vendor/**
+
+.e2e-harness
+
+integration/test/**/*-e2e
+integration/test/**/*-logs.txt
