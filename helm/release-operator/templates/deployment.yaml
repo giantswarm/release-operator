@@ -17,7 +17,7 @@ spec:
       labels:
         app: {{ .Values.resource.default.name }}
       annotations:
-        releasetime: {{ $.Release.Time }}
+        releaseRevision: {{ $.Release.Revision | quote }}
     spec:
       affinity:
         podAntiAffinity:
