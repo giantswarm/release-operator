@@ -1,79 +1,95 @@
-orbs:
-  architect: giantswarm/architect@0.4.5
-
 version: 2.1
-jobs:
-  build:
-    machine: true
-    steps:
-    - checkout
 
-    - run: |
-        wget -q $(curl -sS -H "Authorization: token $RELEASE_TOKEN" https://api.github.com/repos/giantswarm/architect/releases/latest | grep browser_download_url | head -n 1 | cut -d '"' -f 4)
-        chmod +x ./architect
-        ./architect version
-    - run: |
-        date +"%Y" > /tmp/year
-        date +"%m" > /tmp/month
-        date +"%d" > /tmp/day
-    - restore_cache:
-        keys:
-        - go-cache-v1-{{ checksum "/tmp/year" }}-{{ checksum "/tmp/month" }}-{{ checksum "/tmp/day" }}
-        - go-cache-v1-{{ checksum "/tmp/year" }}-{{ checksum "/tmp/month" }}
-        - go-cache-v1-{{ checksum "/tmp/year" }}
-
-    - run: ./architect build
-    - store_test_results:
-        path: /tmp/results
-    - save_cache:
-        key: go-cache-v1-{{ checksum "/tmp/year" }}-{{ checksum "/tmp/month" }}-{{ checksum "/tmp/day" }}
-        paths:
-        - /tmp/go/cache
-    - persist_to_workspace:
-        root: .
-        paths:
-          - ./release-operator
-          - ./architect
-  deploy:
-    machine: true
-    steps:
-    - checkout
-    - attach_workspace:
-        at: .
-    - deploy:
-        command: |
-            ./architect deploy
-
+orbs:
+  architect: giantswarm/architect@0.8.6
 
 workflows:
   version: 2
   build_e2e:
     jobs:
-      - build
+      - architect/go-build:
+          name: go-build-release-operator
+          binary: release-operator
+          filters:
+            # Trigger the job also on git tag.
+            tags:
+              only: /^v.*/
 
-      - architect/push-to-docker-legacy:
+      - architect/push-to-docker:
+          context: architect
           name: push-release-operator-to-quay
           image: "quay.io/giantswarm/release-operator"
           username_envar: "QUAY_USERNAME"
           password_envar: "QUAY_PASSWORD"
           requires:
-            - build
+            - go-build-release-operator
+          filters:
+            # Trigger the job also on git tag.
+            tags:
+              only: /^v.*/
 
-      - architect/push-to-docker-legacy:
+      - architect/push-to-docker:
+          context: architect
           name: push-release-operator-to-aliyun
           image: "registry-intl.cn-shanghai.aliyuncs.com/giantswarm/release-operator"
           username_envar: "ALIYUN_USERNAME"
           password_envar: "ALIYUN_PASSWORD"
           requires:
-            - build
+            - go-build-release-operator
           filters:
             branches:
               only: master
 
-      - deploy:
+      - architect/push-to-app-catalog:
+          context: architect
+          name: push-release-operator-to-control-plane-app-catalog
+          app_catalog: "control-plane-catalog"
+          app_catalog_test: "control-plane-test-catalog"
+          chart: "release-operator"
+          requires:
+            - push-release-operator-to-quay
+          filters:
+            tags:
+              only: /^v.*/
+
+      - architect/push-to-app-collection:
+          context: architect
+          name: push-release-operator-to-aws-app-collection
+          app_name: "release-operator"
+          app_collection_repo: "aws-app-collection"
+          unique: "true"
+          requires:
+            - push-release-operator-to-control-plane-app-catalog
           filters:
             branches:
-              only: master
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+
+      - architect/push-to-app-collection:
+          context: architect
+          name: push-release-operator-to-azure-app-collection
+          app_name: "release-operator"
+          app_collection_repo: "azure-app-collection"
+          unique: "true"
           requires:
-          - push-release-operator-to-aliyun
-          - push-release-operator-to-quay
+            - push-release-operator-to-control-plane-app-catalog
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+
+      - architect/push-to-app-collection:
+          context: architect
+          name: push-release-operator-to-kvm-app-collection
+          app_name: "release-operator"
+          app_collection_repo: "kvm-app-collection"
+          unique: "true"
+          requires:
+            - push-release-operator-to-control-plane-app-catalog
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
