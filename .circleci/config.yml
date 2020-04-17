@@ -37,8 +37,8 @@ workflows:
           requires:
             - go-build-release-operator
           filters:
-            branches:
-              only: master
+            tags:
+              only: /^v.*/
 
       - architect/push-to-app-catalog:
           context: architect
@@ -48,6 +48,7 @@ workflows:
           chart: "release-operator"
           requires:
             - push-release-operator-to-quay
+            - push-release-operator-to-aliyun
           filters:
             tags:
               only: /^v.*/
