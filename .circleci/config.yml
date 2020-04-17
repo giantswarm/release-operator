@@ -47,8 +47,8 @@ workflows:
           app_catalog_test: "control-plane-test-catalog"
           chart: "release-operator"
           requires:
-            - push-release-operator-to-quay
             - push-release-operator-to-aliyun
+            - push-release-operator-to-quay
           filters:
             tags:
               only: /^v.*/
