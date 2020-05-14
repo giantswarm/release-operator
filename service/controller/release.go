@@ -49,7 +49,6 @@ func NewRelease(config ReleaseConfig) (*Release, error) {
 	var releaseController *controller.Controller
 	{
 		c := controller.Config{
-			CRD:       v1alpha1.NewReleaseCRD(),
 			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
 			Name:      releaseControllerName,
