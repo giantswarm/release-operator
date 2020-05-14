@@ -9,15 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Changed
 
+- No longer ensure Release CRD.
 
 ## [1.0.3] 2020-04-22
 
 ### Changed
 
 - Use release.Revision in Helm chart for Helm 3 support.
-
-
 
 ## [1.0.2] 2020-04-21
 
@@ -31,15 +31,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix version in project.go file.
 
-
-
 ## [1.0.0] 2020-04-15
 
 ### Changed
 
 - Deploy as a unique app in app collection.
-
-
 
 ## [0.2.2] 2020-04-02
 
@@ -47,15 +43,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix version in Helm templates.
 
-
-
 ## [0.2.1] 2020-04-02
 
 ### Fixed
 
 - Set proper project version according to released tag.
-
-
 
 ## [0.2.0] 2020-04-02
 
