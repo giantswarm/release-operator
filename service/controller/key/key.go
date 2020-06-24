@@ -3,6 +3,7 @@ package key
 import (
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -26,12 +27,12 @@ type DeletionTimestampGetter interface {
 	GetDeletionTimestamp() *metav1.Time
 }
 
-func GetApps(g8sclient versioned.Interface, namespace string) ([]*applicationv1alpha1.App, error){
-	return nil,nil
+func GetApps(g8sclient versioned.Interface, namespace string) ([]*applicationv1alpha1.App, error) {
+	return nil, nil
 }
 
-func GetReleases(g8sclient versioned.Interface, namespace string) ([]*releasev1alpha1.Release, error){
-	return nil,nil
+func GetReleases(g8sclient versioned.Interface, namespace string) ([]*releasev1alpha1.Release, error) {
+	return nil, nil
 }
 
 func IsDeleted(cr DeletionTimestampGetter) bool {
@@ -41,7 +42,7 @@ func IsDeleted(cr DeletionTimestampGetter) bool {
 // ReleaseVersion returns the version of the given release.
 func ReleaseVersion(releaseCR releasev1alpha1.Release) string {
 	return releaseCR.Name
-
+}
 
 // ToAppCR converts v into an App CR.
 func ToAppCR(v interface{}) (*applicationv1alpha1.App, error) {
