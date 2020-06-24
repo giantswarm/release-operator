@@ -36,8 +36,7 @@ func NewRelease(config ReleaseConfig) (*Release, error) {
 	var resourceSet []resource.Interface
 	{
 		c := release.ResourceSetConfig{
-			G8sClient: config.K8sClient.G8sClient(),
-			K8sClient: config.K8sClient.K8sClient(),
+			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
 		}
 
