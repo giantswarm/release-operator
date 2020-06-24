@@ -1,17 +1,20 @@
 package key
 
 import (
+	"fmt"
+	"strings"
+
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
-	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
 	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/release-operator/pkg/project"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const (
 	// AppCatalog is the name of the app catalog where releases and release
 	// components are stored.
-	AppCatalog = "control-plane"
+	AppCatalog = "control-plane-catalog"
 
 	// Namespace is the namespace where App CRs are created.
 	Namespace = "giantswarm"
@@ -27,12 +30,56 @@ type DeletionTimestampGetter interface {
 	GetDeletionTimestamp() *metav1.Time
 }
 
-func GetApps(g8sclient versioned.Interface, namespace string) ([]*applicationv1alpha1.App, error) {
-	return nil, nil
+func BuildAppName(operatorName, operatorRef string) string {
+	return fmt.Sprintf("%s-%s", operatorName, operatorRef)
 }
 
-func GetReleases(g8sclient versioned.Interface, namespace string) ([]*releasev1alpha1.Release, error) {
-	return nil, nil
+func ExtractOperators(comps []releasev1alpha1.ReleaseSpecComponent) []releasev1alpha1.ReleaseSpecComponent {
+	var operators []releasev1alpha1.ReleaseSpecComponent
+	for _, c := range comps {
+		if strings.Contains(c.Name, "operator") {
+			operators = append(operators, c)
+		}
+	}
+	return operators
+}
+
+func GetOperatorRef(comp releasev1alpha1.ReleaseSpecComponent) string {
+	// PSEUDO
+	// Check if REF field of comp != ""
+	// 	return REF
+	// else return version filed!
+	return comp.Version
+}
+
+func ContainsApp(apps []applicationv1alpha1.App, appName string, appVersion string) bool {
+	for _, a := range apps {
+		if a.Name == appName && a.Spec.Version == appVersion {
+			return true
+		}
+	}
+
+	return false
+}
+
+func ConstructApp(operatorName, operatorRef string) applicationv1alpha1.App {
+	return applicationv1alpha1.App{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      BuildAppName(operatorName, operatorRef),
+			Namespace: Namespace,
+			Labels: map[string]string{
+				// TALK to team batman to find correct version!
+				LabelAppOperatorVersion: "0.0.0",
+				LabelManagedBy:          project.Name(),
+			},
+		},
+		Spec: applicationv1alpha1.AppSpec{
+			Catalog:   AppCatalog,
+			Name:      operatorName,
+			Namespace: Namespace,
+			Version:   operatorRef,
+		},
+	}
 }
 
 func IsDeleted(cr DeletionTimestampGetter) bool {

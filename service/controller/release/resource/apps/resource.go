@@ -1,9 +1,12 @@
 package apps
 
 import (
+	appv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/k8sclient/v3/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
+	"github.com/giantswarm/release-operator/service/controller/key"
 )
 
 const (
@@ -38,4 +41,20 @@ func New(config Config) (*Resource, error) {
 
 func (r *Resource) Name() string {
 	return Name
+}
+
+func calculateMissingApps(releases releasev1alpha1.ReleaseList, apps appv1alpha1.AppList) appv1alpha1.AppList {
+	var missingApps appv1alpha1.AppList
+
+	for _, release := range releases.Items {
+		operators := key.ExtractOperators(release.Spec.Components)
+		for _, operator := range operators {
+			ref := key.GetOperatorRef(operator)
+			if !key.ContainsApp(apps.Items, key.BuildAppName(operator.Name, ref), ref) {
+				missingApp := key.ConstructApp(operator.Name, ref)
+				missingApps.Items = append(missingApps.Items, missingApp)
+			}
+		}
+	}
+	return missingApps
 }
