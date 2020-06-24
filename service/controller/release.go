@@ -2,7 +2,7 @@ package controller
 
 import (
 	"github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
-	"github.com/giantswarm/k8sclient"
+	"github.com/giantswarm/k8sclient/v3"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"

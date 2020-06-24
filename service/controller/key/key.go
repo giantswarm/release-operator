@@ -26,6 +26,14 @@ type DeletionTimestampGetter interface {
 	GetDeletionTimestamp() *metav1.Time
 }
 
+func GetApps(g8sclient versioned.Interface, namespace string) ([]*applicationv1alpha1.App, error){
+	return nil,nil
+}
+
+func GetReleases(g8sclient versioned.Interface, namespace string) ([]*releasev1alpha1.Release, error){
+	return nil,nil
+}
+
 func IsDeleted(cr DeletionTimestampGetter) bool {
 	return cr.GetDeletionTimestamp() != nil
 }
@@ -33,7 +41,7 @@ func IsDeleted(cr DeletionTimestampGetter) bool {
 // ReleaseVersion returns the version of the given release.
 func ReleaseVersion(releaseCR releasev1alpha1.Release) string {
 	return releaseCR.Name
-}
+
 
 // ToAppCR converts v into an App CR.
 func ToAppCR(v interface{}) (*applicationv1alpha1.App, error) {
