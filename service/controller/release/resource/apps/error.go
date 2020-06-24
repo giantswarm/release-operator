@@ -1,4 +1,4 @@
-package label
+package apps
 
 import "github.com/giantswarm/microerror"
 

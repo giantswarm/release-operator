@@ -25,21 +25,21 @@ type ResourceSetConfig struct {
 func NewResourceSet(config ResourceSetConfig) (*controller.ResourceSet, error) {
 	var err error
 
-	var labelResource resource.Interface
+	var appsResource resource.Interface
 	{
 		c := label.Config{
 			G8sClient: config.G8sClient,
 			Logger:    config.Logger,
 		}
 
-		labelResource, err = label.New(c)
+		appsResource, err = label.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 	}
 
 	resources := []resource.Interface{
-		labelResource,
+		appsResource,
 	}
 
 	{

@@ -1,4 +1,4 @@
-package label
+package apps
 
 import (
 	"github.com/giantswarm/apiextensions/pkg/clientset/versioned"
@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	Name = "label"
+	Name = "apps"
 )
 
 type Config struct {
@@ -15,13 +15,6 @@ type Config struct {
 	Logger    micrologger.Logger
 }
 
-// Resource sets "release-operator.giantswarm.io/release-cycle-phase" on the
-// observed CR. The value is taken from .Status.Cycle.Phase. This is to allow
-// selecting non-EOL Release CRs efficiently using label selector.
-//
-// Label resource and status resource are separated to be able to cancel
-// reconciliation independently. There are two requests one to update status
-// and second to update labels which generate separate events.
 type Resource struct {
 	g8sClient versioned.Interface
 	logger    micrologger.Logger
