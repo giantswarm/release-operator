@@ -11,6 +11,6 @@ require (
 	github.com/giantswarm/micrologger v0.3.1
 	github.com/giantswarm/operatorkit v1.1.0
 	github.com/spf13/viper v1.7.0
-	k8s.io/apimachinery v0.18.4
-	k8s.io/client-go v0.16.6
+	k8s.io/apimachinery v0.17.3
+	k8s.io/client-go v0.17.3
 )
