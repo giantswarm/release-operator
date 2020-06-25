@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+	appv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/k8sclient/v3/pkg/k8sclient"
 	"github.com/giantswarm/k8sclient/v3/pkg/k8srestconfig"
 	"github.com/giantswarm/microendpoint/service/version"
@@ -76,7 +77,8 @@ func New(config Config) (*Service, error) {
 	{
 		c := k8sclient.ClientsConfig{
 			SchemeBuilder: k8sclient.SchemeBuilder{
-				v1alpha1.AddToScheme,
+				appv1alpha1.AddToScheme,
+				releasev1alpha1.AddToScheme,
 			},
 			Logger: config.Logger,
 
