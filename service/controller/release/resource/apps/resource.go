@@ -8,11 +8,12 @@ import (
 	"github.com/giantswarm/k8sclient/v3/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/release-operator/pkg/project"
-	"github.com/giantswarm/release-operator/service/controller/key"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/giantswarm/release-operator/pkg/project"
+	"github.com/giantswarm/release-operator/service/controller/key"
 )
 
 const (

@@ -7,8 +7,9 @@ import (
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/release-operator/pkg/project"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/giantswarm/release-operator/pkg/project"
 )
 
 const (
@@ -45,10 +46,9 @@ func ExtractOperators(comps []releasev1alpha1.ReleaseSpecComponent) []releasev1a
 }
 
 func GetOperatorRef(comp releasev1alpha1.ReleaseSpecComponent) string {
-	// PSEUDO
-	// Check if REF field of comp != ""
-	// 	return REF
-	// else return version filed!
+	if comp.Reference != "" {
+		return comp.Reference
+	}
 	return comp.Version
 }
 
