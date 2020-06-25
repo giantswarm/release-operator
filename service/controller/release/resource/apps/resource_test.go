@@ -12,8 +12,26 @@ import (
 	"github.com/giantswarm/release-operator/service/controller/key"
 )
 
-func Test_calculateMissingApps(t *testing.T) {
+var testOperators = []releasev1alpha1.ReleaseSpecComponent{
+	{
+		Name:    "test-operator",
+		Version: "1.0.0",
+	},
+	{
+		Name:    "abc-operator",
+		Version: "123.0.0",
+	},
+	{
+		Name:    "other-operator",
+		Version: "2.0.0",
+	},
+	{
+		Name:    "not-exist-operator",
+		Version: "1.0.0",
+	},
+}
 
+func Test_calculateMissingApps(t *testing.T) {
 	testCases := []struct {
 		name         string
 		releases     releasev1alpha1.ReleaseList
@@ -27,24 +45,15 @@ func Test_calculateMissingApps(t *testing.T) {
 					{
 						Spec: releasev1alpha1.ReleaseSpec{
 							Components: []releasev1alpha1.ReleaseSpecComponent{
-								{
-									Name:    "test-operator",
-									Version: "1.0.0",
-								},
-								{
-									Name:    "abc-operator",
-									Version: "123.0.0",
-								},
+								testOperators[0],
+								testOperators[1],
 							},
 						},
 					},
 					{
 						Spec: releasev1alpha1.ReleaseSpec{
 							Components: []releasev1alpha1.ReleaseSpecComponent{
-								{
-									Name:    "other-operator",
-									Version: "2.0.0",
-								},
+								testOperators[2],
 							},
 						},
 					},
@@ -52,21 +61,13 @@ func Test_calculateMissingApps(t *testing.T) {
 			},
 			apps: appv1alpha1.AppList{
 				Items: []appv1alpha1.App{
-					{
-						ObjectMeta: metav1.ObjectMeta{
-							Name: key.BuildAppName("test-operator", "1.0.0"),
-						},
-						Spec: appv1alpha1.AppSpec{
-							Name:    "test-operator",
-							Version: "1.0.0",
-						},
-					},
+					appForOperator(testOperators[0]),
 				},
 			},
 			expectedApps: appv1alpha1.AppList{
 				Items: []appv1alpha1.App{
-					key.ConstructApp("abc-operator", "123.0.0"),
-					key.ConstructApp("other-operator", "2.0.0"),
+					key.ConstructApp(testOperators[1]),
+					key.ConstructApp(testOperators[2]),
 				},
 			},
 		},
@@ -99,24 +100,15 @@ func Test_calculateObsoleteApps(t *testing.T) {
 					{
 						Spec: releasev1alpha1.ReleaseSpec{
 							Components: []releasev1alpha1.ReleaseSpecComponent{
-								{
-									Name:    "test-operator",
-									Version: "1.0.0",
-								},
-								{
-									Name:    "abc-operator",
-									Version: "123.0.0",
-								},
+								testOperators[0],
+								testOperators[1],
 							},
 						},
 					},
 					{
 						Spec: releasev1alpha1.ReleaseSpec{
 							Components: []releasev1alpha1.ReleaseSpecComponent{
-								{
-									Name:    "other-operator",
-									Version: "2.0.0",
-								},
+								testOperators[2],
 							},
 						},
 					},
@@ -124,15 +116,15 @@ func Test_calculateObsoleteApps(t *testing.T) {
 			},
 			apps: appv1alpha1.AppList{
 				Items: []appv1alpha1.App{
-					key.ConstructApp("test-operator", "1.0.0"),
-					key.ConstructApp("abc-operator", "123.0.0"),
-					key.ConstructApp("other-operator", "2.0.0"),
-					key.ConstructApp("not-exist-operator", "1.0.0"),
+					key.ConstructApp(testOperators[0]),
+					key.ConstructApp(testOperators[1]),
+					key.ConstructApp(testOperators[2]),
+					key.ConstructApp(testOperators[3]),
 				},
 			},
 			expectedApps: appv1alpha1.AppList{
 				Items: []appv1alpha1.App{
-					key.ConstructApp("not-exist-operator", "1.0.0"),
+					key.ConstructApp(testOperators[3]),
 				},
 			},
 		},
@@ -148,5 +140,18 @@ func Test_calculateObsoleteApps(t *testing.T) {
 				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedApps, resultApps))
 			}
 		})
+	}
+}
+
+func appForOperator(operator releasev1alpha1.ReleaseSpecComponent) appv1alpha1.App {
+	return appv1alpha1.App{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: key.BuildAppName(operator),
+		},
+		Spec: appv1alpha1.AppSpec{
+			Name: operator.Name,
+			//TODO this should be ref
+			Version: operator.Version,
+		},
 	}
 }

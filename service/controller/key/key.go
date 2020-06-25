@@ -26,8 +26,8 @@ const (
 	ValueServiceTypeManaged = "managed"
 )
 
-func BuildAppName(operatorName, operatorRef string) string {
-	return fmt.Sprintf("%s-%s-hackathon", operatorName, operatorRef)
+func BuildAppName(operator releasev1alpha1.ReleaseSpecComponent) string {
+	return fmt.Sprintf("%s-%s-hackathon", operator.Name, operator.Version)
 }
 
 func ExtractOperators(comps []releasev1alpha1.ReleaseSpecComponent) []releasev1alpha1.ReleaseSpecComponent {
@@ -47,9 +47,9 @@ func GetOperatorRef(comp releasev1alpha1.ReleaseSpecComponent) string {
 	return comp.Version
 }
 
-func AppInApps(apps []applicationv1alpha1.App, appName string, appVersion string) bool {
+func OperatorDeployed(apps []applicationv1alpha1.App, operator releasev1alpha1.ReleaseSpecComponent) bool {
 	for _, a := range apps {
-		if a.Name == appName && a.Spec.Version == appVersion {
+		if a.Name == BuildAppName(operator) && a.Spec.Version == GetOperatorRef(operator) {
 			return true
 		}
 	}
@@ -57,9 +57,9 @@ func AppInApps(apps []applicationv1alpha1.App, appName string, appVersion string
 	return false
 }
 
-func AppInOperators(operators []releasev1alpha1.ReleaseSpecComponent, app applicationv1alpha1.App) bool {
+func AppReferenced(operators []releasev1alpha1.ReleaseSpecComponent, app applicationv1alpha1.App) bool {
 	for _, operator := range operators {
-		if BuildAppName(operator.Name, GetOperatorRef(operator)) == app.Name && GetOperatorRef(operator) == app.Spec.Version {
+		if BuildAppName(operator) == app.Name && GetOperatorRef(operator) == app.Spec.Version {
 			return true
 		}
 	}
@@ -67,10 +67,10 @@ func AppInOperators(operators []releasev1alpha1.ReleaseSpecComponent, app applic
 	return false
 }
 
-func ConstructApp(operatorName, operatorRef string) applicationv1alpha1.App {
+func ConstructApp(operator releasev1alpha1.ReleaseSpecComponent) applicationv1alpha1.App {
 	return applicationv1alpha1.App{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      BuildAppName(operatorName, operatorRef),
+			Name:      BuildAppName(operator),
 			Namespace: Namespace,
 			Labels: map[string]string{
 				// TALK to team batman to find correct version!
@@ -83,9 +83,9 @@ func ConstructApp(operatorName, operatorRef string) applicationv1alpha1.App {
 			KubeConfig: applicationv1alpha1.AppSpecKubeConfig{
 				InCluster: true,
 			},
-			Name:      operatorName,
+			Name:      operator.Name,
 			Namespace: Namespace,
-			Version:   operatorRef,
+			Version:   GetOperatorRef(operator),
 		},
 	}
 }
