@@ -112,9 +112,8 @@ func calculateMissingApps(releases releasev1alpha1.ReleaseList, apps appv1alpha1
 	for _, release := range releases.Items {
 		operators := key.ExtractOperators(release.Spec.Components)
 		for _, operator := range operators {
-			ref := key.GetOperatorRef(operator)
-			if !key.AppInApps(apps.Items, key.BuildAppName(operator.Name, ref), ref) {
-				missingApp := key.ConstructApp(operator.Name, ref)
+			if !key.OperatorDeployed(apps.Items, operator) {
+				missingApp := key.ConstructApp(operator)
 				missingApps.Items = append(missingApps.Items, missingApp)
 			}
 		}
@@ -131,7 +130,7 @@ func calculateObsoleteApps(releases releasev1alpha1.ReleaseList, apps appv1alpha
 	}
 
 	for _, app := range apps.Items {
-		if !key.AppInOperators(operators, app) {
+		if !key.AppReferenced(operators, app) {
 			obsoleteApps.Items = append(obsoleteApps.Items, app)
 		}
 	}
