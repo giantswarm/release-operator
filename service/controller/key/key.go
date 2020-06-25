@@ -32,7 +32,7 @@ type DeletionTimestampGetter interface {
 }
 
 func BuildAppName(operatorName, operatorRef string) string {
-	return fmt.Sprintf("%s-%s", operatorName, operatorRef)
+	return fmt.Sprintf("%s-%s-hackathon", operatorName, operatorRef)
 }
 
 func ExtractOperators(comps []releasev1alpha1.ReleaseSpecComponent) []releasev1alpha1.ReleaseSpecComponent {

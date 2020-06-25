@@ -54,7 +54,7 @@ func Test_calculateMissingApps(t *testing.T) {
 				Items: []appv1alpha1.App{
 					{
 						ObjectMeta: metav1.ObjectMeta{
-							Name: "test-operator-1.0.0",
+							Name: key.BuildAppName("test-operator", "1.0.0"),
 						},
 						Spec: appv1alpha1.AppSpec{
 							Name:    "test-operator",
