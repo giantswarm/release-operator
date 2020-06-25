@@ -52,9 +52,19 @@ func GetOperatorRef(comp releasev1alpha1.ReleaseSpecComponent) string {
 	return comp.Version
 }
 
-func ContainsApp(apps []applicationv1alpha1.App, appName string, appVersion string) bool {
+func AppInApps(apps []applicationv1alpha1.App, appName string, appVersion string) bool {
 	for _, a := range apps {
 		if a.Name == appName && a.Spec.Version == appVersion {
+			return true
+		}
+	}
+
+	return false
+}
+
+func AppInOperators(operators []releasev1alpha1.ReleaseSpecComponent, app applicationv1alpha1.App) bool {
+	for _, operator := range operators {
+		if BuildAppName(operator.Name, GetOperatorRef(operator)) == app.Name && GetOperatorRef(operator) == app.Spec.Version {
 			return true
 		}
 	}
