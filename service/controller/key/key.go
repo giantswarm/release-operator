@@ -79,7 +79,10 @@ func ConstructApp(operatorName, operatorRef string) applicationv1alpha1.App {
 			},
 		},
 		Spec: applicationv1alpha1.AppSpec{
-			Catalog:   AppCatalog,
+			Catalog: AppCatalog,
+			KubeConfig: applicationv1alpha1.AppSpecKubeConfig{
+				InCluster: true,
+			},
 			Name:      operatorName,
 			Namespace: Namespace,
 			Version:   operatorRef,
