@@ -80,23 +80,27 @@ func (r *Resource) ensureState(ctx context.Context) error {
 	}
 
 	appsToCreate := calculateMissingApps(releases, apps)
-	err := r.k8sClient.CtrlClient().Create(
-		ctx,
-		&appsToCreate,
-	)
-	if apierrors.IsAlreadyExists(err) {
-		// fall through.
-	} else if err != nil {
-		return microerror.Mask(err)
+	for _, app := range appsToCreate.Items {
+		err := r.k8sClient.CtrlClient().Create(
+			ctx,
+			&app,
+		)
+		if apierrors.IsAlreadyExists(err) {
+			// fall through.
+		} else if err != nil {
+			return microerror.Mask(err)
+		}
 	}
 
 	appsToDelete := calculateObsoleteApps(releases, apps)
-	err = r.k8sClient.CtrlClient().Delete(
-		ctx,
-		&appsToDelete,
-	)
-	if err != nil {
-		return microerror.Mask(err)
+	for _, app := range appsToDelete.Items {
+		err := r.k8sClient.CtrlClient().Delete(
+			ctx,
+			&app,
+		)
+		if err != nil {
+			return microerror.Mask(err)
+		}
 	}
 
 	return nil
