@@ -2,6 +2,7 @@ package status
 
 import (
 	"context"
+	"fmt"
 
 	appv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	"github.com/giantswarm/microerror"
@@ -51,6 +52,8 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	}
 
 	if release.Status.Ready != releaseDeployed {
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("setting status for release %#q in namespace %#q", release.Name, release.Namespace))
+
 		release.Status.Ready = releaseDeployed
 		err := r.k8sClient.CtrlClient().Status().Update(
 			ctx,
@@ -59,7 +62,11 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		if err != nil {
 			return microerror.Mask(err)
 		}
+
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("status set for release %#q in namespace %#q", release.Name, release.Namespace))
 	}
+
+	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("status already set for release %#q in namespace %#q", release.Name, release.Namespace))
 
 	return nil
 }
