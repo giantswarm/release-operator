@@ -112,7 +112,7 @@ func calculateMissingApps(releases releasev1alpha1.ReleaseList, apps appv1alpha1
 	for _, release := range releases.Items {
 		operators := key.ExtractOperators(release.Spec.Components)
 		for _, operator := range operators {
-			if !key.OperatorDeployed(apps.Items, operator) {
+			if !key.OperatorCreated(apps.Items, operator) {
 				missingApp := key.ConstructApp(operator)
 				missingApps.Items = append(missingApps.Items, missingApp)
 			}
