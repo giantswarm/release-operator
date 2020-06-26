@@ -39,7 +39,43 @@ func Test_calculateMissingApps(t *testing.T) {
 		expectedApps appv1alpha1.AppList
 	}{
 		{
-			name: "case 0: there is a missing app",
+			name: "case 0: ignores non-operators",
+			releases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						Spec: releasev1alpha1.ReleaseSpec{
+							Components: []releasev1alpha1.ReleaseSpecComponent{
+								testOperators[0],
+								testOperators[1],
+								{
+									Name: "something-else",
+								},
+							},
+						},
+					},
+					{
+						Spec: releasev1alpha1.ReleaseSpec{
+							Components: []releasev1alpha1.ReleaseSpecComponent{
+								testOperators[2],
+							},
+						},
+					},
+				},
+			},
+			apps: appv1alpha1.AppList{
+				Items: []appv1alpha1.App{
+					appForOperator(testOperators[0]),
+				},
+			},
+			expectedApps: appv1alpha1.AppList{
+				Items: []appv1alpha1.App{
+					key.ConstructApp(testOperators[1]),
+					key.ConstructApp(testOperators[2]),
+				},
+			},
+		},
+		{
+			name: "case 1: an app is missing",
 			releases: releasev1alpha1.ReleaseList{
 				Items: []releasev1alpha1.Release{
 					{
@@ -94,7 +130,7 @@ func Test_calculateObsoleteApps(t *testing.T) {
 		expectedApps appv1alpha1.AppList
 	}{
 		{
-			name: "case 0: there is a missing app",
+			name: "case 0: there is an obsolete app",
 			releases: releasev1alpha1.ReleaseList{
 				Items: []releasev1alpha1.Release{
 					{
@@ -138,6 +174,55 @@ func Test_calculateObsoleteApps(t *testing.T) {
 
 			if !cmp.Equal(resultApps, tc.expectedApps) {
 				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedApps, resultApps))
+			}
+		})
+	}
+}
+
+func Test_excludeDeletedRelease(t *testing.T) {
+	testCases := []struct {
+		name             string
+		releases         releasev1alpha1.ReleaseList
+		expectedReleases releasev1alpha1.ReleaseList
+	}{
+		{
+			name: "case 0: some releases are being deleted",
+			releases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name:              "being-deleted",
+							DeletionTimestamp: &metav1.Time{},
+						},
+					},
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name:              "not-being-deleted",
+							DeletionTimestamp: nil,
+						},
+					},
+				},
+			},
+			expectedReleases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "not-being-deleted",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for i, tc := range testCases {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Log(tc.name)
+
+			resultReleases := excludeDeletedRelease(tc.releases)
+
+			if !cmp.Equal(resultReleases, tc.expectedReleases) {
+				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedReleases, resultReleases))
 			}
 		})
 	}
