@@ -51,7 +51,8 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		}
 	}
 
-	if release.Status.Ready != releaseDeployed {
+	{
+		// TODO: Actually check if we actually need to update
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("setting status for release %#q in namespace %#q", release.Name, release.Namespace))
 
 		release.Status.Ready = releaseDeployed
@@ -65,8 +66,6 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("status set for release %#q in namespace %#q", release.Name, release.Namespace))
 	}
-
-	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("status already set for release %#q in namespace %#q", release.Name, release.Namespace))
 
 	return nil
 }
