@@ -33,7 +33,7 @@ func BuildAppName(operator releasev1alpha1.ReleaseSpecComponent) string {
 func ExtractOperators(comps []releasev1alpha1.ReleaseSpecComponent) []releasev1alpha1.ReleaseSpecComponent {
 	var operators []releasev1alpha1.ReleaseSpecComponent
 	for _, c := range comps {
-		if strings.Contains(c.Name, "operator") {
+		if strings.Contains(c.Name, "operator") && c.Name != "chart-operator" && c.Name != "app-operator" {
 			operators = append(operators, c)
 		}
 	}
