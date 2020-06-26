@@ -9,6 +9,7 @@ import (
 	"github.com/giantswarm/operatorkit/resource/wrapper/retryresource"
 
 	"github.com/giantswarm/release-operator/service/controller/release/resource/apps"
+	"github.com/giantswarm/release-operator/service/controller/release/resource/status"
 )
 
 type ResourceSetConfig struct {
@@ -32,8 +33,22 @@ func NewResourceSet(config ResourceSetConfig) ([]resource.Interface, error) {
 		}
 	}
 
+	var statusResource resource.Interface
+	{
+		c := status.Config{
+			K8sClient: config.K8sClient,
+			Logger:    config.Logger,
+		}
+
+		statusResource, err = status.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	resources := []resource.Interface{
 		appsResource,
+		statusResource,
 	}
 
 	{

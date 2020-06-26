@@ -6,6 +6,7 @@ import (
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/release-operator/pkg/project"
@@ -15,6 +16,8 @@ const (
 	// AppCatalog is the name of the app catalog where releases and release
 	// components are stored.
 	AppCatalog = "control-plane-catalog"
+
+	AppStatusDeployed = "DEPLOYED"
 
 	// Namespace is the namespace where App CRs are created.
 	Namespace = "giantswarm"
@@ -45,16 +48,6 @@ func GetOperatorRef(comp releasev1alpha1.ReleaseSpecComponent) string {
 		return comp.Reference
 	}
 	return comp.Version
-}
-
-func OperatorDeployed(apps []applicationv1alpha1.App, operator releasev1alpha1.ReleaseSpecComponent) bool {
-	for _, a := range apps {
-		if a.Name == BuildAppName(operator) && a.Spec.Version == GetOperatorRef(operator) {
-			return true
-		}
-	}
-
-	return false
 }
 
 func AppReferenced(operators []releasev1alpha1.ReleaseSpecComponent, app applicationv1alpha1.App) bool {
@@ -88,4 +81,34 @@ func ConstructApp(operator releasev1alpha1.ReleaseSpecComponent) applicationv1al
 			Version:   GetOperatorRef(operator),
 		},
 	}
+}
+
+func OperatorCreated(apps []applicationv1alpha1.App, operator releasev1alpha1.ReleaseSpecComponent) bool {
+	for _, a := range apps {
+		if a.Name == BuildAppName(operator) && a.Spec.Version == GetOperatorRef(operator) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func OperatorDeployed(apps []applicationv1alpha1.App, operator releasev1alpha1.ReleaseSpecComponent) bool {
+	for _, a := range apps {
+		if a.Name == BuildAppName(operator) && a.Spec.Version == GetOperatorRef(operator) && a.Status.Release.Status == AppStatusDeployed {
+			return true
+		}
+	}
+
+	return false
+}
+
+// ToReleaseCR converts v into a Release CR.
+func ToReleaseCR(v interface{}) (*releasev1alpha1.Release, error) {
+	x, ok := v.(*releasev1alpha1.Release)
+	if !ok {
+		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", x, v)
+	}
+
+	return x, nil
 }
