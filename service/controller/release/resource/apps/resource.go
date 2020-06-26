@@ -2,6 +2,7 @@ package apps
 
 import (
 	"context"
+	"fmt"
 
 	appv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
@@ -81,6 +82,8 @@ func (r *Resource) ensureState(ctx context.Context) error {
 
 	appsToCreate := calculateMissingApps(releases, apps)
 	for _, app := range appsToCreate.Items {
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating app %#q in namespace %#q", app.Name, app.Namespace))
+
 		err := r.k8sClient.CtrlClient().Create(
 			ctx,
 			&app,
@@ -90,10 +93,14 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		} else if err != nil {
 			return microerror.Mask(err)
 		}
+
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("created app %#q in namespace %#q", app.Name, app.Namespace))
 	}
 
 	appsToDelete := calculateObsoleteApps(releases, apps)
 	for _, app := range appsToDelete.Items {
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting app %#q in namespace %#q", app.Name, app.Namespace))
+
 		err := r.k8sClient.CtrlClient().Delete(
 			ctx,
 			&app,
@@ -101,6 +108,8 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		if err != nil {
 			return microerror.Mask(err)
 		}
+
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleted app %#q in namespace %#q", app.Name, app.Namespace))
 	}
 
 	return nil
