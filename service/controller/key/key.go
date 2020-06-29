@@ -36,11 +36,28 @@ func BuildAppName(operator releasev1alpha1.ReleaseSpecComponent) string {
 func ExtractOperators(comps []releasev1alpha1.ReleaseSpecComponent) []releasev1alpha1.ReleaseSpecComponent {
 	var operators []releasev1alpha1.ReleaseSpecComponent
 	for _, c := range comps {
-		if strings.Contains(c.Name, "operator") && c.Name != "chart-operator" && c.Name != "app-operator" {
+		if IsOperator(c) {
 			operators = append(operators, c)
 		}
 	}
 	return operators
+}
+
+func ExtractAllOperators(releases releasev1alpha1.ReleaseList) map[string]releasev1alpha1.ReleaseSpecComponent {
+	var operators = make(map[string]releasev1alpha1.ReleaseSpecComponent)
+
+	for _, release := range releases.Items {
+		for _, component := range release.Spec.Components {
+			if IsOperator(component) && (operators[BuildAppName(component)] == releasev1alpha1.ReleaseSpecComponent{}) {
+				operators[BuildAppName(component)] = component
+			}
+		}
+	}
+	return operators
+}
+
+func IsOperator(component releasev1alpha1.ReleaseSpecComponent) bool {
+	return strings.Contains(component.Name, "operator") && component.Name != "chart-operator" && component.Name != "app-operator"
 }
 
 func GetOperatorRef(comp releasev1alpha1.ReleaseSpecComponent) string {
@@ -50,11 +67,9 @@ func GetOperatorRef(comp releasev1alpha1.ReleaseSpecComponent) string {
 	return comp.Version
 }
 
-func AppReferenced(operators []releasev1alpha1.ReleaseSpecComponent, app applicationv1alpha1.App) bool {
-	for _, operator := range operators {
-		if BuildAppName(operator) == app.Name && GetOperatorRef(operator) == app.Spec.Version {
-			return true
-		}
+func AppReferenced(operators map[string]releasev1alpha1.ReleaseSpecComponent, app applicationv1alpha1.App) bool {
+	if operator, ok := operators[app.Name]; ok && GetOperatorRef(operator) == app.Spec.Version {
+		return true
 	}
 
 	return false

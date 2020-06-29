@@ -34,66 +34,16 @@ var testOperators = []releasev1alpha1.ReleaseSpecComponent{
 func Test_calculateMissingApps(t *testing.T) {
 	testCases := []struct {
 		name         string
-		releases     releasev1alpha1.ReleaseList
+		operators    map[string]releasev1alpha1.ReleaseSpecComponent
 		apps         appv1alpha1.AppList
 		expectedApps appv1alpha1.AppList
 	}{
 		{
-			name: "case 0: ignores non-operators",
-			releases: releasev1alpha1.ReleaseList{
-				Items: []releasev1alpha1.Release{
-					{
-						Spec: releasev1alpha1.ReleaseSpec{
-							Components: []releasev1alpha1.ReleaseSpecComponent{
-								testOperators[0],
-								testOperators[1],
-								{
-									Name: "something-else",
-								},
-							},
-						},
-					},
-					{
-						Spec: releasev1alpha1.ReleaseSpec{
-							Components: []releasev1alpha1.ReleaseSpecComponent{
-								testOperators[2],
-							},
-						},
-					},
-				},
-			},
-			apps: appv1alpha1.AppList{
-				Items: []appv1alpha1.App{
-					appForOperator(testOperators[0]),
-				},
-			},
-			expectedApps: appv1alpha1.AppList{
-				Items: []appv1alpha1.App{
-					key.ConstructApp(testOperators[1]),
-					key.ConstructApp(testOperators[2]),
-				},
-			},
-		},
-		{
-			name: "case 1: an app is missing",
-			releases: releasev1alpha1.ReleaseList{
-				Items: []releasev1alpha1.Release{
-					{
-						Spec: releasev1alpha1.ReleaseSpec{
-							Components: []releasev1alpha1.ReleaseSpecComponent{
-								testOperators[0],
-								testOperators[1],
-							},
-						},
-					},
-					{
-						Spec: releasev1alpha1.ReleaseSpec{
-							Components: []releasev1alpha1.ReleaseSpecComponent{
-								testOperators[2],
-							},
-						},
-					},
-				},
+			name: "case 0: an app is missing",
+			operators: map[string]releasev1alpha1.ReleaseSpecComponent{
+				key.BuildAppName(testOperators[0]): testOperators[0],
+				key.BuildAppName(testOperators[1]): testOperators[1],
+				key.BuildAppName(testOperators[2]): testOperators[2],
 			},
 			apps: appv1alpha1.AppList{
 				Items: []appv1alpha1.App{
@@ -113,7 +63,7 @@ func Test_calculateMissingApps(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Log(tc.name)
 
-			resultApps := calculateMissingApps(tc.releases, tc.apps)
+			resultApps := calculateMissingApps(tc.operators, tc.apps)
 
 			if !cmp.Equal(resultApps, tc.expectedApps) {
 				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedApps, resultApps))
@@ -125,30 +75,16 @@ func Test_calculateMissingApps(t *testing.T) {
 func Test_calculateObsoleteApps(t *testing.T) {
 	testCases := []struct {
 		name         string
-		releases     releasev1alpha1.ReleaseList
+		operators    map[string]releasev1alpha1.ReleaseSpecComponent
 		apps         appv1alpha1.AppList
 		expectedApps appv1alpha1.AppList
 	}{
 		{
 			name: "case 0: there is an obsolete app",
-			releases: releasev1alpha1.ReleaseList{
-				Items: []releasev1alpha1.Release{
-					{
-						Spec: releasev1alpha1.ReleaseSpec{
-							Components: []releasev1alpha1.ReleaseSpecComponent{
-								testOperators[0],
-								testOperators[1],
-							},
-						},
-					},
-					{
-						Spec: releasev1alpha1.ReleaseSpec{
-							Components: []releasev1alpha1.ReleaseSpecComponent{
-								testOperators[2],
-							},
-						},
-					},
-				},
+			operators: map[string]releasev1alpha1.ReleaseSpecComponent{
+				key.BuildAppName(testOperators[0]): testOperators[0],
+				key.BuildAppName(testOperators[1]): testOperators[1],
+				key.BuildAppName(testOperators[2]): testOperators[2],
 			},
 			apps: appv1alpha1.AppList{
 				Items: []appv1alpha1.App{
@@ -170,7 +106,7 @@ func Test_calculateObsoleteApps(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Log(tc.name)
 
-			resultApps := calculateObsoleteApps(tc.releases, tc.apps)
+			resultApps := calculateObsoleteApps(tc.operators, tc.apps)
 
 			if !cmp.Equal(resultApps, tc.expectedApps) {
 				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedApps, resultApps))
