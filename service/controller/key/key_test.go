@@ -95,3 +95,49 @@ func Test_ExtractAllOperators(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsOperator(t *testing.T) {
+	testCases := []struct {
+		name           string
+		operator       releasev1alpha1.ReleaseSpecComponent
+		expectedOutput bool
+	}{
+		{
+			name:           "case 0: is an operator",
+			operator:       releasev1alpha1.ReleaseSpecComponent{Name: "i-am-operator"},
+			expectedOutput: true,
+		},
+		{
+			name:           "case 1: only contains the word operator",
+			operator:       releasev1alpha1.ReleaseSpecComponent{Name: "icontainoperator"},
+			expectedOutput: false,
+		},
+		{
+			name:           "case 2: is not an operator",
+			operator:       releasev1alpha1.ReleaseSpecComponent{Name: "ignoreme"},
+			expectedOutput: false,
+		},
+		{
+			name:           "case 3: ignores chart-operator",
+			operator:       releasev1alpha1.ReleaseSpecComponent{Name: "chart-operator"},
+			expectedOutput: false,
+		},
+		{
+			name:           "case 4: ignores app-operator",
+			operator:       releasev1alpha1.ReleaseSpecComponent{Name: "app-operator"},
+			expectedOutput: false,
+		},
+	}
+
+	for i, tc := range testCases {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Log(tc.name)
+
+			result := IsOperator(tc.operator)
+
+			if !cmp.Equal(result, tc.expectedOutput) {
+				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedOutput, result))
+			}
+		})
+	}
+}

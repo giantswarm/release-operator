@@ -29,8 +29,39 @@ const (
 	ValueServiceTypeManaged = "managed"
 )
 
+func AppReferenced(operators map[string]releasev1alpha1.ReleaseSpecComponent, app applicationv1alpha1.App) bool {
+	if operator, ok := operators[app.Name]; ok && GetOperatorRef(operator) == app.Spec.Version {
+		return true
+	}
+
+	return false
+}
+
 func BuildAppName(operator releasev1alpha1.ReleaseSpecComponent) string {
 	return fmt.Sprintf("%s-%s-hackathon", operator.Name, operator.Version)
+}
+
+func ConstructApp(operator releasev1alpha1.ReleaseSpecComponent) applicationv1alpha1.App {
+	return applicationv1alpha1.App{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      BuildAppName(operator),
+			Namespace: Namespace,
+			Labels: map[string]string{
+				// TALK to team batman to find correct version!
+				LabelAppOperatorVersion: "0.0.0",
+				LabelManagedBy:          project.Name(),
+			},
+		},
+		Spec: applicationv1alpha1.AppSpec{
+			Catalog: AppCatalog,
+			KubeConfig: applicationv1alpha1.AppSpecKubeConfig{
+				InCluster: true,
+			},
+			Name:      operator.Name,
+			Namespace: Namespace,
+			Version:   GetOperatorRef(operator),
+		},
+	}
 }
 
 func ExtractOperators(comps []releasev1alpha1.ReleaseSpecComponent) []releasev1alpha1.ReleaseSpecComponent {
@@ -56,10 +87,6 @@ func ExtractAllOperators(releases releasev1alpha1.ReleaseList) map[string]releas
 	return operators
 }
 
-func IsOperator(component releasev1alpha1.ReleaseSpecComponent) bool {
-	return strings.Contains(component.Name, "operator") && component.Name != "chart-operator" && component.Name != "app-operator"
-}
-
 func GetOperatorRef(comp releasev1alpha1.ReleaseSpecComponent) string {
 	if comp.Reference != "" {
 		return comp.Reference
@@ -67,35 +94,8 @@ func GetOperatorRef(comp releasev1alpha1.ReleaseSpecComponent) string {
 	return comp.Version
 }
 
-func AppReferenced(operators map[string]releasev1alpha1.ReleaseSpecComponent, app applicationv1alpha1.App) bool {
-	if operator, ok := operators[app.Name]; ok && GetOperatorRef(operator) == app.Spec.Version {
-		return true
-	}
-
-	return false
-}
-
-func ConstructApp(operator releasev1alpha1.ReleaseSpecComponent) applicationv1alpha1.App {
-	return applicationv1alpha1.App{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      BuildAppName(operator),
-			Namespace: Namespace,
-			Labels: map[string]string{
-				// TALK to team batman to find correct version!
-				LabelAppOperatorVersion: "0.0.0",
-				LabelManagedBy:          project.Name(),
-			},
-		},
-		Spec: applicationv1alpha1.AppSpec{
-			Catalog: AppCatalog,
-			KubeConfig: applicationv1alpha1.AppSpecKubeConfig{
-				InCluster: true,
-			},
-			Name:      operator.Name,
-			Namespace: Namespace,
-			Version:   GetOperatorRef(operator),
-		},
-	}
+func IsOperator(component releasev1alpha1.ReleaseSpecComponent) bool {
+	return strings.HasSuffix(component.Name, "-operator") && component.Name != "chart-operator" && component.Name != "app-operator"
 }
 
 func OperatorCreated(apps []applicationv1alpha1.App, operator releasev1alpha1.ReleaseSpecComponent) bool {
