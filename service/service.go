@@ -150,5 +150,6 @@ func New(config Config) (*Service, error) {
 func (s *Service) Boot() {
 	s.bootOnce.Do(func() {
 		go s.releaseController.Boot(context.Background())
+		go s.releaseCollector.Boot(context.Background())
 	})
 }
