@@ -10,6 +10,8 @@ import (
 type SetConfig struct {
 	K8sClient k8sclient.Interface
 	Logger    micrologger.Logger
+
+	InstallationName string
 }
 
 // Set is basically only a wrapper for the operator's collector implementations.
@@ -23,7 +25,11 @@ type Set struct {
 func NewSet(config SetConfig) (*Set, error) {
 	var err error
 
-	todo, err := NewReleaseCollector(ReleaseCollectorConfig{})
+	releaseCollector, err := NewReleaseCollector(ReleaseCollectorConfig{
+		K8sClient:        config.K8sClient,
+		Logger:           config.Logger,
+		InstallationName: config.InstallationName,
+	})
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -32,7 +38,7 @@ func NewSet(config SetConfig) (*Set, error) {
 	{
 		c := collector.SetConfig{
 			Collectors: []collector.Interface{
-				todo,
+				releaseCollector,
 			},
 			Logger: config.Logger,
 		}

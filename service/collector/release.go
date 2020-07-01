@@ -13,8 +13,11 @@ import (
 
 const (
 	gaugeValue float64 = 1
-	namespace          = "release_operator"
-	subsystem          = "release"
+)
+
+const (
+	namespace = "release_operator"
+	subsystem = "release"
 )
 
 var (
@@ -99,7 +102,7 @@ func (r *ReleaseCollector) collectReleaseStatus(ctx context.Context, ch chan<- p
 			ReleaseDesc,
 			prometheus.GaugeValue,
 			gaugeValue,
-			"installation-name",
+			r.installationName,
 			release.Name,
 			release.Namespace,
 			release.Spec.State.String(),
