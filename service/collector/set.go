@@ -25,11 +25,7 @@ type Set struct {
 func NewSet(config SetConfig) (*Set, error) {
 	var err error
 
-	releaseCollector, err := NewReleaseCollector(ReleaseCollectorConfig{
-		K8sClient:        config.K8sClient,
-		Logger:           config.Logger,
-		InstallationName: config.InstallationName,
-	})
+	releaseCollector, err := NewReleaseCollector(ReleaseCollectorConfig(config))
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
