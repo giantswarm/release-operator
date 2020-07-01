@@ -2,7 +2,11 @@ package collector
 
 const (
 	labelInstallation = "installation"
+	labelName         = "name"
+	labelNamespace    = "namespace"
+	labelState        = "state"
+	labelReady        = "ready"
 	// labelCluster      = "cluster_id"
-	// labelName         = "name"
+
 	// labelOrganization = "organization"
 )
