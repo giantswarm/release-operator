@@ -85,6 +85,21 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		}
 	}
 
+	appsToDelete := calculateObsoleteApps(operators, apps)
+	for _, app := range appsToDelete.Items {
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting app %#q in namespace %#q", app.Name, app.Namespace))
+
+		err := r.k8sClient.CtrlClient().Delete(
+			ctx,
+			&app,
+		)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleted app %#q in namespace %#q", app.Name, app.Namespace))
+	}
+
 	appsToCreate := calculateMissingApps(operators, apps)
 	for _, app := range appsToCreate.Items {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating app %#q in namespace %#q", app.Name, app.Namespace))
@@ -100,21 +115,6 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		}
 
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("created app %#q in namespace %#q", app.Name, app.Namespace))
-	}
-
-	appsToDelete := calculateObsoleteApps(operators, apps)
-	for _, app := range appsToDelete.Items {
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting app %#q in namespace %#q", app.Name, app.Namespace))
-
-		err := r.k8sClient.CtrlClient().Delete(
-			ctx,
-			&app,
-		)
-		if err != nil {
-			return microerror.Mask(err)
-		}
-
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleted app %#q in namespace %#q", app.Name, app.Namespace))
 	}
 
 	return nil
