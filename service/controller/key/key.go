@@ -13,10 +13,6 @@ import (
 )
 
 const (
-	// AppCatalog is the name of the app catalog where releases and release
-	// components are stored.
-	AppCatalog = "control-plane-catalog"
-
 	AppStatusDeployed = "DEPLOYED"
 
 	// Namespace is the namespace where App CRs are created.
@@ -29,7 +25,7 @@ const (
 	ValueServiceTypeManaged = "managed"
 )
 
-func AppReferenced(operators map[string]releasev1alpha1.ReleaseSpecComponent, app applicationv1alpha1.App) bool {
+func AppReferenced(app applicationv1alpha1.App, operators map[string]releasev1alpha1.ReleaseSpecComponent) bool {
 	if operator, ok := operators[app.Name]; ok && GetOperatorRef(operator) == app.Spec.Version {
 		return true
 	}
@@ -53,7 +49,7 @@ func ConstructApp(operator releasev1alpha1.ReleaseSpecComponent) applicationv1al
 			},
 		},
 		Spec: applicationv1alpha1.AppSpec{
-			Catalog: AppCatalog,
+			Catalog: operator.Catalog,
 			KubeConfig: applicationv1alpha1.AppSpecKubeConfig{
 				InCluster: true,
 			},
@@ -64,16 +60,6 @@ func ConstructApp(operator releasev1alpha1.ReleaseSpecComponent) applicationv1al
 	}
 }
 
-func ExtractOperators(comps []releasev1alpha1.ReleaseSpecComponent) []releasev1alpha1.ReleaseSpecComponent {
-	var operators []releasev1alpha1.ReleaseSpecComponent
-	for _, c := range comps {
-		if IsOperator(c) {
-			operators = append(operators, c)
-		}
-	}
-	return operators
-}
-
 func ExtractAllOperators(releases releasev1alpha1.ReleaseList) map[string]releasev1alpha1.ReleaseSpecComponent {
 	var operators = make(map[string]releasev1alpha1.ReleaseSpecComponent)
 
@@ -82,6 +68,16 @@ func ExtractAllOperators(releases releasev1alpha1.ReleaseList) map[string]releas
 			if IsOperator(component) && (operators[BuildAppName(component)] == releasev1alpha1.ReleaseSpecComponent{}) {
 				operators[BuildAppName(component)] = component
 			}
+		}
+	}
+	return operators
+}
+
+func ExtractOperators(comps []releasev1alpha1.ReleaseSpecComponent) []releasev1alpha1.ReleaseSpecComponent {
+	var operators []releasev1alpha1.ReleaseSpecComponent
+	for _, c := range comps {
+		if IsOperator(c) {
+			operators = append(operators, c)
 		}
 	}
 	return operators
@@ -98,7 +94,7 @@ func IsOperator(component releasev1alpha1.ReleaseSpecComponent) bool {
 	return strings.HasSuffix(component.Name, "-operator") && component.Name != "chart-operator" && component.Name != "app-operator"
 }
 
-func OperatorCreated(apps []applicationv1alpha1.App, operator releasev1alpha1.ReleaseSpecComponent) bool {
+func OperatorCreated(operator releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {
 	for _, a := range apps {
 		if a.Name == BuildAppName(operator) && a.Spec.Version == GetOperatorRef(operator) {
 			return true
@@ -108,7 +104,7 @@ func OperatorCreated(apps []applicationv1alpha1.App, operator releasev1alpha1.Re
 	return false
 }
 
-func OperatorDeployed(apps []applicationv1alpha1.App, operator releasev1alpha1.ReleaseSpecComponent) bool {
+func OperatorDeployed(operator releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {
 	for _, a := range apps {
 		if a.Name == BuildAppName(operator) && a.Spec.Version == GetOperatorRef(operator) && a.Status.Release.Status == AppStatusDeployed {
 			return true

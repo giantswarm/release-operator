@@ -45,7 +45,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	{
 		releaseDeployed = true
 		for _, operator := range operators {
-			if !key.OperatorDeployed(apps.Items, operator) {
+			if !key.OperatorDeployed(operator, apps.Items) {
 				releaseDeployed = false
 			}
 		}
