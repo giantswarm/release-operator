@@ -26,7 +26,6 @@ var (
 		prometheus.BuildFQName(namespace, subsystem, "info"),
 		"Metrics for Release statuses.",
 		[]string{
-			labelInstallation,
 			labelName,
 			labelNamespace,
 			labelState,
@@ -39,15 +38,11 @@ var (
 type ReleaseCollector struct {
 	k8sClient k8sclient.Interface
 	logger    micrologger.Logger
-
-	installationName string
 }
 
 type ReleaseCollectorConfig struct {
 	K8sClient k8sclient.Interface
 	Logger    micrologger.Logger
-
-	InstallationName string
 }
 
 func NewReleaseCollector(config ReleaseCollectorConfig) (*ReleaseCollector, error) {
@@ -58,15 +53,9 @@ func NewReleaseCollector(config ReleaseCollectorConfig) (*ReleaseCollector, erro
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
 
-	if config.InstallationName == "" {
-		// return nil, microerror.Maskf(invalidConfigError, "%T.InstallationName must not be empty", config)
-	}
-
 	rc := &ReleaseCollector{
 		k8sClient: config.K8sClient,
 		logger:    config.Logger,
-
-		installationName: config.InstallationName,
 	}
 
 	return rc, nil
@@ -102,7 +91,6 @@ func (r *ReleaseCollector) collectReleaseStatus(ctx context.Context, ch chan<- p
 			ReleaseDesc,
 			prometheus.GaugeValue,
 			gaugeValue,
-			r.installationName,
 			release.Name,
 			release.Namespace,
 			release.Spec.State.String(),

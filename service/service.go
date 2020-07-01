@@ -125,9 +125,8 @@ func New(config Config) (*Service, error) {
 	var releaseCollector *collector.Set
 	{
 		c := collector.SetConfig{
-			K8sClient:        k8sClient,
-			Logger:           config.Logger,
-			InstallationName: config.Viper.GetString(config.Flag.Service.InstallationName),
+			K8sClient: k8sClient,
+			Logger:    config.Logger,
 		}
 
 		releaseCollector, err = collector.NewSet(c)

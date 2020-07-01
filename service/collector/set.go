@@ -10,8 +10,6 @@ import (
 type SetConfig struct {
 	K8sClient k8sclient.Interface
 	Logger    micrologger.Logger
-
-	InstallationName string
 }
 
 // Set is basically only a wrapper for the operator's collector implementations.
