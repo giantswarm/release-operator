@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/giantswarm/apiextensions v0.4.9-0.20200701124416-0de3a0a74b8c
-  github.com/giantswarm/exporterkit v0.2.0
+	github.com/giantswarm/exporterkit v0.2.0
 	github.com/giantswarm/k8sclient/v3 v3.1.0
 	github.com/giantswarm/microendpoint v0.2.0
 	github.com/giantswarm/microerror v0.2.0
