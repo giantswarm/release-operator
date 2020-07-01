@@ -95,7 +95,6 @@ func Test_ConstructApp(t *testing.T) {
 					},
 				},
 				Spec: applicationv1alpha1.AppSpec{
-					Catalog: AppCatalog,
 					KubeConfig: applicationv1alpha1.AppSpecKubeConfig{
 						InCluster: true,
 					},
@@ -123,13 +122,40 @@ func Test_ConstructApp(t *testing.T) {
 					},
 				},
 				Spec: applicationv1alpha1.AppSpec{
-					Catalog: AppCatalog,
 					KubeConfig: applicationv1alpha1.AppSpecKubeConfig{
 						InCluster: true,
 					},
 					Name:      "test-operator",
 					Namespace: Namespace,
 					Version:   "hello",
+				},
+			},
+		},
+		{
+			name: "case 2: passes the component's catalog to the app",
+			operator: releasev1alpha1.ReleaseSpecComponent{
+				Name:    "test-operator",
+				Version: "1.0.0",
+				Catalog: "the-catalog",
+			},
+			expectedApp: applicationv1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "test-operator-1.0.0-hackathon",
+					Namespace: Namespace,
+					Labels: map[string]string{
+						// TALK to team batman to find correct version!
+						LabelAppOperatorVersion: "0.0.0",
+						LabelManagedBy:          project.Name(),
+					},
+				},
+				Spec: applicationv1alpha1.AppSpec{
+					Catalog: "the-catalog",
+					KubeConfig: applicationv1alpha1.AppSpecKubeConfig{
+						InCluster: true,
+					},
+					Name:      "test-operator",
+					Namespace: Namespace,
+					Version:   "1.0.0",
 				},
 			},
 		},

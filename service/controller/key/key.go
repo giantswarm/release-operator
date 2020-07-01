@@ -13,10 +13,6 @@ import (
 )
 
 const (
-	// AppCatalog is the name of the app catalog where releases and release
-	// components are stored.
-	AppCatalog = "control-plane-catalog"
-
 	AppStatusDeployed = "DEPLOYED"
 
 	// Namespace is the namespace where App CRs are created.
@@ -53,7 +49,7 @@ func ConstructApp(operator releasev1alpha1.ReleaseSpecComponent) applicationv1al
 			},
 		},
 		Spec: applicationv1alpha1.AppSpec{
-			Catalog: AppCatalog,
+			Catalog: operator.Catalog,
 			KubeConfig: applicationv1alpha1.AppSpecKubeConfig{
 				InCluster: true,
 			},
