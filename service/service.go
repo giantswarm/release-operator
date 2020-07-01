@@ -17,6 +17,7 @@ import (
 
 	"github.com/giantswarm/release-operator/flag"
 	"github.com/giantswarm/release-operator/pkg/project"
+	"github.com/giantswarm/release-operator/service/collector"
 	"github.com/giantswarm/release-operator/service/controller"
 )
 
@@ -34,6 +35,7 @@ type Service struct {
 
 	bootOnce          sync.Once
 	releaseController *controller.Release
+	releaseCollector  *collector.Set
 }
 
 // New creates a new service with given configuration.
@@ -120,11 +122,25 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
+	var releaseCollector *collector.Set
+	{
+		c := collector.SetConfig{
+			K8sClient: k8sClient,
+			Logger:    config.Logger,
+		}
+
+		releaseCollector, err = collector.NewSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	s := &Service{
 		Version: versionService,
 
 		bootOnce:          sync.Once{},
 		releaseController: releaseController,
+		releaseCollector:  releaseCollector,
 	}
 
 	return s, nil
