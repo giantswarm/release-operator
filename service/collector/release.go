@@ -1,6 +1,8 @@
 package collector
 
 import (
+	"context"
+
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/prometheus/client_golang/prometheus"
@@ -24,23 +26,18 @@ var (
 )
 
 type ReleaseCollector struct {
-	helper *helper
 	logger micrologger.Logger
 
 	installationName string
 }
 
 type ReleaseCollectorConfig struct {
-	Helper *helper
 	Logger micrologger.Logger
 
 	InstallationName string
 }
 
 func NewReleaseCollector(config ReleaseCollectorConfig) (*ReleaseCollector, error) {
-	if config.Helper == nil {
-		return nil, microerror.Maskf(invalidConfigError, "%T.Helper must not be empty", config)
-	}
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
@@ -50,7 +47,6 @@ func NewReleaseCollector(config ReleaseCollectorConfig) (*ReleaseCollector, erro
 	}
 
 	rc := &ReleaseCollector{
-		helper: config.Helper,
 		logger: config.Logger,
 
 		installationName: config.InstallationName,
@@ -60,10 +56,24 @@ func NewReleaseCollector(config ReleaseCollectorConfig) (*ReleaseCollector, erro
 }
 
 func (r *ReleaseCollector) Collect(ch chan<- prometheus.Metric) error {
+	ctx := context.Background()
+
+	r.logger.LogCtx(ctx, "level", "debug", "message", "collecting metrics")
+
+	err := r.collectReleaseStatus(ctx, ch)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
+	r.logger.LogCtx(ctx, "level", "debug", "message", "finished collecting metrics")
 	return nil
 }
 
 func (r *ReleaseCollector) Describe(ch chan<- *prometheus.Desc) error {
 	ch <- ReleaseDesc
+	return nil
+}
+
+func (r *ReleaseCollector) collectReleaseStatus(ctx context.Context, ch chan<- prometheus.Metric) error {
 	return nil
 }
