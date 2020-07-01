@@ -87,6 +87,7 @@ func (r *ReleaseCollector) collectReleaseStatus(ctx context.Context, ch chan<- p
 	}
 
 	for _, release := range releases.Items {
+		r.logger.Log("level", "debug", "message", "sending metrics")
 		ch <- prometheus.MustNewConstMetric(
 			ReleaseDesc,
 			prometheus.GaugeValue,
