@@ -59,7 +59,7 @@ func NewReleaseCollector(config ReleaseCollectorConfig) (*ReleaseCollector, erro
 	}
 
 	if config.InstallationName == "" {
-		return nil, microerror.Maskf(invalidConfigError, "%T.InstallationName must not be empty", config)
+		// return nil, microerror.Maskf(invalidConfigError, "%T.InstallationName must not be empty", config)
 	}
 
 	rc := &ReleaseCollector{
