@@ -26,7 +26,8 @@ const (
 )
 
 func AppReferenced(app applicationv1alpha1.App, operators map[string]releasev1alpha1.ReleaseSpecComponent) bool {
-	if operator, ok := operators[app.Name]; ok && IsSameApp(operator, app) {
+	operator, ok := operators[app.Name]
+	if ok && IsSameApp(operator, app) {
 		return true
 	}
 
@@ -98,7 +99,6 @@ func IsSameApp(component releasev1alpha1.ReleaseSpecComponent, app applicationv1
 	return BuildAppName(component) == app.Name &&
 		component.Catalog == app.Spec.Catalog &&
 		GetOperatorRef(component) == app.Spec.Version
-
 }
 
 func OperatorCreated(operator releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {
