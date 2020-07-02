@@ -16,18 +16,22 @@ var testOperators = []releasev1alpha1.ReleaseSpecComponent{
 	{
 		Name:    "test-operator",
 		Version: "1.0.0",
+		Catalog: "first",
 	},
 	{
 		Name:    "abc-operator",
 		Version: "123.0.0",
+		Catalog: "second",
 	},
 	{
 		Name:    "other-operator",
 		Version: "2.0.0",
+		Catalog: "third",
 	},
 	{
 		Name:    "not-exist-operator",
 		Version: "7.0.0",
+		Catalog: "fourth",
 	},
 }
 
@@ -324,6 +328,98 @@ func Test_IsOperator(t *testing.T) {
 			t.Log(tc.name)
 
 			result := IsOperator(tc.operator)
+
+			if !cmp.Equal(result, tc.expectedOutput) {
+				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedOutput, result))
+			}
+		})
+	}
+}
+
+func Test_IsSameApp(t *testing.T) {
+	testCases := []struct {
+		name           string
+		component      releasev1alpha1.ReleaseSpecComponent
+		app            applicationv1alpha1.App
+		expectedOutput bool
+	}{
+		{
+			name:      "case 0: component is app",
+			component: testOperators[0],
+			app: applicationv1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: BuildAppName(testOperators[0]),
+				},
+				Spec: applicationv1alpha1.AppSpec{
+					Catalog: testOperators[0].Catalog,
+					Version: GetOperatorRef(testOperators[0]),
+				},
+			},
+			expectedOutput: true,
+		},
+		{
+			name:      "case 1: component has different name",
+			component: testOperators[0],
+			app: applicationv1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "something-else",
+				},
+				Spec: applicationv1alpha1.AppSpec{
+					Catalog: testOperators[0].Catalog,
+					Version: GetOperatorRef(testOperators[0]),
+				},
+			},
+			expectedOutput: false,
+		},
+		{
+			name:      "case 2: component has different version",
+			component: testOperators[0],
+			app: applicationv1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: BuildAppName(testOperators[0]),
+				},
+				Spec: applicationv1alpha1.AppSpec{
+					Catalog: testOperators[0].Catalog,
+					Version: "something-else",
+				},
+			},
+			expectedOutput: false,
+		},
+		{
+			name:      "case 3: component has different reference",
+			component: testOperators[0],
+			app: applicationv1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: BuildAppName(testOperators[0]),
+				},
+				Spec: applicationv1alpha1.AppSpec{
+					Catalog: testOperators[0].Catalog,
+					Version: "not-hello",
+				},
+			},
+			expectedOutput: false,
+		},
+		{
+			name:      "case 4: component has different catalog",
+			component: testOperators[0],
+			app: applicationv1alpha1.App{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: BuildAppName(testOperators[0]),
+				},
+				Spec: applicationv1alpha1.AppSpec{
+					Catalog: "something-else",
+					Version: GetOperatorRef(testOperators[0]),
+				},
+			},
+			expectedOutput: false,
+		},
+	}
+
+	for i, tc := range testCases {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Log(tc.name)
+
+			result := IsSameApp(tc.component, tc.app)
 
 			if !cmp.Equal(result, tc.expectedOutput) {
 				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedOutput, result))
