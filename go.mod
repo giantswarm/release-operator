@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/giantswarm/apiextensions v0.4.9-0.20200701124416-0de3a0a74b8c
+	github.com/giantswarm/exporterkit v0.2.0
 	github.com/giantswarm/k8sclient/v3 v3.1.0
 	github.com/giantswarm/microendpoint v0.2.0
 	github.com/giantswarm/microerror v0.2.0
@@ -11,6 +12,7 @@ require (
 	github.com/giantswarm/micrologger v0.3.1
 	github.com/giantswarm/operatorkit v1.1.0
 	github.com/google/go-cmp v0.4.0
+	github.com/prometheus/client_golang v1.3.0
 	github.com/spf13/viper v1.7.0
 	k8s.io/apimachinery v0.17.3
 	k8s.io/client-go v0.17.3
