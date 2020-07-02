@@ -22,12 +22,10 @@ const (
 
 var (
 	ReleaseDesc *prometheus.Desc = prometheus.NewDesc(
-		// TODO: What is the most descriptive name for this? Maybe change to "states" or "statuses"?
-		prometheus.BuildFQName(namespace, subsystem, "info"),
-		"Metrics for Release statuses.",
+		prometheus.BuildFQName(namespace, subsystem, "status"),
+		"Metric about the status of a Release.",
 		[]string{
 			labelName,
-			labelNamespace,
 			labelState,
 			labelReady,
 		},
@@ -92,7 +90,6 @@ func (r *ReleaseCollector) collectReleaseStatus(ctx context.Context, ch chan<- p
 			prometheus.GaugeValue,
 			gaugeValue,
 			release.Name,
-			release.Namespace,
 			release.Spec.State.String(),
 			strconv.FormatBool(release.Status.Ready),
 		)
