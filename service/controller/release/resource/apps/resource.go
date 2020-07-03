@@ -64,9 +64,9 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		releases = excludeDeletedRelease(releases)
 	}
 
-	var operators map[string]releasev1alpha1.ReleaseSpecComponent
+	var components map[string]releasev1alpha1.ReleaseSpecComponent
 	{
-		operators = key.ExtractAllOperators(releases)
+		components = key.ExtractComponents(releases)
 	}
 
 	var apps appv1alpha1.AppList
@@ -85,7 +85,7 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		}
 	}
 
-	appsToDelete := calculateObsoleteApps(operators, apps)
+	appsToDelete := calculateObsoleteApps(components, apps)
 	for _, app := range appsToDelete.Items {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting app %#q in namespace %#q", app.Name, app.Namespace))
 
@@ -100,7 +100,7 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleted app %#q in namespace %#q", app.Name, app.Namespace))
 	}
 
-	appsToCreate := calculateMissingApps(operators, apps)
+	appsToCreate := calculateMissingApps(components, apps)
 	for _, app := range appsToCreate.Items {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating app %#q in namespace %#q", app.Name, app.Namespace))
 
@@ -120,12 +120,12 @@ func (r *Resource) ensureState(ctx context.Context) error {
 	return nil
 }
 
-func calculateMissingApps(operators map[string]releasev1alpha1.ReleaseSpecComponent, apps appv1alpha1.AppList) appv1alpha1.AppList {
+func calculateMissingApps(components map[string]releasev1alpha1.ReleaseSpecComponent, apps appv1alpha1.AppList) appv1alpha1.AppList {
 	var missingApps appv1alpha1.AppList
 
-	for _, operator := range operators {
-		if !key.OperatorCreated(operator, apps.Items) {
-			missingApp := key.ConstructApp(operator)
+	for _, component := range components {
+		if !key.ComponentCreated(component, apps.Items) {
+			missingApp := key.ConstructApp(component)
 			missingApps.Items = append(missingApps.Items, missingApp)
 		}
 	}
@@ -133,11 +133,11 @@ func calculateMissingApps(operators map[string]releasev1alpha1.ReleaseSpecCompon
 	return missingApps
 }
 
-func calculateObsoleteApps(operators map[string]releasev1alpha1.ReleaseSpecComponent, apps appv1alpha1.AppList) appv1alpha1.AppList {
+func calculateObsoleteApps(components map[string]releasev1alpha1.ReleaseSpecComponent, apps appv1alpha1.AppList) appv1alpha1.AppList {
 	var obsoleteApps appv1alpha1.AppList
 
 	for _, app := range apps.Items {
-		if !key.AppReferenced(app, operators) {
+		if !key.AppReferenced(app, components) {
 			obsoleteApps.Items = append(obsoleteApps.Items, app)
 		}
 	}
