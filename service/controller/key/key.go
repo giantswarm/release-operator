@@ -63,27 +63,27 @@ func ConstructApp(component releasev1alpha1.ReleaseSpecComponent) applicationv1a
 
 // ExtractComponents extracts the components that this operator is responsible for.
 func ExtractComponents(releases releasev1alpha1.ReleaseList) map[string]releasev1alpha1.ReleaseSpecComponent {
-	var relevantComponents = make(map[string]releasev1alpha1.ReleaseSpecComponent)
+	var components = make(map[string]releasev1alpha1.ReleaseSpecComponent)
 
 	for _, release := range releases.Items {
 		for _, component := range release.Spec.Components {
-			if IsOperator(component) && (relevantComponents[BuildAppName(component)] == releasev1alpha1.ReleaseSpecComponent{}) {
-				relevantComponents[BuildAppName(component)] = component
+			if IsOperator(component) && (components[BuildAppName(component)] == releasev1alpha1.ReleaseSpecComponent{}) {
+				components[BuildAppName(component)] = component
 			}
 		}
 	}
-	return relevantComponents
+	return components
 }
 
 // FilterComponents filters the components that this operator is responsible for.
 func FilterComponents(comps []releasev1alpha1.ReleaseSpecComponent) []releasev1alpha1.ReleaseSpecComponent {
-	var relevantComponents []releasev1alpha1.ReleaseSpecComponent
+	var filteredComponents []releasev1alpha1.ReleaseSpecComponent
 	for _, c := range comps {
 		if IsOperator(c) {
-			relevantComponents = append(relevantComponents, c)
+			filteredComponents = append(filteredComponents, c)
 		}
 	}
-	return relevantComponents
+	return filteredComponents
 }
 
 func GetComponentRef(comp releasev1alpha1.ReleaseSpecComponent) string {
