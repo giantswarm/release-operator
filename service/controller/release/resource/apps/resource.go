@@ -66,7 +66,7 @@ func (r *Resource) ensureState(ctx context.Context) error {
 
 	var components map[string]releasev1alpha1.ReleaseSpecComponent
 	{
-		components = key.ExtractAllRelevantComponents(releases)
+		components = key.ExtractComponents(releases)
 	}
 
 	var apps appv1alpha1.AppList

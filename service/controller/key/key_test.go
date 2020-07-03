@@ -178,7 +178,7 @@ func Test_ConstructApp(t *testing.T) {
 	}
 }
 
-func Test_ExtractAllRelevantComponents(t *testing.T) {
+func Test_ExtractComponents(t *testing.T) {
 	testCases := []struct {
 		name               string
 		releases           releasev1alpha1.ReleaseList
@@ -238,7 +238,7 @@ func Test_ExtractAllRelevantComponents(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Log(tc.name)
 
-			resultcomponents := ExtractAllRelevantComponents(tc.releases)
+			resultcomponents := ExtractComponents(tc.releases)
 
 			if !cmp.Equal(resultcomponents, tc.expectedcomponents) {
 				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedcomponents, resultcomponents))
@@ -247,7 +247,7 @@ func Test_ExtractAllRelevantComponents(t *testing.T) {
 	}
 }
 
-func Test_ExtractComponents(t *testing.T) {
+func Test_FilterComponents(t *testing.T) {
 	testCases := []struct {
 		name               string
 		components         []releasev1alpha1.ReleaseSpecComponent
@@ -281,7 +281,7 @@ func Test_ExtractComponents(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Log(tc.name)
 
-			resultcomponents := ExtractRelevantComponents(tc.components)
+			resultcomponents := FilterComponents(tc.components)
 
 			if !cmp.Equal(resultcomponents, tc.expectedcomponents) {
 				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedcomponents, resultcomponents))

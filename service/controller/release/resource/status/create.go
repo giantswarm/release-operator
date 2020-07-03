@@ -23,7 +23,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		return nil
 	}
 
-	components := key.ExtractRelevantComponents(release.Spec.Components)
+	components := key.FilterComponents(release.Spec.Components)
 
 	var apps appv1alpha1.AppList
 	{

@@ -61,7 +61,8 @@ func ConstructApp(component releasev1alpha1.ReleaseSpecComponent) applicationv1a
 	}
 }
 
-func ExtractAllRelevantComponents(releases releasev1alpha1.ReleaseList) map[string]releasev1alpha1.ReleaseSpecComponent {
+// ExtractComponents extracts the components that this operator is responsible for.
+func ExtractComponents(releases releasev1alpha1.ReleaseList) map[string]releasev1alpha1.ReleaseSpecComponent {
 	var relevantComponents = make(map[string]releasev1alpha1.ReleaseSpecComponent)
 
 	for _, release := range releases.Items {
@@ -74,7 +75,8 @@ func ExtractAllRelevantComponents(releases releasev1alpha1.ReleaseList) map[stri
 	return relevantComponents
 }
 
-func ExtractRelevantComponents(comps []releasev1alpha1.ReleaseSpecComponent) []releasev1alpha1.ReleaseSpecComponent {
+// FilterComponents filters the components that this operator is responsible for.
+func FilterComponents(comps []releasev1alpha1.ReleaseSpecComponent) []releasev1alpha1.ReleaseSpecComponent {
 	var relevantComponents []releasev1alpha1.ReleaseSpecComponent
 	for _, c := range comps {
 		if IsOperator(c) {
