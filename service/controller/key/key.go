@@ -25,23 +25,23 @@ const (
 	ValueServiceTypeManaged = "managed"
 )
 
-func AppReferenced(app applicationv1alpha1.App, operators map[string]releasev1alpha1.ReleaseSpecComponent) bool {
-	operator, ok := operators[app.Name]
-	if ok && IsSameApp(operator, app) {
+func AppReferenced(app applicationv1alpha1.App, components map[string]releasev1alpha1.ReleaseSpecComponent) bool {
+	component, ok := components[app.Name]
+	if ok && IsSameApp(component, app) {
 		return true
 	}
 
 	return false
 }
 
-func BuildAppName(operator releasev1alpha1.ReleaseSpecComponent) string {
-	return fmt.Sprintf("%s-%s-hackathon", operator.Name, operator.Version)
+func BuildAppName(component releasev1alpha1.ReleaseSpecComponent) string {
+	return fmt.Sprintf("%s-%s-hackathon", component.Name, component.Version)
 }
 
-func ConstructApp(operator releasev1alpha1.ReleaseSpecComponent) applicationv1alpha1.App {
+func ConstructApp(component releasev1alpha1.ReleaseSpecComponent) applicationv1alpha1.App {
 	return applicationv1alpha1.App{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      BuildAppName(operator),
+			Name:      BuildAppName(component),
 			Namespace: Namespace,
 			Labels: map[string]string{
 				// TALK to team batman to find correct version!
@@ -50,41 +50,41 @@ func ConstructApp(operator releasev1alpha1.ReleaseSpecComponent) applicationv1al
 			},
 		},
 		Spec: applicationv1alpha1.AppSpec{
-			Catalog: operator.Catalog,
+			Catalog: component.Catalog,
 			KubeConfig: applicationv1alpha1.AppSpecKubeConfig{
 				InCluster: true,
 			},
-			Name:      operator.Name,
+			Name:      component.Name,
 			Namespace: Namespace,
-			Version:   GetOperatorRef(operator),
+			Version:   GetComponentRef(component),
 		},
 	}
 }
 
-func ExtractAllOperators(releases releasev1alpha1.ReleaseList) map[string]releasev1alpha1.ReleaseSpecComponent {
-	var operators = make(map[string]releasev1alpha1.ReleaseSpecComponent)
+func ExtractAllRelevantComponents(releases releasev1alpha1.ReleaseList) map[string]releasev1alpha1.ReleaseSpecComponent {
+	var relevantComponents = make(map[string]releasev1alpha1.ReleaseSpecComponent)
 
 	for _, release := range releases.Items {
 		for _, component := range release.Spec.Components {
-			if IsOperator(component) && (operators[BuildAppName(component)] == releasev1alpha1.ReleaseSpecComponent{}) {
-				operators[BuildAppName(component)] = component
+			if IsOperator(component) && (relevantComponents[BuildAppName(component)] == releasev1alpha1.ReleaseSpecComponent{}) {
+				relevantComponents[BuildAppName(component)] = component
 			}
 		}
 	}
-	return operators
+	return relevantComponents
 }
 
-func ExtractOperators(comps []releasev1alpha1.ReleaseSpecComponent) []releasev1alpha1.ReleaseSpecComponent {
-	var operators []releasev1alpha1.ReleaseSpecComponent
+func ExtractRelevantComponents(comps []releasev1alpha1.ReleaseSpecComponent) []releasev1alpha1.ReleaseSpecComponent {
+	var relevantComponents []releasev1alpha1.ReleaseSpecComponent
 	for _, c := range comps {
 		if IsOperator(c) {
-			operators = append(operators, c)
+			relevantComponents = append(relevantComponents, c)
 		}
 	}
-	return operators
+	return relevantComponents
 }
 
-func GetOperatorRef(comp releasev1alpha1.ReleaseSpecComponent) string {
+func GetComponentRef(comp releasev1alpha1.ReleaseSpecComponent) string {
 	if comp.Reference != "" {
 		return comp.Reference
 	}
@@ -98,12 +98,12 @@ func IsOperator(component releasev1alpha1.ReleaseSpecComponent) bool {
 func IsSameApp(component releasev1alpha1.ReleaseSpecComponent, app applicationv1alpha1.App) bool {
 	return BuildAppName(component) == app.Name &&
 		component.Catalog == app.Spec.Catalog &&
-		GetOperatorRef(component) == app.Spec.Version
+		GetComponentRef(component) == app.Spec.Version
 }
 
-func OperatorCreated(operator releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {
+func ComponentCreated(component releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {
 	for _, a := range apps {
-		if IsSameApp(operator, a) {
+		if IsSameApp(component, a) {
 			return true
 		}
 	}
@@ -111,9 +111,9 @@ func OperatorCreated(operator releasev1alpha1.ReleaseSpecComponent, apps []appli
 	return false
 }
 
-func OperatorDeployed(operator releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {
+func ComponentDeployed(component releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {
 	for _, a := range apps {
-		if IsSameApp(operator, a) && a.Status.Release.Status == AppStatusDeployed {
+		if IsSameApp(component, a) && a.Status.Release.Status == AppStatusDeployed {
 			return true
 		}
 	}

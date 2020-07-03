@@ -12,7 +12,7 @@ import (
 	"github.com/giantswarm/release-operator/service/controller/key"
 )
 
-var testOperators = []releasev1alpha1.ReleaseSpecComponent{
+var testComponents = []releasev1alpha1.ReleaseSpecComponent{
 	{
 		Name:    "test-operator",
 		Version: "1.0.0",
@@ -41,19 +41,19 @@ func Test_calculateMissingApps(t *testing.T) {
 		{
 			name: "case 0: an app is missing",
 			operators: map[string]releasev1alpha1.ReleaseSpecComponent{
-				key.BuildAppName(testOperators[0]): testOperators[0],
-				key.BuildAppName(testOperators[1]): testOperators[1],
-				key.BuildAppName(testOperators[2]): testOperators[2],
+				key.BuildAppName(testComponents[0]): testComponents[0],
+				key.BuildAppName(testComponents[1]): testComponents[1],
+				key.BuildAppName(testComponents[2]): testComponents[2],
 			},
 			apps: appv1alpha1.AppList{
 				Items: []appv1alpha1.App{
-					appForOperator(testOperators[0]),
+					appForComponent(testComponents[0]),
 				},
 			},
 			expectedApps: appv1alpha1.AppList{
 				Items: []appv1alpha1.App{
-					key.ConstructApp(testOperators[1]),
-					key.ConstructApp(testOperators[2]),
+					key.ConstructApp(testComponents[1]),
+					key.ConstructApp(testComponents[2]),
 				},
 			},
 		},
@@ -82,21 +82,21 @@ func Test_calculateObsoleteApps(t *testing.T) {
 		{
 			name: "case 0: there is an obsolete app",
 			operators: map[string]releasev1alpha1.ReleaseSpecComponent{
-				key.BuildAppName(testOperators[0]): testOperators[0],
-				key.BuildAppName(testOperators[1]): testOperators[1],
-				key.BuildAppName(testOperators[2]): testOperators[2],
+				key.BuildAppName(testComponents[0]): testComponents[0],
+				key.BuildAppName(testComponents[1]): testComponents[1],
+				key.BuildAppName(testComponents[2]): testComponents[2],
 			},
 			apps: appv1alpha1.AppList{
 				Items: []appv1alpha1.App{
-					key.ConstructApp(testOperators[0]),
-					key.ConstructApp(testOperators[1]),
-					key.ConstructApp(testOperators[2]),
-					key.ConstructApp(testOperators[3]),
+					key.ConstructApp(testComponents[0]),
+					key.ConstructApp(testComponents[1]),
+					key.ConstructApp(testComponents[2]),
+					key.ConstructApp(testComponents[3]),
 				},
 			},
 			expectedApps: appv1alpha1.AppList{
 				Items: []appv1alpha1.App{
-					key.ConstructApp(testOperators[3]),
+					key.ConstructApp(testComponents[3]),
 				},
 			},
 		},
@@ -164,7 +164,7 @@ func Test_excludeDeletedRelease(t *testing.T) {
 	}
 }
 
-func appForOperator(operator releasev1alpha1.ReleaseSpecComponent) appv1alpha1.App {
+func appForComponent(operator releasev1alpha1.ReleaseSpecComponent) appv1alpha1.App {
 	return appv1alpha1.App{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: key.BuildAppName(operator),

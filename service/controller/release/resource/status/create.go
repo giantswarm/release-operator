@@ -23,7 +23,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		return nil
 	}
 
-	operators := key.ExtractOperators(release.Spec.Components)
+	components := key.ExtractRelevantComponents(release.Spec.Components)
 
 	var apps appv1alpha1.AppList
 	{
@@ -44,8 +44,8 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	var releaseDeployed bool
 	{
 		releaseDeployed = true
-		for _, operator := range operators {
-			if !key.OperatorDeployed(operator, apps.Items) {
+		for _, component := range components {
+			if !key.ComponentDeployed(component, apps.Items) {
 				releaseDeployed = false
 			}
 		}
