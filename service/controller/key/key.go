@@ -2,7 +2,6 @@ package key
 
 import (
 	"fmt"
-	"strings"
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
@@ -67,7 +66,7 @@ func ExtractComponents(releases releasev1alpha1.ReleaseList) map[string]releasev
 
 	for _, release := range releases.Items {
 		for _, component := range release.Spec.Components {
-			if IsOperator(component) && (components[BuildAppName(component)] == releasev1alpha1.ReleaseSpecComponent{}) {
+			if component.ReleaseOperatorDeploy && (components[BuildAppName(component)] == releasev1alpha1.ReleaseSpecComponent{}) {
 				components[BuildAppName(component)] = component
 			}
 		}
@@ -79,7 +78,7 @@ func ExtractComponents(releases releasev1alpha1.ReleaseList) map[string]releasev
 func FilterComponents(comps []releasev1alpha1.ReleaseSpecComponent) []releasev1alpha1.ReleaseSpecComponent {
 	var filteredComponents []releasev1alpha1.ReleaseSpecComponent
 	for _, c := range comps {
-		if IsOperator(c) {
+		if c.ReleaseOperatorDeploy {
 			filteredComponents = append(filteredComponents, c)
 		}
 	}
@@ -91,10 +90,6 @@ func GetComponentRef(comp releasev1alpha1.ReleaseSpecComponent) string {
 		return comp.Reference
 	}
 	return comp.Version
-}
-
-func IsOperator(component releasev1alpha1.ReleaseSpecComponent) bool {
-	return strings.HasSuffix(component.Name, "-operator") && component.Name != "chart-operator" && component.Name != "app-operator"
 }
 
 func IsSameApp(component releasev1alpha1.ReleaseSpecComponent, app applicationv1alpha1.App) bool {

@@ -14,24 +14,22 @@ import (
 
 var testComponents = []releasev1alpha1.ReleaseSpecComponent{
 	{
-		Name:    "test-operator",
-		Version: "1.0.0",
-		Catalog: "first",
+		Catalog:               "first",
+		Name:                  "test",
+		ReleaseOperatorDeploy: true,
+		Version:               "1.0.0",
 	},
 	{
-		Name:    "abc-operator",
-		Version: "123.0.0",
-		Catalog: "second",
+		Catalog:               "second",
+		Name:                  "abc",
+		ReleaseOperatorDeploy: true,
+		Version:               "123.0.0",
 	},
 	{
-		Name:    "other-operator",
-		Version: "2.0.0",
-		Catalog: "third",
-	},
-	{
-		Name:    "not-exist-operator",
-		Version: "7.0.0",
-		Catalog: "fourth",
+		Catalog:               "third",
+		Name:                  "other",
+		ReleaseOperatorDeploy: true,
+		Version:               "2.0.0",
 	},
 }
 
@@ -185,7 +183,7 @@ func Test_ExtractComponents(t *testing.T) {
 		expectedcomponents map[string]releasev1alpha1.ReleaseSpecComponent
 	}{
 		{
-			name: "case 0: extracts all operators",
+			name: "case 0: extracts all components with ReleaseOperatorDeploy set",
 			releases: releasev1alpha1.ReleaseList{
 				Items: []releasev1alpha1.Release{
 					{
@@ -212,7 +210,7 @@ func Test_ExtractComponents(t *testing.T) {
 			},
 		},
 		{
-			name: "case 1: does not extract non-operators",
+			name: "case 1: ignores components with ReleaseOperatorDeploy set to false",
 			releases: releasev1alpha1.ReleaseList{
 				Items: []releasev1alpha1.Release{
 					{
@@ -220,9 +218,18 @@ func Test_ExtractComponents(t *testing.T) {
 							Components: []releasev1alpha1.ReleaseSpecComponent{
 								testComponents[0],
 								{
-									Name:    "something-else",
-									Version: "9.0.0",
+									Catalog:               "hello-catalog",
+									Name:                  "hello",
+									ReleaseOperatorDeploy: false,
+									Version:               "7.0.0",
 								},
+							},
+						},
+					},
+					{
+						Spec: releasev1alpha1.ReleaseSpec{
+							Components: []releasev1alpha1.ReleaseSpecComponent{
+								testComponents[1],
 							},
 						},
 					},
@@ -230,6 +237,7 @@ func Test_ExtractComponents(t *testing.T) {
 			},
 			expectedcomponents: map[string]releasev1alpha1.ReleaseSpecComponent{
 				BuildAppName(testComponents[0]): testComponents[0],
+				BuildAppName(testComponents[1]): testComponents[1],
 			},
 		},
 	}
@@ -254,11 +262,10 @@ func Test_FilterComponents(t *testing.T) {
 		expectedcomponents []releasev1alpha1.ReleaseSpecComponent
 	}{
 		{
-			name: "case 0: extracts the operators",
+			name: "case 0: filters all components with ReleaseOperatorDeploy set",
 			components: []releasev1alpha1.ReleaseSpecComponent{
 				testComponents[0],
 				testComponents[1],
-				{Name: "something-totally-else"},
 			},
 			expectedcomponents: []releasev1alpha1.ReleaseSpecComponent{
 				testComponents[0],
@@ -266,10 +273,15 @@ func Test_FilterComponents(t *testing.T) {
 			},
 		},
 		{
-			name: "case 0: does not extract other things",
+			name: "case 1: ignores components with ReleaseOperatorDeploy set to false",
 			components: []releasev1alpha1.ReleaseSpecComponent{
 				testComponents[0],
-				{Name: "something-totally-else"},
+				{
+					Catalog:               "goodbye-catalog",
+					Name:                  "goodbye",
+					ReleaseOperatorDeploy: false,
+					Version:               "7.0.0",
+				},
 			},
 			expectedcomponents: []releasev1alpha1.ReleaseSpecComponent{
 				testComponents[0],
@@ -285,52 +297,6 @@ func Test_FilterComponents(t *testing.T) {
 
 			if !cmp.Equal(resultcomponents, tc.expectedcomponents) {
 				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedcomponents, resultcomponents))
-			}
-		})
-	}
-}
-
-func Test_IsOperator(t *testing.T) {
-	testCases := []struct {
-		name           string
-		component      releasev1alpha1.ReleaseSpecComponent
-		expectedOutput bool
-	}{
-		{
-			name:           "case 0: is an operator",
-			component:      releasev1alpha1.ReleaseSpecComponent{Name: "i-am-operator"},
-			expectedOutput: true,
-		},
-		{
-			name:           "case 1: only contains the word operator",
-			component:      releasev1alpha1.ReleaseSpecComponent{Name: "icontainoperator"},
-			expectedOutput: false,
-		},
-		{
-			name:           "case 2: is not an operator",
-			component:      releasev1alpha1.ReleaseSpecComponent{Name: "ignoreme"},
-			expectedOutput: false,
-		},
-		{
-			name:           "case 3: ignores chart-operator",
-			component:      releasev1alpha1.ReleaseSpecComponent{Name: "chart-operator"},
-			expectedOutput: false,
-		},
-		{
-			name:           "case 4: ignores app-component",
-			component:      releasev1alpha1.ReleaseSpecComponent{Name: "app-operator"},
-			expectedOutput: false,
-		},
-	}
-
-	for i, tc := range testCases {
-		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			t.Log(tc.name)
-
-			result := IsOperator(tc.component)
-
-			if !cmp.Equal(result, tc.expectedOutput) {
-				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedOutput, result))
 			}
 		})
 	}
