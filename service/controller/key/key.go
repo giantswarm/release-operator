@@ -26,7 +26,8 @@ const (
 )
 
 func AppReferenced(app applicationv1alpha1.App, operators map[string]releasev1alpha1.ReleaseSpecComponent) bool {
-	if operator, ok := operators[app.Name]; ok && GetOperatorRef(operator) == app.Spec.Version {
+	operator, ok := operators[app.Name]
+	if ok && IsSameApp(operator, app) {
 		return true
 	}
 
@@ -94,9 +95,15 @@ func IsOperator(component releasev1alpha1.ReleaseSpecComponent) bool {
 	return strings.HasSuffix(component.Name, "-operator") && component.Name != "chart-operator" && component.Name != "app-operator"
 }
 
+func IsSameApp(component releasev1alpha1.ReleaseSpecComponent, app applicationv1alpha1.App) bool {
+	return BuildAppName(component) == app.Name &&
+		component.Catalog == app.Spec.Catalog &&
+		GetOperatorRef(component) == app.Spec.Version
+}
+
 func OperatorCreated(operator releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {
 	for _, a := range apps {
-		if a.Name == BuildAppName(operator) && a.Spec.Version == GetOperatorRef(operator) {
+		if IsSameApp(operator, a) {
 			return true
 		}
 	}
@@ -106,7 +113,7 @@ func OperatorCreated(operator releasev1alpha1.ReleaseSpecComponent, apps []appli
 
 func OperatorDeployed(operator releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {
 	for _, a := range apps {
-		if a.Name == BuildAppName(operator) && a.Spec.Version == GetOperatorRef(operator) && a.Status.Release.Status == AppStatusDeployed {
+		if IsSameApp(operator, a) && a.Status.Release.Status == AppStatusDeployed {
 			return true
 		}
 	}
