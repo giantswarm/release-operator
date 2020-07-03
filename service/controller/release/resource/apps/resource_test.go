@@ -14,20 +14,16 @@ import (
 
 var testComponents = []releasev1alpha1.ReleaseSpecComponent{
 	{
-		Name:    "test-operator",
+		Name:    "test",
 		Version: "1.0.0",
 	},
 	{
-		Name:    "abc-operator",
+		Name:    "abc",
 		Version: "123.0.0",
 	},
 	{
-		Name:    "other-operator",
+		Name:    "other",
 		Version: "2.0.0",
-	},
-	{
-		Name:    "not-exist-operator",
-		Version: "1.0.0",
 	},
 }
 
@@ -84,19 +80,17 @@ func Test_calculateObsoleteApps(t *testing.T) {
 			operators: map[string]releasev1alpha1.ReleaseSpecComponent{
 				key.BuildAppName(testComponents[0]): testComponents[0],
 				key.BuildAppName(testComponents[1]): testComponents[1],
-				key.BuildAppName(testComponents[2]): testComponents[2],
 			},
 			apps: appv1alpha1.AppList{
 				Items: []appv1alpha1.App{
 					key.ConstructApp(testComponents[0]),
 					key.ConstructApp(testComponents[1]),
 					key.ConstructApp(testComponents[2]),
-					key.ConstructApp(testComponents[3]),
 				},
 			},
 			expectedApps: appv1alpha1.AppList{
 				Items: []appv1alpha1.App{
-					key.ConstructApp(testComponents[3]),
+					key.ConstructApp(testComponents[2]),
 				},
 			},
 		},
