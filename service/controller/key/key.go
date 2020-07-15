@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	AppStatusDeployed = "DEPLOYED"
+	AppStatusDeployed = "deployed"
 
 	// Namespace is the namespace where App CRs are created.
 	Namespace = "giantswarm"
@@ -34,7 +34,7 @@ func AppReferenced(app applicationv1alpha1.App, components map[string]releasev1a
 }
 
 func BuildAppName(component releasev1alpha1.ReleaseSpecComponent) string {
-	return fmt.Sprintf("%s-%s-hackathon", component.Name, component.Version)
+	return fmt.Sprintf("%s-%s", component.Name, component.Version)
 }
 
 func ConstructApp(component releasev1alpha1.ReleaseSpecComponent) applicationv1alpha1.App {
