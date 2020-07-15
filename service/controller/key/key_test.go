@@ -88,7 +88,7 @@ func Test_ConstructApp(t *testing.T) {
 			},
 			expectedApp: applicationv1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      "test-operator-1.0.0-hackathon",
+					Name:      "test-operator-1.0.0",
 					Namespace: Namespace,
 					Labels: map[string]string{
 						// TALK to team batman to find correct version!
@@ -115,7 +115,7 @@ func Test_ConstructApp(t *testing.T) {
 			},
 			expectedApp: applicationv1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      "test-operator-1.0.0-hackathon",
+					Name:      "test-operator-1.0.0",
 					Namespace: Namespace,
 					Labels: map[string]string{
 						// TALK to team batman to find correct version!
@@ -142,7 +142,7 @@ func Test_ConstructApp(t *testing.T) {
 			},
 			expectedApp: applicationv1alpha1.App{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      "test-operator-1.0.0-hackathon",
+					Name:      "test-operator-1.0.0",
 					Namespace: Namespace,
 					Labels: map[string]string{
 						// TALK to team batman to find correct version!
