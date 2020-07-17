@@ -43,7 +43,6 @@ func ConstructApp(component releasev1alpha1.ReleaseSpecComponent) applicationv1a
 			Name:      BuildAppName(component),
 			Namespace: Namespace,
 			Labels: map[string]string{
-				// TALK to team batman to find correct version!
 				LabelAppOperatorVersion: "0.0.0",
 				LabelManagedBy:          project.Name(),
 			},

@@ -54,7 +54,6 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	}
 
 	{
-		// TODO: Actually check if we actually need to update
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("setting status for release %#q in namespace %#q", release.Name, release.Namespace))
 
 		release.Status.Ready = releaseDeployed
