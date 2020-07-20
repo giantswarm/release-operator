@@ -5,36 +5,25 @@
 As an example of a Release CR:
 
 ```
-apiVersion: "release.giantswarm.io/v1alpha1"
-kind: "Release"
+apiVersion: release.giantswarm.io/v1alpha1
+kind: Release
 metadata:
-  name: "azure.v0.0.1"
-  labels:
-    giantswarm.io/managed-by: "app-operator"
-    giantswarm.io/provider: "azure"
+  creationTimestamp: null
+  name: v11.3.0
 spec:
-  changelog:
-    - component: "azure-operator"
-      description: "Updated to foo the bar."
-      kind: "changed"
+  apps:
+  - name: app-1
+    version: 1.2.1
   components:
-    - name: "azure-operator"
-      version: "0.0.1"
-  parentVersion: "0.0.0"
-  version: "0.0.1"
+  - name: ignore-me
+    version: 1.0.0
+  - catalog: my-playground-catalog
+    name: deploy-me
+    reference: 1.0.1-a7663534964e4051d3ed957981c4f7885d60d15f
+    releaseOperatorDeploy: true
+    version: 1.0.1
+  date: "2020-04-27T12:00:00Z"
+  state: active
 ```
 
-and an example of a ReleaseCycle CR:
-
-```
-apiVersion: "release.giantswarm.io/v1alpha1"
-kind: "ReleaseCycle"
-metadata:
-  name: "azure.v0.0.1"
-  labels:
-    giantswarm.io/managed-by: "opsctl"
-    giantswarm.io/provider: "azure"
-spec:
-  enabledDate: "2019-01-08"
-  phase: "enabled"
-```
+More information on how this operator works can be found [here](docs/workflow.md)
