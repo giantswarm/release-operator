@@ -26,4 +26,4 @@ spec:
   state: active
 ```
 
-More information on how this operator works can be found [here](docs/workflow.md)
+More information on how this operator works can be found [here](docs/workflow.md).

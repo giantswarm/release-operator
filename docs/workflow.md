@@ -30,11 +30,11 @@ The only part of the release that this operator cares for is the list of compone
 #### What does deploying mean?
 
 So as you can see from the example above, each component can have a subset of the following fields:
-* catalog: which catalog to take the component from? (e.g. control-plane-catalog, control-plane-test-catalog)
-* name: name of the component.
-* reference: reference of the component. Enables testing of untagged commits/branches.
-* releaseOperatorDeploy: controls if this operator will deploy the component.
-* version: version of the component.
+* `catalog`: which catalog to take the component from? (e.g. control-plane-catalog, control-plane-test-catalog)
+* `nam`e: name of the component.
+* `referenc`e: reference of the component. Enables testing of untagged commits/branches.
+* `releaseOperatorDeploy`: controls if this operator will deploy the component.
+* `version`: version of the component.
 
 On each reconcile loop release-operator does the following:
 1. Iterate over all of the releases on the CP.
