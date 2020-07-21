@@ -15,6 +15,7 @@ spec:
     version: 1.2.1
   components:
   - name: ignore-me
+    releaseOperatorDeploy: false
     version: 1.0.0
   - catalog: my-playground-catalog
     name: deploy-me
@@ -25,23 +26,25 @@ spec:
   state: active
 ```
 
-The only part of the release that this operator cares for is the list of components in the spec. It will make sure to deploy all of the components that have `releaseOperatorDeploy` set to true. So in the example above, it will ignore `ignore-me` and deploy `deploy-me` on the CP.
+The only part of the release that this operator cares for is the list of components in the spec. It will make sure to deploy all of the components that have `releaseOperatorDeploy`
+set to true. So in the example above, it will ignore `ignore-me` and deploy `deploy-me` on the CP.
 
 #### What does deploying mean?
 
 So as you can see from the example above, each component can have a subset of the following fields:
 * `catalog`: which catalog to take the component from? (e.g. control-plane-catalog, control-plane-test-catalog)
-* `nam`e: name of the component.
-* `referenc`e: reference of the component. Enables testing of untagged commits/branches.
+* `name`: name of the component.
+* `reference`: reference of the component. Used for testing and alternative tags for existing versions.
 * `releaseOperatorDeploy`: controls if this operator will deploy the component.
 * `version`: version of the component.
 
-On each reconcile loop release-operator does the following:
-1. Iterate over all of the releases on the CP.
-1. Undeploy all components currently not referred by any release.
-1. For each release, deploy all the components that have `releaseOperatorDeploy` set to `true`.
+On each reconciliation loop, release-operator does the following:
+1. Iterate over all of the Release CRs on the CP.
+1. Undeploy all components currently not referenced by any release.
+1. Deploy all components referenced by at least one release that have `releaseOperatorDeploy` set to `true`.
 
-Let's go into a little more details of what deploying a component actually means. For each component, release-operator will create an App CR on the CP. For example, the App CR for `deploy-me` component of the release above will look like this:
+Let's go into a little more details of what deploying a component actually means. For each component, release-operator will create an App CR on the CP. For example, the App CR
+for `deploy-me` component of the release above will look like this:
 
 ```
 apiVersion: application.giantswarm.io/v1alpha1
@@ -67,9 +70,13 @@ A few key points here:
 * reference is being passed through as version in the App CR. If no reference is being used, then release-operator will default to using the component version.
 * for every app, `inCluster` is being set to `true` in the `kubeConfig`.
 
+It's also important to notice that `release-operator` is only responsible for creating the App CRs. `app-operator` and `chart-operator` then take over and deploy the corresponding Helm charts.
+
 #### Release status
 
-In the releases's status, you can find a `Ready` field that will tell you the current state of the release. Once a release has all of its components deployed (even the ones that release-operator is not accountable for), the value of `Ready` will change to `true`.
+In the releases's status, you can find a `Ready` field that will tell you the current state of the release. Once a release has all of its components' App CRs
+created (even the ones that release-operator is not accountable for), the value of `Ready` will change to `true`.
 
-The status of a release is also being exported as a Prometheus metric.
+The status of a release is being exported as a Prometheus metric. There is also an
+[alert](https://github.com/giantswarm/g8s-prometheus/blob/master/helm/g8s-prometheus/prometheus-rules/release.rules.yml) that will page if a release spends more than 30 minutes in a non-ready state.
 
