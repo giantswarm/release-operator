@@ -74,8 +74,7 @@ It's also important to notice that `release-operator` is only responsible for cr
 
 #### Release status
 
-In the releases's status, you can find a `Ready` field that will tell you the current state of the release. Once a release has all of its components' App CRs
-created (even the ones that release-operator is not accountable for), the value of `Ready` will change to `true`.
+In the releases's status, you can find a `Ready` field that will tell you the current state of the release. The value changes to `true` once all the App CRs for components marked with `releaseOperatorDeploy` are present on the CP.
 
 The status of a release is being exported as a Prometheus metric. There is also an
 [alert](https://github.com/giantswarm/g8s-prometheus/blob/master/helm/g8s-prometheus/prometheus-rules/release.rules.yml) that will page if a release spends more than 30 minutes in a non-ready state.
