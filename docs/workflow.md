@@ -34,7 +34,8 @@ set to true. So in the example above, it will ignore `ignore-me` and deploy `dep
 So as you can see from the example above, each component can have a subset of the following fields:
 * `catalog`: which catalog to take the component from? (e.g. control-plane-catalog, control-plane-test-catalog)
 * `name`: name of the component.
-* `reference`: reference of the component. Used for testing and alternative tags for existing versions.
+* `reference`: reference of the component. A reference points to a tagged version of a component (e.g. 0.1.0, 0.1.0-1) with an optional SHA suffix
+(e.g. 0.1.0-1078ad9d2c15178d1466f79f1a54ebd9c92d9614) to specify a commit. Used for testing and referring to alternative versions of existing components.
 * `releaseOperatorDeploy`: controls if this operator will deploy the component.
 * `version`: version of the component.
 
