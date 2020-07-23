@@ -165,7 +165,6 @@ func appForComponent(operator releasev1alpha1.ReleaseSpecComponent) appv1alpha1.
 		},
 		Spec: appv1alpha1.AppSpec{
 			Name: operator.Name,
-			//TODO this should be ref
 			Version: operator.Version,
 		},
 	}
