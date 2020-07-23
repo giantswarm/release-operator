@@ -2,10 +2,11 @@ package controller
 
 import (
 	"github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
-	"github.com/giantswarm/k8sclient"
+	"github.com/giantswarm/k8sclient/v3/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/giantswarm/operatorkit/controller"
+	"github.com/giantswarm/operatorkit/resource"
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"github.com/giantswarm/release-operator/pkg/project"
@@ -32,11 +33,10 @@ func NewRelease(config ReleaseConfig) (*Release, error) {
 
 	var err error
 
-	var resourceSet *controller.ResourceSet
+	var resourceSet []resource.Interface
 	{
 		c := release.ResourceSetConfig{
-			G8sClient: config.K8sClient.G8sClient(),
-			K8sClient: config.K8sClient.K8sClient(),
+			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
 		}
 
@@ -52,9 +52,7 @@ func NewRelease(config ReleaseConfig) (*Release, error) {
 			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
 			Name:      releaseControllerName,
-			ResourceSets: []*controller.ResourceSet{
-				resourceSet,
-			},
+			Resources: resourceSet,
 			NewRuntimeObjectFunc: func() runtime.Object {
 				return new(v1alpha1.Release)
 			},
