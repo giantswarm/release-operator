@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
-	"github.com/giantswarm/k8sclient"
-	"github.com/giantswarm/k8sclient/k8srestconfig"
+	appv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+	"github.com/giantswarm/k8sclient/v3/pkg/k8sclient"
+	"github.com/giantswarm/k8sclient/v3/pkg/k8srestconfig"
 	"github.com/giantswarm/microendpoint/service/version"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -16,6 +17,7 @@ import (
 
 	"github.com/giantswarm/release-operator/flag"
 	"github.com/giantswarm/release-operator/pkg/project"
+	"github.com/giantswarm/release-operator/service/collector"
 	"github.com/giantswarm/release-operator/service/controller"
 )
 
@@ -33,6 +35,7 @@ type Service struct {
 
 	bootOnce          sync.Once
 	releaseController *controller.Release
+	releaseCollector  *collector.Set
 }
 
 // New creates a new service with given configuration.
@@ -76,7 +79,8 @@ func New(config Config) (*Service, error) {
 	{
 		c := k8sclient.ClientsConfig{
 			SchemeBuilder: k8sclient.SchemeBuilder{
-				v1alpha1.AddToScheme,
+				appv1alpha1.AddToScheme,
+				releasev1alpha1.AddToScheme,
 			},
 			Logger: config.Logger,
 
@@ -118,11 +122,25 @@ func New(config Config) (*Service, error) {
 		}
 	}
 
+	var releaseCollector *collector.Set
+	{
+		c := collector.SetConfig{
+			K8sClient: k8sClient,
+			Logger:    config.Logger,
+		}
+
+		releaseCollector, err = collector.NewSet(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	s := &Service{
 		Version: versionService,
 
 		bootOnce:          sync.Once{},
 		releaseController: releaseController,
+		releaseCollector:  releaseCollector,
 	}
 
 	return s, nil
@@ -132,5 +150,11 @@ func New(config Config) (*Service, error) {
 func (s *Service) Boot() {
 	s.bootOnce.Do(func() {
 		go s.releaseController.Boot(context.Background())
+		go func() {
+			err := s.releaseCollector.Boot(context.Background())
+			if err != nil {
+				panic(microerror.JSON(err))
+			}
+		}()
 	})
 }
