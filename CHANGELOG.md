@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.0.0] - 2020-07-23
 
+### Added
+
+- Added functionality for watching Release CRs and creating App CRs to ensure all required components for the release are running.
+
 ### Changed
 
 - No longer ensure Release CRD.
