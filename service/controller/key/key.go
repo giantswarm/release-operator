@@ -1,80 +1,125 @@
 package key
 
 import (
-	"strings"
+	"fmt"
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/giantswarm/release-operator/pkg/project"
 )
 
 const (
-	// AppCatalog is the name of the app catalog where releases and release
-	// components are stored.
-	AppCatalog = "control-plane"
+	AppStatusDeployed = "deployed"
 
 	// Namespace is the namespace where App CRs are created.
 	Namespace = "giantswarm"
 
 	LabelAppOperatorVersion = "app-operator.giantswarm.io/version"
 	LabelManagedBy          = "giantswarm.io/managed-by"
-	LabelReleaseCyclePhase  = "release-operator.giantswarm.io/release-cycle-phase"
 	LabelServiceType        = "giantswarm.io/service-type"
 
 	ValueServiceTypeManaged = "managed"
 )
 
-type DeletionTimestampGetter interface {
-	GetDeletionTimestamp() *metav1.Time
-}
-
-func IsDeleted(cr DeletionTimestampGetter) bool {
-	return cr.GetDeletionTimestamp() != nil
-}
-
-// ReleaseVersion returns the version of the given release.
-func ReleaseVersion(releaseCR releasev1alpha1.Release) string {
-	return releaseCR.Name
-}
-
-// SplitReleaseName splits a release name into provider and version.
-// It returns provider, version, and error, in this order.
-//
-// It expects name to be in the following format <provider>.<version>
-// e.g. aws.v6.0.1
-func SplitReleaseName(name string) (string, string, error) {
-	split := strings.SplitN(name, ".", 2)
-	if len(split) < 2 || len(split[0]) == 0 || len(split[1]) == 0 {
-		return "", "", microerror.Maskf(invalidReleaseNameError, "expect <provider>.<version>, got %#q", name)
+func AppReferenced(app applicationv1alpha1.App, components map[string]releasev1alpha1.ReleaseSpecComponent) bool {
+	component, ok := components[app.Name]
+	if ok && IsSameApp(component, app) {
+		return true
 	}
 
-	return split[0], split[1], nil
+	return false
 }
 
-// ToAppCR converts v into an App CR.
-func ToAppCR(v interface{}) (*applicationv1alpha1.App, error) {
-	x, ok := v.(*applicationv1alpha1.App)
-	if !ok {
-		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", x, v)
+func BuildAppName(component releasev1alpha1.ReleaseSpecComponent) string {
+	return fmt.Sprintf("%s-%s", component.Name, component.Version)
+}
+
+func ConstructApp(component releasev1alpha1.ReleaseSpecComponent) applicationv1alpha1.App {
+	return applicationv1alpha1.App{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      BuildAppName(component),
+			Namespace: Namespace,
+			Labels: map[string]string{
+				LabelAppOperatorVersion: "0.0.0",
+				LabelManagedBy:          project.Name(),
+			},
+		},
+		Spec: applicationv1alpha1.AppSpec{
+			Catalog: component.Catalog,
+			KubeConfig: applicationv1alpha1.AppSpecKubeConfig{
+				InCluster: true,
+			},
+			Name:      component.Name,
+			Namespace: Namespace,
+			Version:   GetComponentRef(component),
+		},
+	}
+}
+
+// ExtractComponents extracts the components that this operator is responsible for.
+func ExtractComponents(releases releasev1alpha1.ReleaseList) map[string]releasev1alpha1.ReleaseSpecComponent {
+	var components = make(map[string]releasev1alpha1.ReleaseSpecComponent)
+
+	for _, release := range releases.Items {
+		for _, component := range release.Spec.Components {
+			if component.ReleaseOperatorDeploy && (components[BuildAppName(component)] == releasev1alpha1.ReleaseSpecComponent{}) {
+				components[BuildAppName(component)] = component
+			}
+		}
+	}
+	return components
+}
+
+// FilterComponents filters the components that this operator is responsible for.
+func FilterComponents(comps []releasev1alpha1.ReleaseSpecComponent) []releasev1alpha1.ReleaseSpecComponent {
+	var filteredComponents []releasev1alpha1.ReleaseSpecComponent
+	for _, c := range comps {
+		if c.ReleaseOperatorDeploy {
+			filteredComponents = append(filteredComponents, c)
+		}
+	}
+	return filteredComponents
+}
+
+func GetComponentRef(comp releasev1alpha1.ReleaseSpecComponent) string {
+	if comp.Reference != "" {
+		return comp.Reference
+	}
+	return comp.Version
+}
+
+func IsSameApp(component releasev1alpha1.ReleaseSpecComponent, app applicationv1alpha1.App) bool {
+	return BuildAppName(component) == app.Name &&
+		component.Catalog == app.Spec.Catalog &&
+		GetComponentRef(component) == app.Spec.Version
+}
+
+func ComponentCreated(component releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {
+	for _, a := range apps {
+		if IsSameApp(component, a) {
+			return true
+		}
 	}
 
-	return x, nil
+	return false
+}
+
+func ComponentDeployed(component releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {
+	for _, a := range apps {
+		if IsSameApp(component, a) && a.Status.Release.Status == AppStatusDeployed {
+			return true
+		}
+	}
+
+	return false
 }
 
 // ToReleaseCR converts v into a Release CR.
 func ToReleaseCR(v interface{}) (*releasev1alpha1.Release, error) {
 	x, ok := v.(*releasev1alpha1.Release)
-	if !ok {
-		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", x, v)
-	}
-
-	return x, nil
-}
-
-// ToReleaseCycleCR converts v into a ReleaseCycle CR.
-func ToReleaseCycleCR(v interface{}) (*releasev1alpha1.ReleaseCycle, error) {
-	x, ok := v.(*releasev1alpha1.ReleaseCycle)
 	if !ok {
 		return nil, microerror.Maskf(wrongTypeError, "expected '%T', got '%T'", x, v)
 	}
