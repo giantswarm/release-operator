@@ -1,6 +1,7 @@
 package apps
 
 import (
+	"sort"
 	"strconv"
 	"testing"
 
@@ -46,6 +47,7 @@ func Test_calculateMissingApps(t *testing.T) {
 					appForComponent(testComponents[0]),
 				},
 			},
+
 			expectedApps: appv1alpha1.AppList{
 				Items: []appv1alpha1.App{
 					key.ConstructApp(testComponents[1]),
@@ -60,6 +62,14 @@ func Test_calculateMissingApps(t *testing.T) {
 			t.Log(tc.name)
 
 			resultApps := calculateMissingApps(tc.operators, tc.apps)
+
+			sortSlice := func(slice []appv1alpha1.App) {
+				sort.SliceStable(slice, func(i, j int) bool { return slice[i].Name < slice[j].Name })
+			}
+
+			// calculateMissingApps iterates over a map -> random order
+			sortSlice(tc.expectedApps.Items)
+			sortSlice(resultApps.Items)
 
 			if !cmp.Equal(resultApps, tc.expectedApps) {
 				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedApps, resultApps))
