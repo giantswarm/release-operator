@@ -5,7 +5,7 @@ var (
 	gitSHA      = "n/a"
 	name        = "release-operator"
 	source      = "https://github.com/giantswarm/release-operator"
-	version     = "1.0.4-dev"
+	version     = "2.0.0"
 )
 
 func Description() string {

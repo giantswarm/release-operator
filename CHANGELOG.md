@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2020-07-23
+
+### Added
+
+- Added functionality for watching Release CRs and creating App CRs to ensure all required components for the release are running.
+
 ### Changed
 
 - No longer ensure Release CRD.
@@ -57,7 +63,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use latest architect orb.
 
 
-[Unreleased]: https://github.com/giantswarm/release-operator/compare/v1.0.3...HEAD
+[Unreleased]: https://github.com/giantswarm/release-operator/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/giantswarm/release-operator/compare/v1.0.3...v2.0.0
 [1.0.3]: https://github.com/giantswarm/release-operator/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/giantswarm/release-operator/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/giantswarm/release-operator/compare/v1.0.0...v1.0.1
