@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  architect: giantswarm/architect@dev:add-nancy
+  architect: giantswarm/architect@dev:add-nancy # Comment
 
 workflows:
   version: 2
