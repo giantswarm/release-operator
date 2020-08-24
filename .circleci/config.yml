@@ -7,6 +7,9 @@ workflows:
   version: 2
   build_e2e:
     jobs:
+      - architect/gitleaks:
+          name: run-gitleaks
+
       - architect/go-build:
           name: go-build-release-operator
           binary: release-operator
