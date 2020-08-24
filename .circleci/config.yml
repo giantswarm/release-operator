@@ -13,6 +13,8 @@ workflows:
       - architect/go-build:
           name: go-build-release-operator
           binary: release-operator
+          requires:
+            - run-gitleaks
           filters:
             # Trigger the job also on git tag.
             tags:
