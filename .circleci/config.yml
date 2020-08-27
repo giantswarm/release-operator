@@ -9,6 +9,7 @@ workflows:
     jobs:
       - architect/gitleaks:
           name: run-gitleaks
+          scan_since_rev: << pipeline.git.base_revision >>
 
       - architect/go-build:
           name: go-build-release-operator
