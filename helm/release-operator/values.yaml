@@ -1,6 +1,11 @@
 image:
   name: "giantswarm/release-operator"
   tag: "[[ .Version ]]"
+
+project:
+  branch: "[[ .Branch ]]"
+  commit: "[[ .SHA ]]"
+
 Installation:
   V1:
     Registry:
@@ -10,18 +15,8 @@ pod:
     id: 1000
   group:
     id: 1000
+
 resource:
-  configMap:
-    name: "release-operator-configmap"
-  default:
-    name: "release-operator"
-    namespace: "giantswarm"
-  networkPolicy:
-    name: "release-operator-network-policy"
-  psp:
-    name: "release-operator-psp"
-  pullSecret:
-    name: "release-operator-pull-secret"
   service:
     port: 8000
     protocol: "TCP"

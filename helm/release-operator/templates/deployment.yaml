@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.resource.default.name }}
-  namespace: {{ .Values.resource.default.namespace }}
+  name: {{ include "resource.default.name" . }}
+  namespace: {{ include "resource.default.namespace" . }}
   labels:
-    app: {{ .Values.resource.default.name }}
+    {{- include "labels.common" . | nindent 4 }}
 spec:
   replicas: 1
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      app: {{ .Values.resource.default.name }}
+      {{- include "labels.selector" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app: {{ .Values.resource.default.name }}
+        {{- include "labels.common" . | nindent 8 }}
       annotations:
         releaseRevision: {{ .Release.Revision | quote }}
     spec:
@@ -25,20 +25,24 @@ spec:
           - podAffinityTerm:
               labelSelector:
                 matchExpressions:
-                - key: app
+                - key: app.kubernetes.io/name
                   operator: In
                   values:
-                  - {{ .Values.resource.default.name }}
+                  - {{ include "name" . | quote }}
+                - key: app.kubernetes.io/instance
+                  operator: In
+                  values:
+                  - {{ .Release.Name | quote }}  
               topologyKey: kubernetes.io/hostname
             weight: 100
       volumes:
-      - name: {{ .Values.resource.configMap.name }}
+      - name: {{ include "resource.configMap.name" . }}
         configMap:
-          name:  {{ .Values.resource.configMap.name }}
+          name:  {{ include "resource.configMap.name" . }}
           items:
           - key: config.yml
             path: config.yml
-      serviceAccountName: {{ .Values.resource.default.name }}
+      serviceAccountName: {{ include "resource.default.name" . }}
       securityContext:
         runAsUser: {{ .Values.pod.user.id }}
         runAsGroup: {{ .Values.pod.group.id }}
@@ -50,7 +54,7 @@ spec:
         - --config.dirs=/var/run/release-operator/configmap/
         - --config.files=config
         volumeMounts:
-        - name: {{ .Values.resource.configMap.name }}
+        - name: {{ include "resource.configMap.name" . }}
           mountPath: /var/run/release-operator/configmap/
         livenessProbe:
           httpGet:
