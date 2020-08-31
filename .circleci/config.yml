@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  architect: giantswarm/architect@dev:test-gitleaks-v6
+  architect: giantswarm/architect@0.11.0
 
 workflows:
   version: 2
