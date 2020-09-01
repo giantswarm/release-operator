@@ -4,7 +4,7 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/giantswarm/k8sclient/v3/pkg/k8sclient"
+	"github.com/giantswarm/k8sclient/v4/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/prometheus/client_golang/prometheus"
@@ -79,7 +79,7 @@ func (r *ReleaseCollector) Describe(ch chan<- *prometheus.Desc) error {
 }
 
 func (r *ReleaseCollector) collectReleaseStatus(ctx context.Context, ch chan<- prometheus.Metric) error {
-	releases, err := r.k8sClient.G8sClient().ReleaseV1alpha1().Releases().List(metav1.ListOptions{})
+	releases, err := r.k8sClient.G8sClient().ReleaseV1alpha1().Releases().List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return microerror.Mask(err)
 	}
