@@ -74,6 +74,7 @@ func (r *Resource) ensureState(ctx context.Context) error {
 			return microerror.Mask(err) // Might be better to proceed here instead of aborting
 		}
 	}
+	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found %d running tenant clusters", len(tenantClusters)))
 	releases, err := r.excludeUnusedDeprecatedReleases(releases, tenantClusters)
 	if err != nil {
 		return microerror.Mask(err)
@@ -160,13 +161,10 @@ func (r *Resource) excludeUnusedDeprecatedReleases(releases releasev1alpha1.Rele
 			if releaseVersions[release.Name] {
 				active.Items = append(active.Items, release)
 			} else {
+				operatorVersion := getOperatorVersionInRelease("aws-operator", release)
 				// check set of operator versions -- if present ,keep
-				for _, component := range release.Spec.Components {
-					if component.Name == "aws-operator" { // TODO: parameterize the operator version or check all
-						if operatorVersions[component.Version] {
-							active.Items = append(active.Items, release)
-						}
-					}
+				if operatorVersion != "" && operatorVersions[operatorVersion] {
+					active.Items = append(active.Items, release)
 				}
 			}
 		}
@@ -174,6 +172,15 @@ func (r *Resource) excludeUnusedDeprecatedReleases(releases releasev1alpha1.Rele
 
 	fmt.Println(apiexlabels.AWSOperatorVersion)
 	return active, nil
+}
+
+func getOperatorVersionInRelease(operator string, release releasev1alpha1.Release) string {
+	for _, component := range release.Spec.Components {
+		if component.Name == operator { // TODO: parameterize the operator version or check all
+			return component.Version
+		}
+	}
+	return ""
 }
 
 func consolidateClusterVersions(clusters []TenantCluster) (map[string]bool, map[string]bool) {
@@ -197,11 +204,13 @@ func (r *Resource) getCurrentTenantClusters() ([]TenantCluster, error) {
 			return nil, microerror.Mask(err)
 		}
 		tenantClusters = append(tenantClusters, awsClusters...)
+		r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d aws tenant clusters", len(awsClusters)))
 
 		legacyClusters, err := r.getLegacyClusters()
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
+		r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d legacy tenant clusters", len(legacyClusters)))
 		tenantClusters = append(tenantClusters, legacyClusters...)
 	}
 
@@ -301,15 +310,3 @@ func excludeDeletedRelease(releases releasev1alpha1.ReleaseList) releasev1alpha1
 	}
 	return active
 }
-
-// func getPossibleReleasesForOperator(operator string, version string, releases releasev1alpha1.ReleaseList) releasev1alpha1.ReleaseList {
-// 	var possibleReleases releasev1alpha1.ReleaseList
-// 	for _, release := range releases.Items {
-// 		for _, c := range release.Spec.Components {
-// 			if c.Name == operator && c.Version == version {
-// 				possibleReleases.Items = append(possibleReleases.Items, release)
-// 			}
-// 		}
-// 	}
-// 	return possibleReleases
-// }
