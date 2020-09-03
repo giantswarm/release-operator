@@ -91,6 +91,10 @@ func GetComponentRef(comp releasev1alpha1.ReleaseSpecComponent) string {
 	return comp.Version
 }
 
+func GetProviderOperators() []string {
+	return []string{"aws-operator", "azure-operator", "kvm-operator"}
+}
+
 func IsSameApp(component releasev1alpha1.ReleaseSpecComponent, app applicationv1alpha1.App) bool {
 	return BuildAppName(component) == app.Name &&
 		component.Catalog == app.Spec.Catalog &&
