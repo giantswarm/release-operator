@@ -263,7 +263,11 @@ func (r *Resource) getLegacyClusters() ([]TenantCluster, error) {
 	}
 	legacyClusters = append(legacyClusters, azure...)
 
-	// Same KVM
+	kvm, err := r.getLegacyKVMClusters()
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+	legacyClusters = append(legacyClusters, kvm...)
 
 	return legacyClusters, nil
 }
