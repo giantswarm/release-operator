@@ -12,6 +12,12 @@ rules:
     verbs:
       - "*"
   - apiGroups:
+      - infrastructure.giantswarm.io
+    resources:
+      - awsclusters
+    verbs:
+      - list
+  - apiGroups:
       - release.giantswarm.io
     resources:
       - releases

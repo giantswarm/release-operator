@@ -161,7 +161,7 @@ func (r *Resource) excludeUnusedDeprecatedReleases(releases releasev1alpha1.Rele
 			if releaseVersions[release.Name] {
 				active.Items = append(active.Items, release)
 			} else {
-				operatorVersion := getOperatorVersionInRelease("aws-operator", release)
+				operatorVersion := getOperatorVersionInRelease("aws-operator", release) // TODO: parameterize the operator version or check all
 				// check set of operator versions -- if present ,keep
 				if operatorVersion != "" && operatorVersions[operatorVersion] {
 					active.Items = append(active.Items, release)
@@ -170,13 +170,12 @@ func (r *Resource) excludeUnusedDeprecatedReleases(releases releasev1alpha1.Rele
 		}
 	}
 
-	fmt.Println(apiexlabels.AWSOperatorVersion)
 	return active, nil
 }
 
 func getOperatorVersionInRelease(operator string, release releasev1alpha1.Release) string {
 	for _, component := range release.Spec.Components {
-		if component.Name == operator { // TODO: parameterize the operator version or check all
+		if component.Name == operator {
 			return component.Version
 		}
 	}
