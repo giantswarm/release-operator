@@ -4,14 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	// "github.com/giantswarm/api/legacycluster"
-
 	appv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
 	apiexlabels "github.com/giantswarm/apiextensions/pkg/label"
-
-	// gsclient "github.com/giantswarm/gsclientgen/v2/client"
-	// "github.com/giantswarm/gsclientgen/v2/client/clusters"
 	"github.com/giantswarm/k8sclient/v3/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
