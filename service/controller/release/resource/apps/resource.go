@@ -135,18 +135,6 @@ func (r *Resource) ensureState(ctx context.Context) error {
 	return nil
 }
 
-func getPossibleReleasesForOperator(operator string, version string, releases releasev1alpha1.ReleaseList) releasev1alpha1.ReleaseList {
-	var possibleReleases releasev1alpha1.ReleaseList
-	for _, release := range releases.Items {
-		for _, c := range release.Spec.Components {
-			if c.Name == operator && c.Version == version {
-				possibleReleases.Items = append(possibleReleases.Items, release)
-			}
-		}
-	}
-	return possibleReleases
-}
-
 type TenantCluster struct {
 	ID               string
 	ReleaseVersion   string
@@ -225,7 +213,7 @@ func (r *Resource) getCurrentAWSClusters() ([]TenantCluster, error) {
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	var clusterIDs []string
+
 	var clusters []TenantCluster
 	for _, cluster := range awsclusters.Items {
 		c := TenantCluster{
@@ -235,7 +223,6 @@ func (r *Resource) getCurrentAWSClusters() ([]TenantCluster, error) {
 			Provider:        "aws", // TODO: Parameterize or detect
 		}
 		clusters = append(clusters, c)
-		clusterIDs = append(clusterIDs, cluster.Name)
 	}
 
 	return clusters, nil
@@ -272,13 +259,13 @@ func (r *Resource) getLegacyAWSClusters() ([]TenantCluster, error) {
 	return clusters, nil
 }
 
-func getCurrentAzureClusters() {
+// func getCurrentAzureClusters() {
 
-}
+// }
 
-func getCurrentKVMClusters() {
+// func getCurrentKVMClusters() {
 
-}
+// }
 
 func calculateMissingApps(components map[string]releasev1alpha1.ReleaseSpecComponent, apps appv1alpha1.AppList) appv1alpha1.AppList {
 	var missingApps appv1alpha1.AppList
@@ -314,3 +301,15 @@ func excludeDeletedRelease(releases releasev1alpha1.ReleaseList) releasev1alpha1
 	}
 	return active
 }
+
+// func getPossibleReleasesForOperator(operator string, version string, releases releasev1alpha1.ReleaseList) releasev1alpha1.ReleaseList {
+// 	var possibleReleases releasev1alpha1.ReleaseList
+// 	for _, release := range releases.Items {
+// 		for _, c := range release.Spec.Components {
+// 			if c.Name == operator && c.Version == version {
+// 				possibleReleases.Items = append(possibleReleases.Items, release)
+// 			}
+// 		}
+// 	}
+// 	return possibleReleases
+// }
