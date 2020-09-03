@@ -137,12 +137,10 @@ func (r *Resource) ensureState(ctx context.Context) error {
 }
 
 type TenantCluster struct {
-	ID               string
-	ReleaseVersion   string
-	PossibleVersions []string
-	Labels           []string
-	OperatorVersion  string
-	Provider         string
+	ID              string
+	OperatorVersion string
+	Provider        string
+	ReleaseVersion  string
 }
 
 func (r *Resource) excludeUnusedDeprecatedReleases(releases releasev1alpha1.ReleaseList, clusters []TenantCluster) (releasev1alpha1.ReleaseList, error) {
@@ -160,15 +158,19 @@ func (r *Resource) excludeUnusedDeprecatedReleases(releases releasev1alpha1.Rele
 			// check set of release versions -- if present ,keep
 			if releaseVersions[release.Name] {
 				active.Items = append(active.Items, release)
+				r.logger.Log("level", "debug", "message", fmt.Sprintf("keeping release %s because it is explicitly used", release.Name))
 			} else {
 				operatorVersion := getOperatorVersionInRelease("aws-operator", release) // TODO: parameterize the operator version or check all
 				// check set of operator versions -- if present ,keep
 				if operatorVersion != "" && operatorVersions[operatorVersion] {
 					active.Items = append(active.Items, release)
+					r.logger.Log("level", "debug", "message", fmt.Sprintf("keeping release %s because a cluster using its operator version (%s) is present", release.Name, operatorVersion))
 				}
 			}
 		}
 	}
+
+	r.logger.Log("level", "debug", "message", fmt.Sprintf("excluded %d unused deprecated releases", len(releases.Items)-len(active.Items)))
 
 	return active, nil
 }
