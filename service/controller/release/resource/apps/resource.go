@@ -146,22 +146,23 @@ type TenantCluster struct {
 func (r *Resource) excludeUnusedDeprecatedReleases(releases releasev1alpha1.ReleaseList, clusters []TenantCluster) (releasev1alpha1.ReleaseList, error) {
 	// Go over releases
 	// If deprecated, AND no existing cluster with this version, exclude it
-	// Cluster with this version:
-	//    - has release label with this version or
-	//    - if no release label, check operator label
-	//        - with operator label, find possible releases
+	// A cluster with this version either:
+	//    - has release label with this release version, or
+	//    - uses the provider operator version specified in this release
 
+	// Get two sets of just deduplicated versions
 	releaseVersions, operatorVersions := consolidateClusterVersions(clusters)
+
 	var active releasev1alpha1.ReleaseList
 	for _, release := range releases.Items {
 		if release.Spec.State == "deprecated" { // TODO: Should make this constant public in apiextensions
-			// check set of release versions -- if present ,keep
+			// Check the set of release versions and keep this release if it is used.
 			if releaseVersions[release.Name] {
 				active.Items = append(active.Items, release)
 				r.logger.Log("level", "debug", "message", fmt.Sprintf("keeping release %s because it is explicitly used", release.Name))
 			} else {
 				operatorVersion := getOperatorVersionInRelease("aws-operator", release) // TODO: parameterize the operator version or check all
-				// check set of operator versions -- if present ,keep
+				// Check the set of operator versions and keep this release if its operator version is used.
 				if operatorVersion != "" && operatorVersions[operatorVersion] {
 					active.Items = append(active.Items, release)
 					r.logger.Log("level", "debug", "message", fmt.Sprintf("keeping release %s because a cluster using its operator version (%s) is present", release.Name, operatorVersion))
@@ -175,6 +176,7 @@ func (r *Resource) excludeUnusedDeprecatedReleases(releases releasev1alpha1.Rele
 	return active, nil
 }
 
+// Searches the components in a release for the given operator and returns the version.
 func getOperatorVersionInRelease(operator string, release releasev1alpha1.Release) string {
 	for _, component := range release.Spec.Components {
 		if component.Name == operator {
@@ -184,6 +186,7 @@ func getOperatorVersionInRelease(operator string, release releasev1alpha1.Releas
 	return ""
 }
 
+// Takes a list of tenant clusters and returns two maps containing the versions of their release and operator versions.
 func consolidateClusterVersions(clusters []TenantCluster) (map[string]bool, map[string]bool) {
 	releaseVersions := make(map[string]bool)
 	operatorVersions := make(map[string]bool)
@@ -197,6 +200,7 @@ func consolidateClusterVersions(clusters []TenantCluster) (map[string]bool, map[
 	return releaseVersions, operatorVersions
 }
 
+// Returns a list of tenant clusters currently running on the installation.
 func (r *Resource) getCurrentTenantClusters() ([]TenantCluster, error) {
 
 	var tenantClusters []TenantCluster
@@ -219,6 +223,7 @@ func (r *Resource) getCurrentTenantClusters() ([]TenantCluster, error) {
 	return tenantClusters, nil
 }
 
+// Returns a list of AWS clusters according to the awscluster resource (non-legacy).
 func (r *Resource) getCurrentAWSClusters() ([]TenantCluster, error) {
 	awsclusters, err := r.k8sClient.G8sClient().InfrastructureV1alpha2().AWSClusters("default").List(metav1.ListOptions{})
 	if err != nil {
@@ -239,6 +244,7 @@ func (r *Resource) getCurrentAWSClusters() ([]TenantCluster, error) {
 	return clusters, nil
 }
 
+// Returns a list of legacy clusters based on <provider>config resources.
 func (r *Resource) getLegacyClusters() ([]TenantCluster, error) {
 	var legacyClusters []TenantCluster
 	aws, err := r.getLegacyAWSClusters()
@@ -252,6 +258,7 @@ func (r *Resource) getLegacyClusters() ([]TenantCluster, error) {
 	return legacyClusters, nil
 }
 
+// Returns a list of running AWS legacy clusters based on awsconfig resources.
 func (r *Resource) getLegacyAWSClusters() ([]TenantCluster, error) {
 	awsconfigs, err := r.k8sClient.G8sClient().ProviderV1alpha1().AWSConfigs("default").List(metav1.ListOptions{})
 	if err != nil {
