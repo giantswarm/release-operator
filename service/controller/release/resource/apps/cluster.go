@@ -1,7 +1,10 @@
 package apps
 
 import (
+	"context"
 	"fmt"
+
+	"github.com/giantswarm/release-operator/service/controller/key"
 
 	apiexlabels "github.com/giantswarm/apiextensions/pkg/label"
 	"github.com/giantswarm/microerror"
@@ -45,12 +48,26 @@ func (r *Resource) getCurrentTenantClusters() ([]TenantCluster, error) {
 		tenantClusters = append(tenantClusters, awsClusters...)
 		r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d aws tenant clusters", len(awsClusters)))
 
+		azureClusters, err := r.getCurrentAzureClusters()
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+		tenantClusters = append(tenantClusters, azureClusters...)
+		r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d azure tenant clusters", len(azureClusters)))
+
+		kvmClusters, err := r.getCurrentKVMClusters()
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+		tenantClusters = append(tenantClusters, kvmClusters...)
+		r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d kvm tenant clusters", len(kvmClusters)))
+
 		legacyClusters, err := r.getLegacyClusters()
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
-		r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d legacy tenant clusters", len(legacyClusters)))
 		tenantClusters = append(tenantClusters, legacyClusters...)
+		r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d legacy tenant clusters", len(legacyClusters)))
 	}
 
 	return tenantClusters, nil
@@ -69,7 +86,7 @@ func (r *Resource) getCurrentAWSClusters() ([]TenantCluster, error) {
 			ID:               cluster.Name,
 			OperatorVersion:  cluster.Labels[apiexlabels.AWSOperatorVersion],
 			ReleaseVersion:   cluster.Labels[apiexlabels.ReleaseVersion],
-			ProviderOperator: "aws-operator", // TODO: Parameterize or detect
+			ProviderOperator: key.ProviderOperatorAWS,
 		}
 		clusters = append(clusters, c)
 	}
@@ -122,7 +139,7 @@ func (r *Resource) getLegacyAWSClusters() ([]TenantCluster, error) {
 		c := TenantCluster{
 			ID:               cluster.Name,
 			OperatorVersion:  cluster.Labels[apiexlabels.AWSOperatorVersion],
-			ProviderOperator: "aws-operator",
+			ProviderOperator: key.ProviderOperatorAWS,
 		}
 		clusters = append(clusters, c)
 	}
@@ -141,7 +158,7 @@ func (r *Resource) getLegacyAzureClusters() ([]TenantCluster, error) {
 		c := TenantCluster{
 			ID:               cluster.Name,
 			OperatorVersion:  cluster.Labels[apiexlabels.AzureOperatorVersion],
-			ProviderOperator: "azure-operator",
+			ProviderOperator: key.ProviderOperatorAzure,
 		}
 		clusters = append(clusters, c)
 	}
@@ -160,13 +177,19 @@ func (r *Resource) getLegacyKVMClusters() ([]TenantCluster, error) {
 		c := TenantCluster{
 			ID:               cluster.Name,
 			OperatorVersion:  cluster.Labels["kvm-operator.giantswarm.io/version"], // TODO: Why isn't this in apiextensions?
-			ProviderOperator: "kvm-operator",
+			ProviderOperator: key.ProviderOperatorKVM,
 		}
 		clusters = append(clusters, c)
 	}
 	return clusters, nil
 }
 
-// func getCurrentKVMClusters() {
+func (r *Resource) getCurrentAzureClusters(ctx context.Context) ([]TenantCluster, error) {
+	// TODO
+	return []TenantCluster{}, nil
+}
 
-// }
+func (r *Resource) getCurrentKVMClusters(ctx context.Context) ([]TenantCluster, error) {
+	// TODO
+	return []TenantCluster{}, nil
+}
