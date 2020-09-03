@@ -156,7 +156,7 @@ func (r *Resource) excludeUnusedDeprecatedReleases(releases releasev1alpha1.Rele
 				r.logger.Log("level", "debug", "message", fmt.Sprintf("keeping release %s because it is explicitly used", release.Name))
 			} else {
 				for _, o := range key.GetProviderOperators() {
-					operatorVersion := getOperatorVersionInRelease(o, release) // TODO: parameterize the operator version or check all
+					operatorVersion := getOperatorVersionInRelease(o, release)
 					// Check the set of operator versions and keep this release if its operator version is used.
 					if operatorVersion != "" && operatorVersions[o][operatorVersion] {
 						active.Items = append(active.Items, release)
