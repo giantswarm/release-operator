@@ -18,6 +18,12 @@ rules:
     verbs:
       - list
   - apiGroups:
+      - provider.giantswarm.io
+    resources:
+      - awsconfigs
+    verbs:
+      - list
+  - apiGroups:
       - release.giantswarm.io
     resources:
       - releases
