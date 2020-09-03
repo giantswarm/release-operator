@@ -3,7 +3,6 @@ module github.com/giantswarm/release-operator
 go 1.13
 
 require (
-	// github.com/giantswarm/api v1.8.0
 	github.com/giantswarm/apiextensions v0.4.20
 	github.com/giantswarm/exporterkit v0.2.0
 	github.com/giantswarm/k8sclient/v3 v3.1.2
