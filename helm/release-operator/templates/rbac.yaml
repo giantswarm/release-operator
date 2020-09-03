@@ -21,6 +21,8 @@ rules:
       - provider.giantswarm.io
     resources:
       - awsconfigs
+      - azureconfigs
+      - kvmconfigs
     verbs:
       - list
   - apiGroups:
