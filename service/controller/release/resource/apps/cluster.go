@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/giantswarm/release-operator/service/controller/key"
-
 	apiexlabels "github.com/giantswarm/apiextensions/pkg/label"
 	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/release-operator/service/controller/key"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	azurecapi "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 )
 
 type TenantCluster struct {
@@ -54,13 +54,6 @@ func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]TenantCluste
 		}
 		tenantClusters = append(tenantClusters, azureClusters...)
 		r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d azure tenant clusters", len(azureClusters)))
-
-		kvmClusters, err := r.getCurrentKVMClusters(ctx)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-		tenantClusters = append(tenantClusters, kvmClusters...)
-		r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d kvm tenant clusters", len(kvmClusters)))
 
 		legacyClusters, err := r.getLegacyClusters()
 		if err != nil {
@@ -185,11 +178,21 @@ func (r *Resource) getLegacyKVMClusters() ([]TenantCluster, error) {
 }
 
 func (r *Resource) getCurrentAzureClusters(ctx context.Context) ([]TenantCluster, error) {
-	// TODO
-	return []TenantCluster{}, nil
-}
+	azureclusters := azurecapi.AzureClusterList{} // TODO: Actually get the clusters
+	// if err != nil {
+	// 	return nil, microerror.Mask(err)
+	// }
 
-func (r *Resource) getCurrentKVMClusters(ctx context.Context) ([]TenantCluster, error) {
-	// TODO
-	return []TenantCluster{}, nil
+	var clusters []TenantCluster
+	for _, cluster := range azureclusters.Items {
+		c := TenantCluster{
+			ID:               cluster.Name,
+			OperatorVersion:  cluster.Labels[apiexlabels.AWSOperatorVersion],
+			ReleaseVersion:   cluster.Labels[apiexlabels.ReleaseVersion],
+			ProviderOperator: key.ProviderOperatorAWS,
+		}
+		clusters = append(clusters, c)
+	}
+
+	return clusters, nil
 }
