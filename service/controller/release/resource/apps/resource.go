@@ -73,7 +73,6 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		tenantClusters, err = r.getCurrentTenantClusters()
 		if err != nil {
 			r.logger.LogCtx(ctx, "level", "error", "message", fmt.Sprintf("error finding tenant clusters: %s", err))
-			// return microerror.Mask(err) // Might be better to proceed here instead of aborting
 		} else {
 			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found %d running tenant clusters", len(tenantClusters)))
 		}
@@ -253,20 +252,26 @@ func (r *Resource) getLegacyClusters() ([]TenantCluster, error) {
 	var legacyClusters []TenantCluster
 	aws, err := r.getLegacyAWSClusters()
 	if err != nil {
-		return nil, microerror.Mask(err)
+		r.logger.Log("level", "error", "message", fmt.Sprintf("error getting aws legacy clusters: %s", err))
+		// return nil, microerror.Mask(err)
 	}
+	r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d aws legacy clusters", len(aws)))
 	legacyClusters = append(legacyClusters, aws...)
 
 	azure, err := r.getLegacyAzureClusters()
 	if err != nil {
-		return nil, microerror.Mask(err)
+		r.logger.Log("level", "error", "message", fmt.Sprintf("error getting azure legacy clusters: %s", err))
+		// return nil, microerror.Mask(err)
 	}
+	r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d azure legacy clusters", len(azure)))
 	legacyClusters = append(legacyClusters, azure...)
 
 	kvm, err := r.getLegacyKVMClusters()
 	if err != nil {
-		return nil, microerror.Mask(err)
+		r.logger.Log("level", "error", "message", fmt.Sprintf("error getting kvm legacy clusters: %s", err))
+		// return nil, microerror.Mask(err)
 	}
+	r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d kvm legacy clusters", len(kvm)))
 	legacyClusters = append(legacyClusters, kvm...)
 
 	return legacyClusters, nil
