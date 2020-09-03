@@ -189,6 +189,7 @@ func consolidateClusterVersions(clusters []TenantCluster) (map[string]bool, map[
 	operatorVersions := make(map[string]bool)
 
 	for _, c := range clusters {
+		fmt.Printf("Cluster %s (%s) is using operator version %s", c.ID, c.ReleaseVersion, c.OperatorVersion)
 		releaseVersions[c.ReleaseVersion] = true
 		operatorVersions[c.OperatorVersion] = true
 	}
