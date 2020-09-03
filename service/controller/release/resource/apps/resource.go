@@ -2,10 +2,7 @@ package apps
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"strings"
-	"time"
 
 	// "github.com/giantswarm/api/legacycluster"
 
@@ -153,12 +150,14 @@ func getPossibleReleasesForOperator(operator string, version string, releases re
 
 type TenantCluster struct {
 	ID               string
-	Version          string
+	ReleaseVersion   string
 	PossibleVersions []string
 	Labels           []string
+	OperatorVersion  string
+	Provider         string
 }
 
-func (r *Resource) excludeUnusedDeprecatedReleases(releases releasev1alpha1.ReleaseList, clusters []string) (releasev1alpha1.ReleaseList, error) {
+func (r *Resource) excludeUnusedDeprecatedReleases(releases releasev1alpha1.ReleaseList, clusters []TenantCluster) (releasev1alpha1.ReleaseList, error) {
 	// Go over releases
 	// If deprecated, AND no existing cluster with this version, exclude it
 	// Cluster with this version:
@@ -166,15 +165,44 @@ func (r *Resource) excludeUnusedDeprecatedReleases(releases releasev1alpha1.Rele
 	//    - if no release label, check operator label
 	//        - with operator label, find possible releases
 
+	releaseVersions, operatorVersions := consolidateClusterVersions(clusters)
+	var active releasev1alpha1.ReleaseList
 	for _, release := range releases.Items {
 		if release.Spec.State == "deprecated" { // TODO: Should make this constant public in apiextensions
-
+			// check set of release versions -- if present ,keep
+			if releaseVersions[release.Name] {
+				active.Items = append(active.Items, release)
+			} else {
+				// var operatorVersion string
+				for _, component := range release.Spec.Components {
+					if component.Name == "aws-operator" { // TODO: parameterize the operator version or check all
+						if operatorVersions[component.Version] {
+							active.Items = append(active.Items, release)
+						}
+					}
+				}
+			}
 		}
 	}
 
-	var active releasev1alpha1.ReleaseList
+	//var active releasev1alpha1.ReleaseList
 	fmt.Println(apiexlabels.AWSOperatorVersion)
 	return active, nil
+}
+
+func consolidateClusterVersions(clusters []TenantCluster) (map[string]bool, map[string]bool) {
+	var releaseVersions, operatorVersions map[string]bool
+
+	for _, c := range clusters {
+		releaseVersions[c.ReleaseVersion] = true
+		operatorVersions[c.OperatorVersion] = true
+	}
+
+	return releaseVersions, operatorVersions
+}
+
+func valueIsInSet(value string, set map[string]struct{}) {
+	//
 }
 
 // func getPotentialClusterVersions(cluster TenantCluster, releases releasev1alpha1.ReleaseList) []string {
@@ -193,18 +221,45 @@ func (r *Resource) excludeUnusedDeprecatedReleases(releases releasev1alpha1.Rele
 // 	return versions
 // }
 
-func (r *Resource) getCurrentTenantClusters(ctx context.Context) {
+func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]TenantCluster, error) {
 
 	// legacycluster.List()
 
 	// params := clusters.NewGetClustersParams()
 	// gsclient.New()
 
-	legacyClusters, err := r.getLegacyClusters(ctx)
+	var tenantClusters []TenantCluster
+	{
+		awsClusters, err := r.getCurrentAWSClusters()
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+		tenantClusters = append(tenantClusters, awsClusters...)
 
+		legacyClusters, err := r.getLegacyClusters()
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+		tenantClusters = append(tenantClusters, legacyClusters...)
+	}
+
+	// for _, c := range legacyClusters {
+	// 	if c.ReleaseVersion == "" {
+	// 		switch c.Provider {
+	// 		case "aws":
+	// 			c.ReleaseVersion =
+	// 		case "azure":
+	// 		case "kvm":
+	// 		default:
+	// 			fmt.Printf("Unknown TC provider: %s", c.Provider)
+	// 		}
+	// 	}
+	// }
+
+	return tenantClusters, nil
 }
 
-func (r *Resource) getCurrentAWSClusters() ([]Cluster, error) {
+func (r *Resource) getCurrentAWSClusters() ([]TenantCluster, error) {
 	awsclusters, err := r.k8sClient.G8sClient().InfrastructureV1alpha2().AWSClusters("default").List(metav1.ListOptions{})
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -215,7 +270,38 @@ func (r *Resource) getCurrentAWSClusters() ([]Cluster, error) {
 		// releaseVersion := cluster.Labels[v2labels.ReleaseVersion]
 	}
 
-	return []Cluster{}, nil
+	return []TenantCluster{}, nil
+}
+
+func (r *Resource) getLegacyClusters() ([]TenantCluster, error) {
+	var legacyClusters []TenantCluster
+	aws, err := r.getLegacyAWSClusters()
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+	legacyClusters = append(legacyClusters, aws...)
+
+	// Same for Azure and KVM
+
+	return legacyClusters, nil
+}
+
+func (r *Resource) getLegacyAWSClusters() ([]TenantCluster, error) {
+	awsconfigs, err := r.k8sClient.G8sClient().ProviderV1alpha1().AWSConfigs("default").List(metav1.ListOptions{})
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	var clusters []TenantCluster
+	for _, cluster := range awsconfigs.Items {
+		c := TenantCluster{
+			ID:              cluster.Name,
+			OperatorVersion: cluster.Labels[apiexlabels.AWSOperatorVersion],
+			Provider:        "aws",
+		}
+		clusters = append(clusters, c)
+	}
+	return clusters, nil
 }
 
 func getCurrentAzureClusters() {
@@ -226,62 +312,13 @@ func getCurrentKVMClusters() {
 
 }
 
-type Cluster struct {
-	CreateDate     time.Time `json:"create_date"`
-	ID             string    `json:"id"`
-	Name           string    `json:"name"`
-	Owner          string    `json:"owner"`
-	ReleaseVersion string    `json:"release_version"`
-}
-
-func (r *Resource) getLegacyClusters(ctx context.Context, orgIDs []string) ([]Cluster, error) {
-	storageConfig, err := r.k8sClient.G8sClient().CoreV1alpha1().StorageConfigs("giantswarm").Get("cluster-service", metav1.GetOptions{})
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
-	clusterIDs := []string{}
-	for _, orgID := range orgIDs {
-		key := "/owner/organization/" + orgID
-		keyLen := len(key)
-
-		for k := range storageConfig.Spec.Storage.Data {
-			if len(k) <= keyLen+1 {
-				continue
-			}
-			if !strings.HasPrefix(k, key) {
-				continue
-			}
-
-			if k[keyLen] != '/' {
-				continue
-			}
-
-			clusterID := k[keyLen+1:]
-			clusterIDs = append(clusterIDs, clusterID)
-		}
-	}
-
-	clusters := []Cluster{}
-	for _, clusterID := range clusterIDs {
-		key := "/cluster/" + clusterID
-		value, ok := storageConfig.Spec.Storage.Data[key]
-		if !ok {
-			return nil, microerror.Maskf(notFoundError, "no value for key '%s'", key)
-		}
-
-		var cluster Cluster
-		err = json.Unmarshal([]byte(value), &cluster)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-
-		clusters = append(clusters, cluster)
-	}
-
-	return clusters, nil
-
-}
+// type Cluster struct {
+// 	CreateDate     time.Time `json:"create_date"`
+// 	ID             string    `json:"id"`
+// 	Name           string    `json:"name"`
+// 	Owner          string    `json:"owner"`
+// 	ReleaseVersion string    `json:"release_version"`
+// }
 
 // func (r *Resource) excludeUnusedDeprecatedReleases(releases releasev1alpha1.ReleaseList) (releasev1alpha1.ReleaseList, error) {
 
