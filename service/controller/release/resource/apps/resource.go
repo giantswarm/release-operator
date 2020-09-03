@@ -66,14 +66,18 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		releases = excludeDeletedRelease(releases)
 	}
 
-	// var tenantClusters
-	// {
-	//    tenantClusters, err := r.getCurrentTenantClusters()
-	//    if err != nil {
-	// 	     return microerror.Mask(err) // Might be better to proceed here instead of aborting
-	//    }
-	// }
-	// releases = excludeUnusedDeprecatedReleases(releases, tenantClusters)
+	var tenantClusters []TenantCluster
+	{
+		var err error
+		tenantClusters, err = r.getCurrentTenantClusters()
+		if err != nil {
+			return microerror.Mask(err) // Might be better to proceed here instead of aborting
+		}
+	}
+	releases, err := r.excludeUnusedDeprecatedReleases(releases, tenantClusters)
+	if err != nil {
+		return microerror.Mask(err)
+	}
 
 	var components map[string]releasev1alpha1.ReleaseSpecComponent
 	{
@@ -185,7 +189,8 @@ func (r *Resource) excludeUnusedDeprecatedReleases(releases releasev1alpha1.Rele
 }
 
 func consolidateClusterVersions(clusters []TenantCluster) (map[string]bool, map[string]bool) {
-	var releaseVersions, operatorVersions map[string]bool
+	releaseVersions := make(map[string]bool)
+	operatorVersions := make(map[string]bool)
 
 	for _, c := range clusters {
 		releaseVersions[c.ReleaseVersion] = true
@@ -195,7 +200,7 @@ func consolidateClusterVersions(clusters []TenantCluster) (map[string]bool, map[
 	return releaseVersions, operatorVersions
 }
 
-func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]TenantCluster, error) {
+func (r *Resource) getCurrentTenantClusters() ([]TenantCluster, error) {
 
 	var tenantClusters []TenantCluster
 	{
