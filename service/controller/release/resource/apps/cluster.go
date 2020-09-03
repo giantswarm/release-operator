@@ -37,7 +37,7 @@ func consolidateClusterVersions(clusters []TenantCluster) (map[string]bool, map[
 }
 
 // Returns a list of tenant clusters currently running on the installation.
-func (r *Resource) getCurrentTenantClusters() ([]TenantCluster, error) {
+func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]TenantCluster, error) {
 
 	var tenantClusters []TenantCluster
 	{
@@ -48,14 +48,14 @@ func (r *Resource) getCurrentTenantClusters() ([]TenantCluster, error) {
 		tenantClusters = append(tenantClusters, awsClusters...)
 		r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d aws tenant clusters", len(awsClusters)))
 
-		azureClusters, err := r.getCurrentAzureClusters()
+		azureClusters, err := r.getCurrentAzureClusters(ctx)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 		tenantClusters = append(tenantClusters, azureClusters...)
 		r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d azure tenant clusters", len(azureClusters)))
 
-		kvmClusters, err := r.getCurrentKVMClusters()
+		kvmClusters, err := r.getCurrentKVMClusters(ctx)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}

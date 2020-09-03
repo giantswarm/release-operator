@@ -68,7 +68,7 @@ func (r *Resource) ensureState(ctx context.Context) error {
 	var tenantClusters []TenantCluster
 	{
 		var err error
-		tenantClusters, err = r.getCurrentTenantClusters()
+		tenantClusters, err = r.getCurrentTenantClusters(ctx)
 		if err != nil {
 			r.logger.LogCtx(ctx, "level", "error", "message", fmt.Sprintf("error finding tenant clusters: %s", err))
 		} else {
