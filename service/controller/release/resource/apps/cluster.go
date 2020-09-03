@@ -6,9 +6,10 @@ import (
 
 	apiexlabels "github.com/giantswarm/apiextensions/pkg/label"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/release-operator/service/controller/key"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	azurecapi "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
+
+	"github.com/giantswarm/release-operator/service/controller/key"
 )
 
 type TenantCluster struct {
