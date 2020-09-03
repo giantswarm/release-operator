@@ -66,15 +66,19 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		releases = excludeDeletedRelease(releases)
 	}
 
+	r.logger.LogCtx(ctx, "level", "debug", "message", "searching for running tenant clusters")
 	var tenantClusters []TenantCluster
 	{
 		var err error
 		tenantClusters, err = r.getCurrentTenantClusters()
 		if err != nil {
-			return microerror.Mask(err) // Might be better to proceed here instead of aborting
+			r.logger.LogCtx(ctx, "level", "error", "message", fmt.Sprintf("error finding tenant clusters: %s", err))
+			// return microerror.Mask(err) // Might be better to proceed here instead of aborting
+		} else {
+			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found %d running tenant clusters", len(tenantClusters)))
 		}
 	}
-	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found %d running tenant clusters", len(tenantClusters)))
+
 	releases, err := r.excludeUnusedDeprecatedReleases(releases, tenantClusters)
 	if err != nil {
 		return microerror.Mask(err)
@@ -253,7 +257,13 @@ func (r *Resource) getLegacyClusters() ([]TenantCluster, error) {
 	}
 	legacyClusters = append(legacyClusters, aws...)
 
-	// Same for Azure and KVM
+	azure, err := r.getLegacyAzureClusters()
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+	legacyClusters = append(legacyClusters, azure...)
+
+	// Same KVM
 
 	return legacyClusters, nil
 }
@@ -277,9 +287,43 @@ func (r *Resource) getLegacyAWSClusters() ([]TenantCluster, error) {
 	return clusters, nil
 }
 
-// func getCurrentAzureClusters() {
+// Returns a list of running Azure legacy clusters based on azureconfig resources.
+func (r *Resource) getLegacyAzureClusters() ([]TenantCluster, error) {
+	azureconfigs, err := r.k8sClient.G8sClient().ProviderV1alpha1().AzureConfigs("default").List(metav1.ListOptions{})
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
 
-// }
+	var clusters []TenantCluster
+	for _, cluster := range azureconfigs.Items {
+		c := TenantCluster{
+			ID:              cluster.Name,
+			OperatorVersion: cluster.Labels[apiexlabels.AzureOperatorVersion],
+			Provider:        "azure",
+		}
+		clusters = append(clusters, c)
+	}
+	return clusters, nil
+}
+
+// Returns a list of running KVM legacy clusters based on kvmconfig resources.
+func (r *Resource) getLegacyKVMClusters() ([]TenantCluster, error) {
+	kvmconfigs, err := r.k8sClient.G8sClient().ProviderV1alpha1().KVMConfigs("default").List(metav1.ListOptions{})
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	var clusters []TenantCluster
+	for _, cluster := range kvmconfigs.Items {
+		c := TenantCluster{
+			ID:              cluster.Name,
+			OperatorVersion: cluster.Labels["kvm-operator.giantswarm.io/version"], // TODO: Why isn't this in apiextensions?
+			Provider:        "kvm",
+		}
+		clusters = append(clusters, c)
+	}
+	return clusters, nil
+}
 
 // func getCurrentKVMClusters() {
 
