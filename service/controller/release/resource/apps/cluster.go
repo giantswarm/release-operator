@@ -23,6 +23,9 @@ func consolidateClusterVersions(clusters []TenantCluster) (map[string]bool, map[
 	releaseVersions := make(map[string]bool)
 	operatorVersions := make(map[string]map[string]bool)
 
+	// operatorVersions is a nested map including the operator name and version
+	// e.g. operatorVersions["aws-operator"]["8.7.6"]:true
+
 	for _, c := range clusters {
 		fmt.Printf("Cluster %s (%s) is using operator version %s\n", c.ID, c.ReleaseVersion, c.OperatorVersion)
 		releaseVersions[c.ReleaseVersion] = true
@@ -169,7 +172,7 @@ func (r *Resource) getLegacyKVMClusters() ([]TenantCluster, error) {
 	for _, cluster := range kvmconfigs.Items {
 		c := TenantCluster{
 			ID:               cluster.Name,
-			OperatorVersion:  cluster.Labels["kvm-operator.giantswarm.io/version"], // TODO: Why isn't this in apiextensions?
+			OperatorVersion:  cluster.Labels[key.LabelKVMOperator],
 			ProviderOperator: key.ProviderOperatorKVM,
 		}
 		clusters = append(clusters, c)
