@@ -174,8 +174,8 @@ github.com/giantswarm/microerror v0.2.0/go.mod h1:1YtJq/m7Vlq1Y6NP7B+SODOKCGlG7e
 github.com/giantswarm/microerror v0.2.1 h1:4y88WstqZ4OSSq6T/TvTJaefRe/JbrbuwoWQNVxOOyU=
 github.com/giantswarm/microerror v0.2.1/go.mod h1:1YtJq/m7Vlq1Y6NP7B+SODOKCGlG7e5wctV2OoE9n34=
 github.com/giantswarm/microkit v0.2.0/go.mod h1:1vDHFUN+ZsUahZJ2hgZxcU7nG35Rj484t8Y5akhdRIM=
-github.com/giantswarm/microkit v0.2.2-0.20200901165545-4a16870c8303 h1:m2im018z6t0NJkIFq7oQ3Tp9G6Tp6r4ow0fq3tmtvdo=
-github.com/giantswarm/microkit v0.2.2-0.20200901165545-4a16870c8303/go.mod h1:CyZkhd0K/a0L/S7PGgCSVvmJXc8cxQoWqUpCK3f/u9w=
+github.com/giantswarm/microkit v0.2.2 h1:BNK55FyS+AXls6mH+81Iloo3z2+FRWqeEz2jYb7ZUhc=
+github.com/giantswarm/microkit v0.2.2/go.mod h1:XCj0vA/+jHiM03XDMlcWuvYdgZQyNS3O7ZVHDOUCYA8=
 github.com/giantswarm/micrologger v0.3.1 h1:HbYbQLobvfsLYzRiGTncaO61CCPd4BlT18xaaday+4o=
 github.com/giantswarm/micrologger v0.3.1/go.mod h1:PjAgtcJ922ZMX/Aa05IPi0bdYvOj2P7pZ7+6dBShMQs=
 github.com/giantswarm/operatorkit/v2 v2.0.0 h1:sq7WWTggG+8PryPppxgLJ4djjrRreY1g4fH6vfXor1M=

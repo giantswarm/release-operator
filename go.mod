@@ -8,7 +8,7 @@ require (
 	github.com/giantswarm/k8sclient/v4 v4.0.0
 	github.com/giantswarm/microendpoint v0.2.0
 	github.com/giantswarm/microerror v0.2.1
-	github.com/giantswarm/microkit v0.2.2-0.20200901165545-4a16870c8303
+	github.com/giantswarm/microkit v0.2.2
 	github.com/giantswarm/micrologger v0.3.1
 	github.com/giantswarm/operatorkit/v2 v2.0.0
 	github.com/google/go-cmp v0.5.1
@@ -19,4 +19,5 @@ require (
 	sigs.k8s.io/controller-runtime v0.6.1
 )
 
+// Apply fix for CVE-2020-15114 not yet released in github.com/spf13/viper.
 replace github.com/bketelsen/crypt => github.com/bketelsen/crypt v0.0.3
