@@ -1,12 +1,12 @@
 package release
 
 import (
-	"github.com/giantswarm/k8sclient/v3/pkg/k8sclient"
+	"github.com/giantswarm/k8sclient/v4/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/operatorkit/resource"
-	"github.com/giantswarm/operatorkit/resource/wrapper/metricsresource"
-	"github.com/giantswarm/operatorkit/resource/wrapper/retryresource"
+	"github.com/giantswarm/operatorkit/v2/pkg/resource"
+	"github.com/giantswarm/operatorkit/v2/pkg/resource/wrapper/metricsresource"
+	"github.com/giantswarm/operatorkit/v2/pkg/resource/wrapper/retryresource"
 
 	"github.com/giantswarm/release-operator/service/controller/release/resource/apps"
 	"github.com/giantswarm/release-operator/service/controller/release/resource/status"

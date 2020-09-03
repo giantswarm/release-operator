@@ -3,8 +3,8 @@ package key
 import (
 	"fmt"
 
-	applicationv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
-	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+	applicationv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
