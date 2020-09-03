@@ -155,11 +155,14 @@ func (r *Resource) excludeUnusedDeprecatedReleases(releases releasev1alpha1.Rele
 				active.Items = append(active.Items, release)
 				r.logger.Log("level", "debug", "message", fmt.Sprintf("keeping release %s because it is explicitly used", release.Name))
 			} else {
-				operatorVersion := getOperatorVersionInRelease("aws-operator", release) // TODO: parameterize the operator version or check all
-				// Check the set of operator versions and keep this release if its operator version is used.
-				if operatorVersion != "" && operatorVersions[operatorVersion] {
-					active.Items = append(active.Items, release)
-					r.logger.Log("level", "debug", "message", fmt.Sprintf("keeping release %s because a cluster using its operator version (%s) is present", release.Name, operatorVersion))
+				providerOperators := []string{"aws-operator", "azure-operator", "kvm-operator"}
+				for _, o := range providerOperators {
+					operatorVersion := getOperatorVersionInRelease(o, release) // TODO: parameterize the operator version or check all
+					// Check the set of operator versions and keep this release if its operator version is used.
+					if operatorVersion != "" && operatorVersions[o][operatorVersion] {
+						active.Items = append(active.Items, release)
+						r.logger.Log("level", "debug", "message", fmt.Sprintf("keeping release %s because a cluster using its operator version (%s) is present", release.Name, operatorVersion))
+					}
 				}
 			}
 		}

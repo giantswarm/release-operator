@@ -9,21 +9,21 @@ import (
 )
 
 type TenantCluster struct {
-	ID              string
-	OperatorVersion string
-	Provider        string
-	ReleaseVersion  string
+	ID               string
+	OperatorVersion  string
+	ProviderOperator string
+	ReleaseVersion   string
 }
 
 // Takes a list of tenant clusters and returns two maps containing the versions of their release and operator versions.
-func consolidateClusterVersions(clusters []TenantCluster) (map[string]bool, map[string]bool) {
+func consolidateClusterVersions(clusters []TenantCluster) (map[string]bool, map[string]map[string]bool) {
 	releaseVersions := make(map[string]bool)
-	operatorVersions := make(map[string]bool)
+	operatorVersions := make(map[string]map[string]bool)
 
 	for _, c := range clusters {
 		fmt.Printf("Cluster %s (%s) is using operator version %s\n", c.ID, c.ReleaseVersion, c.OperatorVersion)
 		releaseVersions[c.ReleaseVersion] = true
-		operatorVersions[c.OperatorVersion] = true
+		operatorVersions[c.ProviderOperator][c.OperatorVersion] = true
 	}
 
 	return releaseVersions, operatorVersions
@@ -62,10 +62,10 @@ func (r *Resource) getCurrentAWSClusters() ([]TenantCluster, error) {
 	var clusters []TenantCluster
 	for _, cluster := range awsclusters.Items {
 		c := TenantCluster{
-			ID:              cluster.Name,
-			OperatorVersion: cluster.Labels[apiexlabels.AWSOperatorVersion],
-			ReleaseVersion:  cluster.Labels[apiexlabels.ReleaseVersion],
-			Provider:        "aws", // TODO: Parameterize or detect
+			ID:               cluster.Name,
+			OperatorVersion:  cluster.Labels[apiexlabels.AWSOperatorVersion],
+			ReleaseVersion:   cluster.Labels[apiexlabels.ReleaseVersion],
+			ProviderOperator: "aws-operator", // TODO: Parameterize or detect
 		}
 		clusters = append(clusters, c)
 	}
@@ -116,9 +116,9 @@ func (r *Resource) getLegacyAWSClusters() ([]TenantCluster, error) {
 	var clusters []TenantCluster
 	for _, cluster := range awsconfigs.Items {
 		c := TenantCluster{
-			ID:              cluster.Name,
-			OperatorVersion: cluster.Labels[apiexlabels.AWSOperatorVersion],
-			Provider:        "aws",
+			ID:               cluster.Name,
+			OperatorVersion:  cluster.Labels[apiexlabels.AWSOperatorVersion],
+			ProviderOperator: "aws-operator",
 		}
 		clusters = append(clusters, c)
 	}
@@ -135,9 +135,9 @@ func (r *Resource) getLegacyAzureClusters() ([]TenantCluster, error) {
 	var clusters []TenantCluster
 	for _, cluster := range azureconfigs.Items {
 		c := TenantCluster{
-			ID:              cluster.Name,
-			OperatorVersion: cluster.Labels[apiexlabels.AzureOperatorVersion],
-			Provider:        "azure",
+			ID:               cluster.Name,
+			OperatorVersion:  cluster.Labels[apiexlabels.AzureOperatorVersion],
+			ProviderOperator: "azure-operator",
 		}
 		clusters = append(clusters, c)
 	}
@@ -154,9 +154,9 @@ func (r *Resource) getLegacyKVMClusters() ([]TenantCluster, error) {
 	var clusters []TenantCluster
 	for _, cluster := range kvmconfigs.Items {
 		c := TenantCluster{
-			ID:              cluster.Name,
-			OperatorVersion: cluster.Labels["kvm-operator.giantswarm.io/version"], // TODO: Why isn't this in apiextensions?
-			Provider:        "kvm",
+			ID:               cluster.Name,
+			OperatorVersion:  cluster.Labels["kvm-operator.giantswarm.io/version"], // TODO: Why isn't this in apiextensions?
+			ProviderOperator: "kvm-operator",
 		}
 		clusters = append(clusters, c)
 	}
