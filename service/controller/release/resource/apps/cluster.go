@@ -75,7 +75,9 @@ func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]TenantCluste
 // Returns a list of AWS clusters according to the awscluster resource (non-legacy).
 func (r *Resource) getCurrentAWSClusters() ([]TenantCluster, error) {
 	awsclusters, err := r.k8sClient.G8sClient().InfrastructureV1alpha2().AWSClusters("default").List(metav1.ListOptions{})
-	if err != nil {
+	if IsResourceNotFound(err) {
+		// Fall through
+	} else if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
@@ -186,7 +188,9 @@ func (r *Resource) getLegacyKVMClusters() ([]TenantCluster, error) {
 func (r *Resource) getCurrentAzureClusters(ctx context.Context) ([]TenantCluster, error) {
 	azureClusters := azurecapi.AzureClusterList{}
 	err := r.k8sClient.CtrlClient().List(ctx, &azureClusters)
-	if err != nil {
+	if IsResourceNotFound(err) {
+		// Fall through
+	} else if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
