@@ -164,6 +164,8 @@ func (r *Resource) excludeUnusedDeprecatedReleases(releases releasev1alpha1.Rele
 					}
 				}
 			}
+		} else {
+			active.Items = append(active.Items, release)
 		}
 	}
 
