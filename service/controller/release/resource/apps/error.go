@@ -22,3 +22,11 @@ func IsResourceNotFound(err error) bool {
 	}
 	return strings.Contains(microerror.Cause(err).Error(), "the server could not find the requested resource")
 }
+
+// IsNoMatchesForKind asserts the kind was not found in the API resources.
+func IsNoMatchesForKind(err error) bool {
+	if err == nil {
+		return false
+	}
+	return strings.Contains(microerror.Cause(err).Error(), "no matches for kind")
+}

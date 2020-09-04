@@ -59,7 +59,7 @@ func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]TenantCluste
 		r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d aws tenant clusters", len(awsClusters)))
 
 		azureClusters, err := r.getCurrentAzureClusters(ctx)
-		if IsResourceNotFound(err) {
+		if IsResourceNotFound(err) || IsNoMatchesForKind(err) {
 			// Fall through
 		} else if err != nil {
 			return nil, microerror.Mask(err)
