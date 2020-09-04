@@ -147,6 +147,7 @@ func (r *Resource) getLegacyAWSClusters() ([]TenantCluster, error) {
 			ID:               cluster.Name,
 			OperatorVersion:  cluster.Labels[apiexlabels.AWSOperatorVersion],
 			ProviderOperator: key.ProviderOperatorAWS,
+			ReleaseVersion:   cluster.Labels[apiexlabels.ReleaseVersion],
 		}
 		clusters = append(clusters, c)
 	}
@@ -166,6 +167,7 @@ func (r *Resource) getLegacyAzureClusters() ([]TenantCluster, error) {
 			ID:               cluster.Name,
 			OperatorVersion:  cluster.Labels[apiexlabels.AzureOperatorVersion],
 			ProviderOperator: key.ProviderOperatorAzure,
+			ReleaseVersion:   cluster.Labels[apiexlabels.ReleaseVersion],
 		}
 		clusters = append(clusters, c)
 	}
@@ -185,6 +187,7 @@ func (r *Resource) getLegacyKVMClusters() ([]TenantCluster, error) {
 			ID:               cluster.Name,
 			OperatorVersion:  cluster.Labels[key.LabelKVMOperator],
 			ProviderOperator: key.ProviderOperatorKVM,
+			ReleaseVersion:   cluster.Labels[apiexlabels.ReleaseVersion],
 		}
 		clusters = append(clusters, c)
 	}
@@ -203,8 +206,8 @@ func (r *Resource) getCurrentAzureClusters(ctx context.Context) ([]TenantCluster
 		c := TenantCluster{
 			ID:               cluster.Name,
 			OperatorVersion:  cluster.Labels[apiexlabels.AWSOperatorVersion],
-			ReleaseVersion:   cluster.Labels[apiexlabels.ReleaseVersion],
 			ProviderOperator: key.ProviderOperatorAWS,
+			ReleaseVersion:   cluster.Labels[apiexlabels.ReleaseVersion],
 		}
 		clusters = append(clusters, c)
 	}
