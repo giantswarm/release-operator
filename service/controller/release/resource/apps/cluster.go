@@ -9,6 +9,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	azurecapi "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 
+	// "sigs.k8s.io/controller-runtime/pkg/client"
+
 	"github.com/giantswarm/release-operator/service/controller/key"
 )
 
@@ -182,13 +184,14 @@ func (r *Resource) getLegacyKVMClusters() ([]TenantCluster, error) {
 }
 
 func (r *Resource) getCurrentAzureClusters(ctx context.Context) ([]TenantCluster, error) {
-	azureclusters := azurecapi.AzureClusterList{} // TODO: Actually get the clusters
-	// if err != nil {
-	// 	return nil, microerror.Mask(err)
-	// }
+	azureClusters := azurecapi.AzureClusterList{}
+	err := r.k8sClient.CtrlClient().List(ctx, &azureClusters)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
 
 	var clusters []TenantCluster
-	for _, cluster := range azureclusters.Items {
+	for _, cluster := range azureClusters.Items {
 		c := TenantCluster{
 			ID:               cluster.Name,
 			OperatorVersion:  cluster.Labels[apiexlabels.AWSOperatorVersion],
