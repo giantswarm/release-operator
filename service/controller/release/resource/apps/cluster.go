@@ -5,8 +5,10 @@ import (
 	"fmt"
 
 	apiexlabels "github.com/giantswarm/apiextensions/pkg/label"
+	// azurecapi "github.com/giantswarm/cluster-api-provider-azure/api/v1alpha3"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	azurecapi "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 
 	// "sigs.k8s.io/controller-runtime/pkg/client"
@@ -48,14 +50,18 @@ func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]TenantCluste
 	var tenantClusters []TenantCluster
 	{
 		awsClusters, err := r.getCurrentAWSClusters()
-		if err != nil {
+		if IsResourceNotFound(err) {
+			// Fall through
+		} else if err != nil {
 			return nil, microerror.Mask(err)
 		}
 		tenantClusters = append(tenantClusters, awsClusters...)
 		r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d aws tenant clusters", len(awsClusters)))
 
 		azureClusters, err := r.getCurrentAzureClusters(ctx)
-		if err != nil {
+		if IsResourceNotFound(err) {
+			// Fall through
+		} else if err != nil {
 			return nil, microerror.Mask(err)
 		}
 		tenantClusters = append(tenantClusters, azureClusters...)
@@ -188,9 +194,7 @@ func (r *Resource) getLegacyKVMClusters() ([]TenantCluster, error) {
 func (r *Resource) getCurrentAzureClusters(ctx context.Context) ([]TenantCluster, error) {
 	azureClusters := azurecapi.AzureClusterList{}
 	err := r.k8sClient.CtrlClient().List(ctx, &azureClusters)
-	if IsResourceNotFound(err) {
-		// Fall through
-	} else if err != nil {
+	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
