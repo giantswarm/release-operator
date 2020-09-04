@@ -205,8 +205,8 @@ func (r *Resource) getCurrentAzureClusters(ctx context.Context) ([]TenantCluster
 	for _, cluster := range azureClusters.Items {
 		c := TenantCluster{
 			ID:               cluster.Name,
-			OperatorVersion:  cluster.Labels[apiexlabels.AWSOperatorVersion],
-			ProviderOperator: key.ProviderOperatorAWS,
+			OperatorVersion:  cluster.Labels[apiexlabels.AzureOperatorVersion],
+			ProviderOperator: key.ProviderOperatorAzure,
 			ReleaseVersion:   cluster.Labels[apiexlabels.ReleaseVersion],
 		}
 		clusters = append(clusters, c)
