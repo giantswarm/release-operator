@@ -18,15 +18,11 @@ rules:
     verbs:
       - list
   - apiGroups:
-      # - cluster.x-k8s.io
       - infrastructure.cluster.x-k8s.io
     resources:
-      # - clusters
       - azureclusters
-      # - azureclusters/status
-      # - azuremachines
     verbs:
-      - "*"
+      - "list"
   - apiGroups:
       - provider.giantswarm.io
     resources:
