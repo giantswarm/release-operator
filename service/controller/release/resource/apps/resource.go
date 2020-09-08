@@ -93,7 +93,9 @@ func (r *Resource) ensureState(ctx context.Context) error {
 			ctx,
 			&app,
 		)
-		if err != nil {
+		if apierrors.IsNotFound(err) {
+			// fall through.
+		} else if err != nil {
 			return microerror.Mask(err)
 		}
 
