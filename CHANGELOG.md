@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated backward incompatible Kubernetes dependencies to v1.18.5.
 - Don't error when app was not found while deleting app.
 
+## Fixed
+
+- Deleted Release namespace from logging since releases are not namespaced.
+
 ## [2.0.0] - 2020-07-23
 
 ### Added
