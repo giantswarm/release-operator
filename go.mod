@@ -3,7 +3,7 @@ module github.com/giantswarm/release-operator
 go 1.13
 
 require (
-	github.com/giantswarm/apiextensions/v2 v2.1.1-0.20200911094856-08012f5d7754
+	github.com/giantswarm/apiextensions/v2 v2.1.1-0.20200911125415-95df6338b163
 	github.com/giantswarm/exporterkit v0.2.0
 	github.com/giantswarm/k8sclient/v4 v4.0.0
 	github.com/giantswarm/microendpoint v0.2.0
@@ -20,7 +20,7 @@ require (
 	sigs.k8s.io/controller-runtime v0.6.1
 )
 
-// v3.3.17 is required by github.com/spf13/viper v1.3.2, 1.6.2, 1.4.0 and github.com/bketelsen/crypt@v0.0.3-0.20200106085610-5cbc8cc4026c. Can remove this replace when updated.
+// v3.3.13 is required by github.com/spf13/viper v1.3.2, 1.6.2, 1.4.0 and github.com/bketelsen/crypt@v0.0.3-0.20200106085610-5cbc8cc4026c. Can remove this replace when updated.
 replace github.com/coreos/etcd v3.3.13+incompatible => github.com/coreos/etcd v3.3.24+incompatible
 
 replace (

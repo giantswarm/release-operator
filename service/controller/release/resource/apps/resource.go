@@ -64,22 +64,7 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		releases = excludeDeletedRelease(releases)
 	}
 
-	r.logger.LogCtx(ctx, "level", "debug", "message", "searching for running tenant clusters")
-	var tenantClusters []TenantCluster
-	{
-		var err error
-		tenantClusters, err = r.getCurrentTenantClusters(ctx)
-		if err != nil {
-			r.logger.LogCtx(ctx, "level", "error", "message", fmt.Sprintf("error finding tenant clusters: %s", err))
-		} else {
-			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found %d running tenant clusters", len(tenantClusters)))
-		}
-	}
-
-	releases, err := r.excludeUnusedDeprecatedReleases(releases, tenantClusters)
-	if err != nil {
-		return microerror.Mask(err)
-	}
+	releases = r.excludeUnusedDeprecatedReleases(releases)
 
 	var components map[string]releasev1alpha1.ReleaseSpecComponent
 	{
@@ -137,69 +122,19 @@ func (r *Resource) ensureState(ctx context.Context) error {
 	return nil
 }
 
-func (r *Resource) excludeUnusedDeprecatedReleases(releases releasev1alpha1.ReleaseList, clusters []TenantCluster) (releasev1alpha1.ReleaseList, error) {
-	// Go over releases
-	// If deprecated, AND no existing cluster with this version, exclude it
-	// A cluster with this version either:
-	//    - has release label with this release version, or
-	//    - uses the provider operator version specified in this release
-
-	// Get two sets of just deduplicated versions
-	releaseVersions, operatorVersions := consolidateClusterVersions(clusters)
-
+func (r *Resource) excludeUnusedDeprecatedReleases(releases releasev1alpha1.ReleaseList) releasev1alpha1.ReleaseList {
 	var active releasev1alpha1.ReleaseList
+
 	for _, release := range releases.Items {
-		if release.Spec.State == "deprecated" { // TODO: Should make this constant public in apiextensions
-			// Check the set of release versions and keep this release if it is used.
-			if releaseVersions[release.Name] {
-				active.Items = append(active.Items, release)
-				r.logger.Log("level", "debug", "message", fmt.Sprintf("keeping release %s because it is explicitly used", release.Name))
-			} else {
-				for _, o := range key.GetProviderOperators() {
-					operatorVersion := getOperatorVersionInRelease(o, release)
-					// Check the set of operator versions and keep this release if its operator version is used.
-					if operatorVersion != "" && operatorVersions[o][operatorVersion] {
-						active.Items = append(active.Items, release)
-						r.logger.Log("level", "debug", "message", fmt.Sprintf("keeping release %s because a cluster using its operator version (%s) is present", release.Name, operatorVersion))
-					}
-				}
-			}
+		if release.Spec.State == releasev1alpha1.StateDeprecated && !release.Status.InUse {
+			// Skip this release
+			r.logger.Log("level", "debug", "message", fmt.Sprintf("excluding release %s because it is deprecated and unused", release.Name))
 		} else {
 			active.Items = append(active.Items, release)
 		}
 	}
 
-	r.logger.Log("level", "debug", "message", fmt.Sprintf("excluded %d unused deprecated releases", len(releases.Items)-len(active.Items)))
-
-	return active, nil
-}
-
-// func markUnused() ? {
-
-// {
-// 	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("setting status for release %#q in namespace %#q", release.Name, release.Namespace))
-
-// 	release.Status.Ready = releaseDeployed
-// 	err := r.k8sClient.CtrlClient().Status().Update(
-// 		ctx,
-// 		release,
-// 	)
-// 	if err != nil {
-// 		return microerror.Mask(err)
-// 	}
-
-// 	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("status set for release %#q in namespace %#q", release.Name, release.Namespace))
-// }
-// }
-
-// Searches the components in a release for the given operator and returns the version.
-func getOperatorVersionInRelease(operator string, release releasev1alpha1.Release) string {
-	for _, component := range release.Spec.Components {
-		if component.Name == operator {
-			return component.Version
-		}
-	}
-	return ""
+	return active
 }
 
 func calculateMissingApps(components map[string]releasev1alpha1.ReleaseSpecComponent, apps appv1alpha1.AppList) appv1alpha1.AppList {
