@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	apiexlabels "github.com/giantswarm/apiextensions/pkg/label"
+	apiexlabels "github.com/giantswarm/apiextensions/v2/pkg/label"
 	// azurecapi "github.com/giantswarm/cluster-api-provider-azure/api/v1alpha3"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -49,7 +49,7 @@ func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]TenantCluste
 
 	var tenantClusters []TenantCluster
 	{
-		awsClusters, err := r.getCurrentAWSClusters()
+		awsClusters, err := r.getCurrentAWSClusters(ctx)
 		if IsResourceNotFound(err) {
 			// Fall through
 		} else if err != nil {
@@ -67,7 +67,7 @@ func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]TenantCluste
 		tenantClusters = append(tenantClusters, azureClusters...)
 		r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d azure tenant clusters", len(azureClusters)))
 
-		legacyClusters, err := r.getLegacyClusters()
+		legacyClusters, err := r.getLegacyClusters(ctx)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -79,8 +79,8 @@ func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]TenantCluste
 }
 
 // Returns a list of AWS clusters according to the awscluster resource (non-legacy).
-func (r *Resource) getCurrentAWSClusters() ([]TenantCluster, error) {
-	awsclusters, err := r.k8sClient.G8sClient().InfrastructureV1alpha2().AWSClusters("default").List(metav1.ListOptions{})
+func (r *Resource) getCurrentAWSClusters(ctx context.Context) ([]TenantCluster, error) {
+	awsclusters, err := r.k8sClient.G8sClient().InfrastructureV1alpha2().AWSClusters("default").List(ctx, metav1.ListOptions{})
 	if IsResourceNotFound(err) {
 		// Fall through
 	} else if err != nil {
@@ -102,9 +102,9 @@ func (r *Resource) getCurrentAWSClusters() ([]TenantCluster, error) {
 }
 
 // Returns a list of legacy clusters based on <provider>config resources.
-func (r *Resource) getLegacyClusters() ([]TenantCluster, error) {
+func (r *Resource) getLegacyClusters(ctx context.Context) ([]TenantCluster, error) {
 	var legacyClusters []TenantCluster
-	aws, err := r.getLegacyAWSClusters()
+	aws, err := r.getLegacyAWSClusters(ctx)
 	if IsResourceNotFound(err) {
 		// Fall through
 	} else if err != nil {
@@ -113,7 +113,7 @@ func (r *Resource) getLegacyClusters() ([]TenantCluster, error) {
 	r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d aws legacy clusters", len(aws)))
 	legacyClusters = append(legacyClusters, aws...)
 
-	azure, err := r.getLegacyAzureClusters()
+	azure, err := r.getLegacyAzureClusters(ctx)
 	if IsResourceNotFound(err) {
 		// Fall through
 	} else if err != nil {
@@ -122,7 +122,7 @@ func (r *Resource) getLegacyClusters() ([]TenantCluster, error) {
 	r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d azure legacy clusters", len(azure)))
 	legacyClusters = append(legacyClusters, azure...)
 
-	kvm, err := r.getLegacyKVMClusters()
+	kvm, err := r.getLegacyKVMClusters(ctx)
 	if IsResourceNotFound(err) {
 		// Fall through
 	} else if err != nil {
@@ -135,8 +135,8 @@ func (r *Resource) getLegacyClusters() ([]TenantCluster, error) {
 }
 
 // Returns a list of running AWS legacy clusters based on awsconfig resources.
-func (r *Resource) getLegacyAWSClusters() ([]TenantCluster, error) {
-	awsconfigs, err := r.k8sClient.G8sClient().ProviderV1alpha1().AWSConfigs("default").List(metav1.ListOptions{})
+func (r *Resource) getLegacyAWSClusters(ctx context.Context) ([]TenantCluster, error) {
+	awsconfigs, err := r.k8sClient.G8sClient().ProviderV1alpha1().AWSConfigs("default").List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -155,8 +155,8 @@ func (r *Resource) getLegacyAWSClusters() ([]TenantCluster, error) {
 }
 
 // Returns a list of running Azure legacy clusters based on azureconfig resources.
-func (r *Resource) getLegacyAzureClusters() ([]TenantCluster, error) {
-	azureconfigs, err := r.k8sClient.G8sClient().ProviderV1alpha1().AzureConfigs("default").List(metav1.ListOptions{})
+func (r *Resource) getLegacyAzureClusters(ctx context.Context) ([]TenantCluster, error) {
+	azureconfigs, err := r.k8sClient.G8sClient().ProviderV1alpha1().AzureConfigs("default").List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -175,8 +175,8 @@ func (r *Resource) getLegacyAzureClusters() ([]TenantCluster, error) {
 }
 
 // Returns a list of running KVM legacy clusters based on kvmconfig resources.
-func (r *Resource) getLegacyKVMClusters() ([]TenantCluster, error) {
-	kvmconfigs, err := r.k8sClient.G8sClient().ProviderV1alpha1().KVMConfigs("default").List(metav1.ListOptions{})
+func (r *Resource) getLegacyKVMClusters(ctx context.Context) ([]TenantCluster, error) {
+	kvmconfigs, err := r.k8sClient.G8sClient().ProviderV1alpha1().KVMConfigs("default").List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}

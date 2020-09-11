@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	appv1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/application/v1alpha1"
-	releasev1alpha1 "github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
-	"github.com/giantswarm/k8sclient/v3/pkg/k8sclient"
+	appv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
+	"github.com/giantswarm/k8sclient/v4/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -173,6 +173,24 @@ func (r *Resource) excludeUnusedDeprecatedReleases(releases releasev1alpha1.Rele
 
 	return active, nil
 }
+
+// func markUnused() ? {
+
+// {
+// 	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("setting status for release %#q in namespace %#q", release.Name, release.Namespace))
+
+// 	release.Status.Ready = releaseDeployed
+// 	err := r.k8sClient.CtrlClient().Status().Update(
+// 		ctx,
+// 		release,
+// 	)
+// 	if err != nil {
+// 		return microerror.Mask(err)
+// 	}
+
+// 	r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("status set for release %#q in namespace %#q", release.Name, release.Namespace))
+// }
+// }
 
 // Searches the components in a release for the given operator and returns the version.
 func getOperatorVersionInRelease(operator string, release releasev1alpha1.Release) string {
