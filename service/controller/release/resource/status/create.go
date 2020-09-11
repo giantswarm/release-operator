@@ -46,8 +46,8 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	r.logger.LogCtx(ctx, "level", "debug", "message", "searching for running tenant clusters")
 	var tenantClusters []TenantCluster
 	{
-		// var err error
-		tenantClusters, err := r.getCurrentTenantClusters(ctx)
+		var err error
+		tenantClusters, err = r.getCurrentTenantClusters(ctx)
 		if err != nil {
 			r.logger.LogCtx(ctx, "level", "error", "message", fmt.Sprintf("error finding tenant clusters: %s", err))
 		} else {
@@ -60,6 +60,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		// Get two sets of just deduplicated versions
 		releaseVersions, operatorVersions := consolidateClusterVersions(tenantClusters)
 		// Check the set of release versions and keep this release if it is used.
+		r.logger.Log("level", "debug", "message", fmt.Sprintf("checking release %s", release.Name))
 		if releaseVersions[release.Name] {
 			r.logger.Log("level", "debug", "message", fmt.Sprintf("keeping release %s because it is explicitly used", release.Name))
 			releaseInUse = true
