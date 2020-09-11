@@ -5,13 +5,9 @@ import (
 	"fmt"
 
 	apiexlabels "github.com/giantswarm/apiextensions/v2/pkg/label"
-	// azurecapi "github.com/giantswarm/cluster-api-provider-azure/api/v1alpha3"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	azurecapi "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
-
-	// "sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/release-operator/service/controller/key"
 )
