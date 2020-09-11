@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/giantswarm/apiextensions/pkg/apis/release/v1alpha1"
+	"github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/k8sclient/v4/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
