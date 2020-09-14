@@ -3,6 +3,7 @@ package status
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	appv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
@@ -61,7 +62,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		releaseVersions, operatorVersions := consolidateClusterVersions(tenantClusters)
 		// Check the set of release versions and keep this release if it is used.
 		r.logger.Log("level", "debug", "message", fmt.Sprintf("checking release %s", release.Name))
-		if releaseVersions[release.Name] {
+		if releaseVersions[strings.TrimPrefix(release.Name, "v")] { // The release name has a leading `v`
 			r.logger.Log("level", "debug", "message", fmt.Sprintf("keeping release %s because it is explicitly used", release.Name))
 			releaseInUse = true
 		} else {
