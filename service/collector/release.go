@@ -28,6 +28,7 @@ var (
 			labelName,
 			labelState,
 			labelReady,
+			labelInUse,
 		},
 		nil,
 	)
@@ -92,6 +93,7 @@ func (r *ReleaseCollector) collectReleaseStatus(ctx context.Context, ch chan<- p
 			release.Name,
 			release.Spec.State.String(),
 			strconv.FormatBool(release.Status.Ready),
+			strconv.FormatBool(release.Status.InUse),
 		)
 	}
 
