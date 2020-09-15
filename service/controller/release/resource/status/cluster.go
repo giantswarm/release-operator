@@ -195,7 +195,7 @@ func (r *Resource) getLegacyKVMClusters(ctx context.Context) ([]TenantCluster, e
 	for _, cluster := range kvmconfigs.Items {
 		c := TenantCluster{
 			ID:               cluster.Name,
-			OperatorVersion:  cluster.Labels[key.LabelKVMOperator],
+			OperatorVersion:  cluster.Labels[apiexlabels.KVMOperatorVersion],
 			ProviderOperator: key.ProviderOperatorKVM,
 			ReleaseVersion:   cluster.Labels[apiexlabels.ReleaseVersion],
 		}

@@ -20,7 +20,6 @@ const (
 	LabelAppOperatorVersion = "app-operator.giantswarm.io/version"
 	LabelManagedBy          = "giantswarm.io/managed-by"
 	LabelServiceType        = "giantswarm.io/service-type"
-	LabelKVMOperator        = "kvm-operator.giantswarm.io/version" // TODO: Why isn't this in apiextensions?
 
 	ValueServiceTypeManaged = "managed"
 )
