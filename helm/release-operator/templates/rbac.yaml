@@ -22,7 +22,7 @@ rules:
     resources:
       - azureclusters
     verbs:
-      - "list"
+      - list
   - apiGroups:
       - provider.giantswarm.io
     resources:

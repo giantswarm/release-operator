@@ -74,7 +74,7 @@ func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]TenantCluste
 	return tenantClusters, nil
 }
 
-// Returns a list of AWS clusters according to the awscluster resource (non-legacy).
+// Returns a list of AWS clusters according to the awscluster resource.
 func (r *Resource) getCurrentAWSClusters(ctx context.Context) ([]TenantCluster, error) {
 	awsclusters, err := r.k8sClient.G8sClient().InfrastructureV1alpha2().AWSClusters("default").List(ctx, metav1.ListOptions{})
 	if IsResourceNotFound(err) {
@@ -90,6 +90,28 @@ func (r *Resource) getCurrentAWSClusters(ctx context.Context) ([]TenantCluster, 
 			OperatorVersion:  cluster.Labels[apiexlabels.AWSOperatorVersion],
 			ReleaseVersion:   cluster.Labels[apiexlabels.ReleaseVersion],
 			ProviderOperator: key.ProviderOperatorAWS,
+		}
+		clusters = append(clusters, c)
+	}
+
+	return clusters, nil
+}
+
+// Returns a list of Azure clusters according to the azurecluster resource.
+func (r *Resource) getCurrentAzureClusters(ctx context.Context) ([]TenantCluster, error) {
+	azureClusters := azurecapi.AzureClusterList{}
+	err := r.k8sClient.CtrlClient().List(ctx, &azureClusters)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
+
+	var clusters []TenantCluster
+	for _, cluster := range azureClusters.Items {
+		c := TenantCluster{
+			ID:               cluster.Name,
+			OperatorVersion:  cluster.Labels[apiexlabels.AzureOperatorVersion],
+			ProviderOperator: key.ProviderOperatorAzure,
+			ReleaseVersion:   cluster.Labels[apiexlabels.ReleaseVersion],
 		}
 		clusters = append(clusters, c)
 	}
@@ -187,26 +209,5 @@ func (r *Resource) getLegacyKVMClusters(ctx context.Context) ([]TenantCluster, e
 		}
 		clusters = append(clusters, c)
 	}
-	return clusters, nil
-}
-
-func (r *Resource) getCurrentAzureClusters(ctx context.Context) ([]TenantCluster, error) {
-	azureClusters := azurecapi.AzureClusterList{}
-	err := r.k8sClient.CtrlClient().List(ctx, &azureClusters)
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
-	var clusters []TenantCluster
-	for _, cluster := range azureClusters.Items {
-		c := TenantCluster{
-			ID:               cluster.Name,
-			OperatorVersion:  cluster.Labels[apiexlabels.AzureOperatorVersion],
-			ProviderOperator: key.ProviderOperatorAzure,
-			ReleaseVersion:   cluster.Labels[apiexlabels.ReleaseVersion],
-		}
-		clusters = append(clusters, c)
-	}
-
 	return clusters, nil
 }
