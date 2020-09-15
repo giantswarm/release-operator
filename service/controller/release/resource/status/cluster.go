@@ -2,7 +2,6 @@ package status
 
 import (
 	"context"
-	"fmt"
 
 	apiexlabels "github.com/giantswarm/apiextensions/v2/pkg/label"
 	"github.com/giantswarm/microerror"
@@ -28,7 +27,6 @@ func consolidateClusterVersions(clusters []TenantCluster) (map[string]bool, map[
 	// e.g. operatorVersions["aws-operator"]["8.7.6"]:true
 
 	for _, c := range clusters {
-		fmt.Printf("Cluster %s (%s) is using operator version %s\n", c.ID, c.ReleaseVersion, c.OperatorVersion)
 		releaseVersions[c.ReleaseVersion] = true
 
 		if operatorVersions[c.ProviderOperator] == nil {
@@ -52,7 +50,6 @@ func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]TenantCluste
 			return nil, microerror.Mask(err)
 		}
 		tenantClusters = append(tenantClusters, awsClusters...)
-		r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d aws tenant clusters", len(awsClusters)))
 
 		azureClusters, err := r.getCurrentAzureClusters(ctx)
 		if IsResourceNotFound(err) || IsNoMatchesForKind(err) {
@@ -61,14 +58,12 @@ func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]TenantCluste
 			return nil, microerror.Mask(err)
 		}
 		tenantClusters = append(tenantClusters, azureClusters...)
-		r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d azure tenant clusters", len(azureClusters)))
 
 		legacyClusters, err := r.getLegacyClusters(ctx)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 		tenantClusters = append(tenantClusters, legacyClusters...)
-		r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d legacy tenant clusters", len(legacyClusters)))
 	}
 
 	return tenantClusters, nil
@@ -126,27 +121,24 @@ func (r *Resource) getLegacyClusters(ctx context.Context) ([]TenantCluster, erro
 	if IsResourceNotFound(err) {
 		// Fall through
 	} else if err != nil {
-		r.logger.Log("level", "error", "message", fmt.Sprintf("error getting aws legacy clusters: %s", err))
+		return nil, microerror.Mask(err)
 	}
-	r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d aws legacy clusters", len(aws)))
 	legacyClusters = append(legacyClusters, aws...)
 
 	azure, err := r.getLegacyAzureClusters(ctx)
 	if IsResourceNotFound(err) {
 		// Fall through
 	} else if err != nil {
-		r.logger.Log("level", "error", "message", fmt.Sprintf("error getting azure legacy clusters: %s", err))
+		return nil, microerror.Mask(err)
 	}
-	r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d azure legacy clusters", len(azure)))
 	legacyClusters = append(legacyClusters, azure...)
 
 	kvm, err := r.getLegacyKVMClusters(ctx)
 	if IsResourceNotFound(err) {
 		// Fall through
 	} else if err != nil {
-		r.logger.Log("level", "error", "message", fmt.Sprintf("error getting kvm legacy clusters: %s", err))
+		return nil, microerror.Mask(err)
 	}
-	r.logger.Log("level", "debug", "message", fmt.Sprintf("found %d kvm legacy clusters", len(kvm)))
 	legacyClusters = append(legacyClusters, kvm...)
 
 	return legacyClusters, nil
