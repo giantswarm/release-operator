@@ -91,7 +91,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	}
 
 	{
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("setting status for release %#q in namespace %#q", release.Name, release.Namespace))
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("setting status for release %#q", release.Name))
 
 		release.Status.Ready = releaseDeployed
 		release.Status.InUse = releaseInUse
@@ -103,7 +103,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 			return microerror.Mask(err)
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("status set for release %#q in namespace %#q", release.Name, release.Namespace))
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("status set for release %#q", release.Name))
 	}
 
 	return nil

@@ -1,6 +1,6 @@
 module github.com/giantswarm/release-operator
 
-go 1.13
+go 1.14
 
 require (
 	github.com/giantswarm/apiextensions/v2 v2.2.0
@@ -8,7 +8,7 @@ require (
 	github.com/giantswarm/k8sclient/v4 v4.0.0
 	github.com/giantswarm/microendpoint v0.2.0
 	github.com/giantswarm/microerror v0.2.1
-	github.com/giantswarm/microkit v0.2.1
+	github.com/giantswarm/microkit v0.2.2
 	github.com/giantswarm/micrologger v0.3.1
 	github.com/giantswarm/operatorkit/v2 v2.0.0
 	github.com/google/go-cmp v0.5.2
