@@ -73,12 +73,6 @@ func (r *Resource) getCurrentAWSClusters(ctx context.Context) ([]TenantCluster, 
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	// awsclusters, err := r.k8sClient.G8sClient().InfrastructureV1alpha2().AWSClusters("default").List(ctx, metav1.ListOptions{})
-	// if IsResourceNotFound(err) {
-	// 	// Fall through
-	// } else if err != nil {
-	// 	return nil, microerror.Mask(err)
-	// }
 
 	var clusters []TenantCluster
 	for _, cluster := range awsClusters.Items {
