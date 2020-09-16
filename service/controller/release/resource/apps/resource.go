@@ -62,9 +62,8 @@ func (r *Resource) ensureState(ctx context.Context) error {
 			return microerror.Mask(err)
 		}
 		releases = excludeDeletedRelease(releases)
+		releases = r.excludeUnusedDeprecatedReleases(releases)
 	}
-
-	releases = r.excludeUnusedDeprecatedReleases(releases)
 
 	var components map[string]releasev1alpha1.ReleaseSpecComponent
 	{

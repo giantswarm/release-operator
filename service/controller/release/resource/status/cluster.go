@@ -19,9 +19,9 @@ type TenantCluster struct {
 }
 
 // Takes a list of tenant clusters and returns two maps containing the versions of their release and operator versions.
-func consolidateClusterVersions(clusters []TenantCluster) (map[string]bool, map[string]map[string]bool) {
-	releaseVersions := make(map[string]bool)
-	operatorVersions := make(map[string]map[string]bool)
+func consolidateClusterVersions(clusters []TenantCluster) (releaseVersions map[string]bool, operatorVersions map[string]map[string]bool) {
+	releaseVersions = make(map[string]bool)
+	operatorVersions = make(map[string]map[string]bool)
 
 	// operatorVersions is a nested map including the operator name and version
 	// e.g. operatorVersions["aws-operator"]["8.7.6"]:true
@@ -35,35 +35,30 @@ func consolidateClusterVersions(clusters []TenantCluster) (map[string]bool, map[
 		operatorVersions[c.ProviderOperator][c.OperatorVersion] = true
 	}
 
-	return releaseVersions, operatorVersions
+	return
 }
 
 // Returns a list of tenant clusters currently running on the installation.
 func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]TenantCluster, error) {
+	tcGetters := []func(context.Context) ([]TenantCluster, error){
+		r.getCurrentAWSClusters,
+		r.getCurrentAzureClusters,
+		r.getLegacyAWSClusters,
+		r.getLegacyAzureClusters,
+		r.getLegacyKVMClusters,
+	}
 
 	var tenantClusters []TenantCluster
 	{
-		awsClusters, err := r.getCurrentAWSClusters(ctx)
-		if IsResourceNotFound(err) {
-			// Fall through
-		} else if err != nil {
-			return nil, microerror.Mask(err)
+		for _, f := range tcGetters {
+			clusters, err := f(ctx)
+			if IsResourceNotFound(err) {
+				// Fall through
+			} else if err != nil {
+				return nil, microerror.Mask(err)
+			}
+			tenantClusters = append(tenantClusters, clusters...)
 		}
-		tenantClusters = append(tenantClusters, awsClusters...)
-
-		azureClusters, err := r.getCurrentAzureClusters(ctx)
-		if IsResourceNotFound(err) || IsNoMatchesForKind(err) {
-			// Fall through
-		} else if err != nil {
-			return nil, microerror.Mask(err)
-		}
-		tenantClusters = append(tenantClusters, azureClusters...)
-
-		legacyClusters, err := r.getLegacyClusters(ctx)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-		tenantClusters = append(tenantClusters, legacyClusters...)
 	}
 
 	return tenantClusters, nil
@@ -112,36 +107,6 @@ func (r *Resource) getCurrentAzureClusters(ctx context.Context) ([]TenantCluster
 	}
 
 	return clusters, nil
-}
-
-// Returns a list of legacy clusters based on <provider>config resources.
-func (r *Resource) getLegacyClusters(ctx context.Context) ([]TenantCluster, error) {
-	var legacyClusters []TenantCluster
-	aws, err := r.getLegacyAWSClusters(ctx)
-	if IsResourceNotFound(err) {
-		// Fall through
-	} else if err != nil {
-		return nil, microerror.Mask(err)
-	}
-	legacyClusters = append(legacyClusters, aws...)
-
-	azure, err := r.getLegacyAzureClusters(ctx)
-	if IsResourceNotFound(err) {
-		// Fall through
-	} else if err != nil {
-		return nil, microerror.Mask(err)
-	}
-	legacyClusters = append(legacyClusters, azure...)
-
-	kvm, err := r.getLegacyKVMClusters(ctx)
-	if IsResourceNotFound(err) {
-		// Fall through
-	} else if err != nil {
-		return nil, microerror.Mask(err)
-	}
-	legacyClusters = append(legacyClusters, kvm...)
-
-	return legacyClusters, nil
 }
 
 // Returns a list of running AWS legacy clusters based on awsconfig resources.
