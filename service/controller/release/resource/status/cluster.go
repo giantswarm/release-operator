@@ -12,7 +12,7 @@ import (
 	"github.com/giantswarm/release-operator/service/controller/key"
 )
 
-type TenantCluster struct {
+type tenantCluster struct {
 	ID               string
 	OperatorVersion  string
 	ProviderOperator string
@@ -20,7 +20,7 @@ type TenantCluster struct {
 }
 
 // Takes a list of tenant clusters and returns two maps containing the versions of their release and operator versions.
-func consolidateClusterVersions(clusters []TenantCluster) (releaseVersions map[string]bool, operatorVersions map[string]map[string]bool) {
+func consolidateClusterVersions(clusters []tenantCluster) (releaseVersions map[string]bool, operatorVersions map[string]map[string]bool) {
 	releaseVersions = make(map[string]bool)
 	operatorVersions = make(map[string]map[string]bool)
 
@@ -41,8 +41,8 @@ func consolidateClusterVersions(clusters []TenantCluster) (releaseVersions map[s
 
 // E 09/16 09:58:15 /apis/release.giantswarm.io/v1alpha1/releases/v11.5.1 status error finding tenant clusters: no matches for kind "AzureCluster" in version "infrastructure.cluster.x-k8s.io/v1alpha3" | release-operator/service/controller/release/resource/status/create.go:54 | controller=release-operator-release | event=update | loop=73 | version=46222030
 // Returns a list of tenant clusters currently running on the installation.
-func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]TenantCluster, error) {
-	tcGetters := []func(context.Context) ([]TenantCluster, error){
+func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]tenantCluster, error) {
+	tcGetters := []func(context.Context) ([]tenantCluster, error){
 		r.getCurrentAWSClusters,
 		r.getCurrentAzureClusters,
 		r.getLegacyAWSClusters,
@@ -50,7 +50,7 @@ func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]TenantCluste
 		r.getLegacyKVMClusters,
 	}
 
-	var tenantClusters []TenantCluster
+	var tenantClusters []tenantCluster
 	{
 		for _, f := range tcGetters {
 			clusters, err := f(ctx)
@@ -67,20 +67,20 @@ func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]TenantCluste
 }
 
 // Returns a list of AWS clusters according to the awscluster resource.
-func (r *Resource) getCurrentAWSClusters(ctx context.Context) ([]TenantCluster, error) {
+func (r *Resource) getCurrentAWSClusters(ctx context.Context) ([]tenantCluster, error) {
 	awsClusters := infrastructurev1alpha2.AWSClusterList{}
 	err := r.k8sClient.CtrlClient().List(ctx, &awsClusters)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	var clusters []TenantCluster
+	var clusters []tenantCluster
 	for _, cluster := range awsClusters.Items {
-		c := TenantCluster{
+		c := tenantCluster{
 			ID:               cluster.Name,
 			OperatorVersion:  cluster.Labels[apiexlabels.AWSOperatorVersion],
-			ReleaseVersion:   cluster.Labels[apiexlabels.ReleaseVersion],
 			ProviderOperator: key.ProviderOperatorAWS,
+			ReleaseVersion:   cluster.Labels[apiexlabels.ReleaseVersion],
 		}
 		clusters = append(clusters, c)
 	}
@@ -89,16 +89,16 @@ func (r *Resource) getCurrentAWSClusters(ctx context.Context) ([]TenantCluster, 
 }
 
 // Returns a list of Azure clusters according to the azurecluster resource.
-func (r *Resource) getCurrentAzureClusters(ctx context.Context) ([]TenantCluster, error) {
+func (r *Resource) getCurrentAzureClusters(ctx context.Context) ([]tenantCluster, error) {
 	azureClusters := azurecapi.AzureClusterList{}
 	err := r.k8sClient.CtrlClient().List(ctx, &azureClusters)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	var clusters []TenantCluster
+	var clusters []tenantCluster
 	for _, cluster := range azureClusters.Items {
-		c := TenantCluster{
+		c := tenantCluster{
 			ID:               cluster.Name,
 			OperatorVersion:  cluster.Labels[apiexlabels.AzureOperatorVersion],
 			ProviderOperator: key.ProviderOperatorAzure,
@@ -111,15 +111,15 @@ func (r *Resource) getCurrentAzureClusters(ctx context.Context) ([]TenantCluster
 }
 
 // Returns a list of running AWS legacy clusters based on awsconfig resources.
-func (r *Resource) getLegacyAWSClusters(ctx context.Context) ([]TenantCluster, error) {
+func (r *Resource) getLegacyAWSClusters(ctx context.Context) ([]tenantCluster, error) {
 	awsconfigs, err := r.k8sClient.G8sClient().ProviderV1alpha1().AWSConfigs("default").List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	var clusters []TenantCluster
+	var clusters []tenantCluster
 	for _, cluster := range awsconfigs.Items {
-		c := TenantCluster{
+		c := tenantCluster{
 			ID:               cluster.Name,
 			OperatorVersion:  cluster.Labels[apiexlabels.AWSOperatorVersion],
 			ProviderOperator: key.ProviderOperatorAWS,
@@ -131,15 +131,15 @@ func (r *Resource) getLegacyAWSClusters(ctx context.Context) ([]TenantCluster, e
 }
 
 // Returns a list of running Azure legacy clusters based on azureconfig resources.
-func (r *Resource) getLegacyAzureClusters(ctx context.Context) ([]TenantCluster, error) {
+func (r *Resource) getLegacyAzureClusters(ctx context.Context) ([]tenantCluster, error) {
 	azureconfigs, err := r.k8sClient.G8sClient().ProviderV1alpha1().AzureConfigs("default").List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	var clusters []TenantCluster
+	var clusters []tenantCluster
 	for _, cluster := range azureconfigs.Items {
-		c := TenantCluster{
+		c := tenantCluster{
 			ID:               cluster.Name,
 			OperatorVersion:  cluster.Labels[apiexlabels.AzureOperatorVersion],
 			ProviderOperator: key.ProviderOperatorAzure,
@@ -151,15 +151,15 @@ func (r *Resource) getLegacyAzureClusters(ctx context.Context) ([]TenantCluster,
 }
 
 // Returns a list of running KVM legacy clusters based on kvmconfig resources.
-func (r *Resource) getLegacyKVMClusters(ctx context.Context) ([]TenantCluster, error) {
+func (r *Resource) getLegacyKVMClusters(ctx context.Context) ([]tenantCluster, error) {
 	kvmconfigs, err := r.k8sClient.G8sClient().ProviderV1alpha1().KVMConfigs("default").List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
-	var clusters []TenantCluster
+	var clusters []tenantCluster
 	for _, cluster := range kvmconfigs.Items {
-		c := TenantCluster{
+		c := tenantCluster{
 			ID:               cluster.Name,
 			OperatorVersion:  cluster.Labels[apiexlabels.KVMOperatorVersion],
 			ProviderOperator: key.ProviderOperatorKVM,

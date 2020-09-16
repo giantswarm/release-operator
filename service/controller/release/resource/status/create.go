@@ -44,7 +44,7 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	}
 
 	// Doing this per-release isn't ideal, can we pass this list to each status reconcile somehow?
-	var tenantClusters []TenantCluster
+	var tenantClusters []tenantCluster
 	{
 		r.logger.LogCtx(ctx, "level", "debug", "message", "searching for running tenant clusters")
 
