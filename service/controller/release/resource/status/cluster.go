@@ -3,6 +3,7 @@ package status
 import (
 	"context"
 
+	infrastructurev1alpha2 "github.com/giantswarm/apiextensions/v2/pkg/apis/infrastructure/v1alpha2"
 	apiexlabels "github.com/giantswarm/apiextensions/v2/pkg/label"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -67,15 +68,20 @@ func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]TenantCluste
 
 // Returns a list of AWS clusters according to the awscluster resource.
 func (r *Resource) getCurrentAWSClusters(ctx context.Context) ([]TenantCluster, error) {
-	awsclusters, err := r.k8sClient.G8sClient().InfrastructureV1alpha2().AWSClusters("default").List(ctx, metav1.ListOptions{})
-	if IsResourceNotFound(err) {
-		// Fall through
-	} else if err != nil {
+	awsClusters := infrastructurev1alpha2.AWSClusterList{}
+	err := r.k8sClient.CtrlClient().List(ctx, &awsClusters)
+	if err != nil {
 		return nil, microerror.Mask(err)
 	}
+	// awsclusters, err := r.k8sClient.G8sClient().InfrastructureV1alpha2().AWSClusters("default").List(ctx, metav1.ListOptions{})
+	// if IsResourceNotFound(err) {
+	// 	// Fall through
+	// } else if err != nil {
+	// 	return nil, microerror.Mask(err)
+	// }
 
 	var clusters []TenantCluster
-	for _, cluster := range awsclusters.Items {
+	for _, cluster := range awsClusters.Items {
 		c := TenantCluster{
 			ID:               cluster.Name,
 			OperatorVersion:  cluster.Labels[apiexlabels.AWSOperatorVersion],
