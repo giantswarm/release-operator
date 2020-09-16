@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	appv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
+	infrastructurev1alpha2 "github.com/giantswarm/apiextensions/v2/pkg/apis/infrastructure/v1alpha2"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/k8sclient/v4/pkg/k8sclient"
 	"github.com/giantswarm/k8sclient/v4/pkg/k8srestconfig"
@@ -14,6 +15,7 @@ import (
 	"github.com/giantswarm/micrologger"
 	"github.com/spf13/viper"
 	"k8s.io/client-go/rest"
+	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 
 	"github.com/giantswarm/release-operator/flag"
 	"github.com/giantswarm/release-operator/pkg/project"
@@ -80,7 +82,9 @@ func New(config Config) (*Service, error) {
 		c := k8sclient.ClientsConfig{
 			SchemeBuilder: k8sclient.SchemeBuilder{
 				appv1alpha1.AddToScheme,
+				infrastructurev1alpha2.AddToScheme,
 				releasev1alpha1.AddToScheme,
+				capzv1alpha3.AddToScheme,
 			},
 			Logger: config.Logger,
 

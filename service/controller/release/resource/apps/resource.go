@@ -62,6 +62,7 @@ func (r *Resource) ensureState(ctx context.Context) error {
 			return microerror.Mask(err)
 		}
 		releases = excludeDeletedRelease(releases)
+		releases = r.excludeUnusedDeprecatedReleases(releases)
 	}
 
 	var components map[string]releasev1alpha1.ReleaseSpecComponent
@@ -120,6 +121,21 @@ func (r *Resource) ensureState(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func (r *Resource) excludeUnusedDeprecatedReleases(releases releasev1alpha1.ReleaseList) releasev1alpha1.ReleaseList {
+	var active releasev1alpha1.ReleaseList
+
+	for _, release := range releases.Items {
+		if release.Spec.State == releasev1alpha1.StateDeprecated && !release.Status.InUse {
+			// Skip this release
+			r.logger.Log("level", "debug", "message", fmt.Sprintf("excluding release %s because it is deprecated and unused", release.Name))
+		} else {
+			active.Items = append(active.Items, release)
+		}
+	}
+
+	return active
 }
 
 func calculateMissingApps(components map[string]releasev1alpha1.ReleaseSpecComponent, apps appv1alpha1.AppList) appv1alpha1.AppList {

@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Set `InUse` field of `release` CRs.
+
+### Changed
+
+- Remove components for deprecated releases if no cluster is using the release.
+
+### Added
+
 - Add monitoring labels and add basic labels
 
 ## Changed

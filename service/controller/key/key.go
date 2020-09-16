@@ -24,6 +24,12 @@ const (
 	ValueServiceTypeManaged = "managed"
 )
 
+const (
+	ProviderOperatorAWS   = "aws-operator"
+	ProviderOperatorAzure = "azure-operator"
+	ProviderOperatorKVM   = "kvm-operator"
+)
+
 func AppReferenced(app applicationv1alpha1.App, components map[string]releasev1alpha1.ReleaseSpecComponent) bool {
 	component, ok := components[app.Name]
 	if ok && IsSameApp(component, app) {
@@ -89,6 +95,10 @@ func GetComponentRef(comp releasev1alpha1.ReleaseSpecComponent) string {
 		return comp.Reference
 	}
 	return comp.Version
+}
+
+func GetProviderOperators() []string {
+	return []string{ProviderOperatorAWS, ProviderOperatorAzure, ProviderOperatorKVM}
 }
 
 func IsSameApp(component releasev1alpha1.ReleaseSpecComponent, app applicationv1alpha1.App) bool {
