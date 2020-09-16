@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2020-09-16
+
 ### Added
 
 - Set `InUse` field of `release` CRs.
@@ -81,7 +83,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use latest architect orb.
 
 
-[Unreleased]: https://github.com/giantswarm/release-operator/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/giantswarm/release-operator/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/giantswarm/release-operator/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/giantswarm/release-operator/compare/v1.0.3...v2.0.0
 [1.0.3]: https://github.com/giantswarm/release-operator/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/giantswarm/release-operator/compare/v1.0.1...v1.0.2
