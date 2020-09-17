@@ -4,24 +4,8 @@ import (
 	"strconv"
 	"testing"
 
-	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
 	"github.com/google/go-cmp/cmp"
 )
-
-var testComponents = []releasev1alpha1.ReleaseSpecComponent{
-	{
-		Name:    "test",
-		Version: "1.0.0",
-	},
-	{
-		Name:    "abc",
-		Version: "123.0.0",
-	},
-	{
-		Name:    "other",
-		Version: "2.0.0",
-	},
-}
 
 var testClusters = []tenantCluster{
 	{
