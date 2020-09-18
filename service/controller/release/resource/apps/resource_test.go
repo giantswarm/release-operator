@@ -5,10 +5,9 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/giantswarm/release-operator/service/controller/unittest"
-
 	appv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
+	"github.com/giantswarm/k8sclient/v4/pkg/k8sclienttest"
 	"github.com/giantswarm/micrologger/microloggertest"
 	"github.com/google/go-cmp/cmp"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -341,7 +340,7 @@ func Test_excludeDeprecatedUnusedRelease(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Log(tc.name)
 
-			fakeK8sClient := unittest.FakeK8sClient()
+			fakeK8sClient := k8sclienttest.NewEmpty()
 
 			var newResource *Resource
 			{
