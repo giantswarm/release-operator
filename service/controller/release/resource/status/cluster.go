@@ -39,7 +39,6 @@ func consolidateClusterVersions(clusters []tenantCluster) (releaseVersions map[s
 	return
 }
 
-// E 09/16 09:58:15 /apis/release.giantswarm.io/v1alpha1/releases/v11.5.1 status error finding tenant clusters: no matches for kind "AzureCluster" in version "infrastructure.cluster.x-k8s.io/v1alpha3" | release-operator/service/controller/release/resource/status/create.go:54 | controller=release-operator-release | event=update | loop=73 | version=46222030
 // Returns a list of tenant clusters currently running on the installation.
 func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]tenantCluster, error) {
 	tcGetters := []func(context.Context) ([]tenantCluster, error){
