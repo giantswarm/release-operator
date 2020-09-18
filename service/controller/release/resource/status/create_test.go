@@ -20,8 +20,16 @@ var testClusters = []tenantCluster{
 		ProviderOperator: "test-operator",
 		ReleaseVersion:   "8.7.6",
 	},
+	// These next two clusters differ only in their IDs.
+	// The versions should be deduplicated in the result map.
 	{
 		ID:               "ghi56",
+		OperatorVersion:  "1.2.1-4",
+		ProviderOperator: "another-operator",
+		ReleaseVersion:   "9.8.9-1",
+	},
+	{
+		ID:               "jkl78",
 		OperatorVersion:  "1.2.1-4",
 		ProviderOperator: "another-operator",
 		ReleaseVersion:   "9.8.9-1",
