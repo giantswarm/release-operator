@@ -183,8 +183,7 @@ func Test_excludeDeprecatedUnusedRelease(t *testing.T) {
 				Items: []releasev1alpha1.Release{
 					{
 						ObjectMeta: metav1.ObjectMeta{
-							Name:              "ancient-release",
-							DeletionTimestamp: &metav1.Time{},
+							Name: "ancient-release",
 						},
 						Spec: releasev1alpha1.ReleaseSpec{
 							State: releasev1alpha1.StateDeprecated,
@@ -216,8 +215,7 @@ func Test_excludeDeprecatedUnusedRelease(t *testing.T) {
 				Items: []releasev1alpha1.Release{
 					{
 						ObjectMeta: metav1.ObjectMeta{
-							Name:              "active-release",
-							DeletionTimestamp: nil,
+							Name: "active-release",
 						},
 						Spec: releasev1alpha1.ReleaseSpec{
 							State: releasev1alpha1.StateActive,
@@ -228,8 +226,7 @@ func Test_excludeDeprecatedUnusedRelease(t *testing.T) {
 					},
 					{
 						ObjectMeta: metav1.ObjectMeta{
-							Name:              "not-being-deleted",
-							DeletionTimestamp: nil,
+							Name: "not-being-deleted",
 						},
 					},
 				},
@@ -258,8 +255,7 @@ func Test_excludeDeprecatedUnusedRelease(t *testing.T) {
 				Items: []releasev1alpha1.Release{
 					{
 						ObjectMeta: metav1.ObjectMeta{
-							Name:              "deprecated-used-release",
-							DeletionTimestamp: nil,
+							Name: "deprecated-used-release",
 						},
 						Spec: releasev1alpha1.ReleaseSpec{
 							State: releasev1alpha1.StateDeprecated,
@@ -270,8 +266,7 @@ func Test_excludeDeprecatedUnusedRelease(t *testing.T) {
 					},
 					{
 						ObjectMeta: metav1.ObjectMeta{
-							Name:              "not-being-deleted",
-							DeletionTimestamp: nil,
+							Name: "not-being-deleted",
 						},
 					},
 				},
@@ -303,8 +298,7 @@ func Test_excludeDeprecatedUnusedRelease(t *testing.T) {
 				Items: []releasev1alpha1.Release{
 					{
 						ObjectMeta: metav1.ObjectMeta{
-							Name:              "deprecated-used-release",
-							DeletionTimestamp: nil,
+							Name: "deprecated-used-release",
 						},
 						Spec: releasev1alpha1.ReleaseSpec{
 							State: releasev1alpha1.StateWIP,
@@ -315,8 +309,7 @@ func Test_excludeDeprecatedUnusedRelease(t *testing.T) {
 					},
 					{
 						ObjectMeta: metav1.ObjectMeta{
-							Name:              "not-being-deleted",
-							DeletionTimestamp: nil,
+							Name: "not-being-deleted",
 						},
 					},
 				},
