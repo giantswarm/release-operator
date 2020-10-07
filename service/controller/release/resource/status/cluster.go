@@ -7,6 +7,7 @@ import (
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	capiv1alpha2 "sigs.k8s.io/cluster-api/api/v1alpha2"
+	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
 
 	"github.com/giantswarm/release-operator/service/controller/key"
 )
@@ -88,7 +89,7 @@ func (r *Resource) getCurrentAWSClusters(ctx context.Context) ([]tenantCluster, 
 
 // Returns a list of Azure clusters according to the azurecluster resource.
 func (r *Resource) getCurrentAzureClusters(ctx context.Context) ([]tenantCluster, error) {
-	azureClusters := capiv1alpha2.ClusterList{}
+	azureClusters := capiv1alpha3.ClusterList{}
 	err := r.k8sClient.CtrlClient().List(ctx, &azureClusters)
 	if err != nil {
 		return nil, microerror.Mask(err)
