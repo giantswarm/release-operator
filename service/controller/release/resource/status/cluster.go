@@ -2,7 +2,6 @@ package status
 
 import (
 	"context"
-	"fmt"
 
 	apiexlabels "github.com/giantswarm/apiextensions/v2/pkg/label"
 	"github.com/giantswarm/microerror"
@@ -104,7 +103,6 @@ func (r *Resource) getCurrentAzureClusters(ctx context.Context) ([]tenantCluster
 			ProviderOperator: key.ProviderOperatorAzure,
 			ReleaseVersion:   cluster.Labels[apiexlabels.ReleaseVersion],
 		}
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("found current Azure Cluster %s in version %s", cluster.Name, c.ReleaseVersion))
 		clusters = append(clusters, c)
 	}
 
