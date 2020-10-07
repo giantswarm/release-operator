@@ -6,7 +6,7 @@ import (
 	apiexlabels "github.com/giantswarm/apiextensions/v2/pkg/label"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	apiv1alpha2 "sigs.k8s.io/cluster-api/api/v1alpha2"
+	capiv1alpha2 "sigs.k8s.io/cluster-api/api/v1alpha2"
 
 	"github.com/giantswarm/release-operator/service/controller/key"
 )
@@ -66,7 +66,7 @@ func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]tenantCluste
 
 // Returns a list of AWS clusters according to the awscluster resource.
 func (r *Resource) getCurrentAWSClusters(ctx context.Context) ([]tenantCluster, error) {
-	awsClusters := apiv1alpha2.ClusterList{}
+	awsClusters := capiv1alpha2.ClusterList{}
 	err := r.k8sClient.CtrlClient().List(ctx, &awsClusters)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -88,7 +88,7 @@ func (r *Resource) getCurrentAWSClusters(ctx context.Context) ([]tenantCluster, 
 
 // Returns a list of Azure clusters according to the azurecluster resource.
 func (r *Resource) getCurrentAzureClusters(ctx context.Context) ([]tenantCluster, error) {
-	azureClusters := apiv1alpha2.ClusterList{}
+	azureClusters := capiv1alpha2.ClusterList{}
 	err := r.k8sClient.CtrlClient().List(ctx, &azureClusters)
 	if err != nil {
 		return nil, microerror.Mask(err)
