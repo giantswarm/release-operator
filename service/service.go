@@ -15,7 +15,6 @@ import (
 	"github.com/giantswarm/micrologger"
 	"github.com/spf13/viper"
 	"k8s.io/client-go/rest"
-	capzv1alpha3 "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
 	capiv1alpha2 "sigs.k8s.io/cluster-api/api/v1alpha2"
 
 	"github.com/giantswarm/release-operator/flag"
@@ -85,7 +84,6 @@ func New(config Config) (*Service, error) {
 				appv1alpha1.AddToScheme,
 				infrastructurev1alpha2.AddToScheme,
 				releasev1alpha1.AddToScheme,
-				capzv1alpha3.AddToScheme,
 				capiv1alpha2.AddToScheme,
 			},
 			Logger: config.Logger,
