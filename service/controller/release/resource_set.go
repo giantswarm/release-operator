@@ -8,8 +8,8 @@ import (
 	"github.com/giantswarm/operatorkit/v2/pkg/resource/wrapper/metricsresource"
 	"github.com/giantswarm/operatorkit/v2/pkg/resource/wrapper/retryresource"
 
-	"github.com/giantswarm/release-operator/service/controller/release/resource/apps"
-	"github.com/giantswarm/release-operator/service/controller/release/resource/status"
+	"github.com/giantswarm/release-operator/v2/service/controller/release/resource/apps"
+	"github.com/giantswarm/release-operator/v2/service/controller/release/resource/status"
 )
 
 type ResourceSetConfig struct {

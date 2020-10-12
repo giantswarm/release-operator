@@ -18,10 +18,10 @@ import (
 	capiv1alpha2 "sigs.k8s.io/cluster-api/api/v1alpha2"
 	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
 
-	"github.com/giantswarm/release-operator/flag"
-	"github.com/giantswarm/release-operator/pkg/project"
-	"github.com/giantswarm/release-operator/service/collector"
-	"github.com/giantswarm/release-operator/service/controller"
+	"github.com/giantswarm/release-operator/v2/flag"
+	"github.com/giantswarm/release-operator/v2/pkg/project"
+	"github.com/giantswarm/release-operator/v2/service/collector"
+	"github.com/giantswarm/release-operator/v2/service/controller"
 )
 
 // Config represents the configuration used to create a new service.

@@ -1,4 +1,4 @@
-module github.com/giantswarm/release-operator
+module github.com/giantswarm/release-operator/v2
 
 go 1.14
 
@@ -14,6 +14,7 @@ require (
 	github.com/google/go-cmp v0.5.2
 	github.com/onsi/ginkgo v1.14.0 // indirect
 	github.com/prometheus/client_golang v1.7.1
+	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/viper v1.7.1
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9 // indirect
 	golang.org/x/net v0.0.0-20200602114024-627f9648deb9 // indirect
