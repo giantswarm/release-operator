@@ -9,7 +9,7 @@ import (
 	capiv1alpha2 "sigs.k8s.io/cluster-api/api/v1alpha2"
 	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
 
-	"github.com/giantswarm/release-operator/service/controller/key"
+	"github.com/giantswarm/release-operator/v2/service/controller/key"
 )
 
 type tenantCluster struct {

@@ -9,8 +9,8 @@ import (
 	"github.com/giantswarm/operatorkit/v2/pkg/resource"
 	"k8s.io/apimachinery/pkg/runtime"
 
-	"github.com/giantswarm/release-operator/pkg/project"
-	"github.com/giantswarm/release-operator/service/controller/release"
+	"github.com/giantswarm/release-operator/v2/pkg/project"
+	"github.com/giantswarm/release-operator/v2/service/controller/release"
 )
 
 var (

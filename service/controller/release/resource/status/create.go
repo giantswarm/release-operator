@@ -11,8 +11,8 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/giantswarm/release-operator/pkg/project"
-	"github.com/giantswarm/release-operator/service/controller/key"
+	"github.com/giantswarm/release-operator/v2/pkg/project"
+	"github.com/giantswarm/release-operator/v2/service/controller/key"
 )
 
 func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {

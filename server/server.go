@@ -10,9 +10,9 @@ import (
 	"github.com/giantswarm/micrologger"
 	"github.com/spf13/viper"
 
-	"github.com/giantswarm/release-operator/pkg/project"
-	"github.com/giantswarm/release-operator/server/endpoint"
-	"github.com/giantswarm/release-operator/service"
+	"github.com/giantswarm/release-operator/v2/pkg/project"
+	"github.com/giantswarm/release-operator/v2/server/endpoint"
+	"github.com/giantswarm/release-operator/v2/service"
 )
 
 // Config represents the configuration used to construct server object.
