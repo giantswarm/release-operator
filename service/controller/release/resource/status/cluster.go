@@ -3,11 +3,11 @@ package status
 import (
 	"context"
 
-	infrastructurev1alpha2 "github.com/giantswarm/apiextensions/v2/pkg/apis/infrastructure/v1alpha2"
 	apiexlabels "github.com/giantswarm/apiextensions/v2/pkg/label"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	azurecapi "sigs.k8s.io/cluster-api-provider-azure/api/v1alpha3"
+	capiv1alpha2 "sigs.k8s.io/cluster-api/api/v1alpha2"
+	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
 
 	"github.com/giantswarm/release-operator/service/controller/key"
 )
@@ -67,7 +67,7 @@ func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]tenantCluste
 
 // Returns a list of AWS clusters according to the awscluster resource.
 func (r *Resource) getCurrentAWSClusters(ctx context.Context) ([]tenantCluster, error) {
-	awsClusters := infrastructurev1alpha2.AWSClusterList{}
+	awsClusters := capiv1alpha2.ClusterList{}
 	err := r.k8sClient.CtrlClient().List(ctx, &awsClusters)
 	if err != nil {
 		return nil, microerror.Mask(err)
@@ -89,7 +89,7 @@ func (r *Resource) getCurrentAWSClusters(ctx context.Context) ([]tenantCluster, 
 
 // Returns a list of Azure clusters according to the azurecluster resource.
 func (r *Resource) getCurrentAzureClusters(ctx context.Context) ([]tenantCluster, error) {
-	azureClusters := azurecapi.AzureClusterList{}
+	azureClusters := capiv1alpha3.ClusterList{}
 	err := r.k8sClient.CtrlClient().List(ctx, &azureClusters)
 	if err != nil {
 		return nil, microerror.Mask(err)

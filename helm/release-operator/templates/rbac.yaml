@@ -12,15 +12,9 @@ rules:
     verbs:
       - "*"
   - apiGroups:
-      - infrastructure.giantswarm.io
+      - cluster.x-k8s.io
     resources:
-      - awsclusters
-    verbs:
-      - list
-  - apiGroups:
-      - infrastructure.cluster.x-k8s.io
-    resources:
-      - azureclusters
+      - clusters
     verbs:
       - list
   - apiGroups:
