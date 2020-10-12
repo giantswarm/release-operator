@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Detect running AWS and Azure clusters using `Cluster` CRs instead of provider-specific CRs
+- Use release-operator/v2 imports
 
 ## [2.1.0] - 2020-09-16
 
