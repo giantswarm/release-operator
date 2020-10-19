@@ -13,11 +13,9 @@ require (
 	github.com/giantswarm/operatorkit/v2 v2.0.0
 	github.com/google/go-cmp v0.5.2
 	github.com/onsi/ginkgo v1.14.0 // indirect
-	github.com/prometheus/client_golang v1.7.1
+	github.com/prometheus/client_golang v1.8.0
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/viper v1.7.1
-	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9 // indirect
-	golang.org/x/net v0.0.0-20200602114024-627f9648deb9 // indirect
 	k8s.io/apimachinery v0.18.5
 	k8s.io/client-go v0.18.5
 	k8s.io/kube-openapi v0.0.0-20200410145947-bcb3869e6f29 // indirect
