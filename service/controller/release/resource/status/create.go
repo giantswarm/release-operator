@@ -76,6 +76,22 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 				}
 			}
 		}
+
+		// We don't want to unschedule a kvm-operator with no releases in use as long as it has pods it needs to drain.
+		// We check the kvm-operator version (blank if this is an AWS/Azure installation), find all pods with that
+		// version bundle version annotation and consider the release to be in use if any were found.
+		if !releaseInUse { // small optimization
+			operatorVersion := getOperatorVersionInRelease(key.ProviderOperatorKVM, release)
+			if operatorVersion != "" { // only execute on KVM
+				kvmPodsExist, err := r.getKVMOperatorVersionPodsExist(ctx, operatorVersion)
+				if err != nil {
+					return microerror.Mask(err)
+				}
+				if kvmPodsExist {
+					releaseInUse = true
+				}
+			}
+		}
 	}
 
 	var releaseDeployed bool

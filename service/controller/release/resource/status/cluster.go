@@ -166,5 +166,6 @@ func (r *Resource) getLegacyKVMClusters(ctx context.Context) ([]tenantCluster, e
 		}
 		clusters = append(clusters, c)
 	}
+
 	return clusters, nil
 }
