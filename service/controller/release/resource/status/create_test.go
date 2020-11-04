@@ -1,10 +1,16 @@
 package status
 
 import (
+	"context"
 	"strconv"
 	"testing"
 
+	"github.com/giantswarm/k8sclient/v4/pkg/k8sclienttest"
 	"github.com/google/go-cmp/cmp"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/kubernetes/fake"
 )
 
 var testClusters = []tenantCluster{
@@ -73,6 +79,108 @@ func Test_consolidateClusterVersions(t *testing.T) {
 			}
 			if !cmp.Equal(resultOperators, tc.expectedOperators) {
 				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedOperators, resultOperators))
+			}
+		})
+	}
+}
+
+func Test_getKVMOperatorVersionPodsExist(t *testing.T) {
+	testCases := []struct {
+		name            string
+		pods            []runtime.Object
+		operatorVersion string
+		expectedValue   bool
+	}{
+		{
+			name: "case 0: pre-k8s 1.18 kvm-operator with matching pod",
+			pods: []runtime.Object{
+				&v1.Pod{
+					ObjectMeta: metav1.ObjectMeta{
+						Labels: map[string]string{
+							PodWatcherLabel: "kvm-operator",
+						},
+						Annotations: map[string]string{
+							KVMVersionBundleVersionAnnotation: "1.0.0",
+						},
+					},
+				},
+			},
+			operatorVersion: "1.0.0",
+			expectedValue:   true,
+		},
+		{
+			name: "case 1: k8s 1.18 kvm-operator with matching pod",
+			pods: []runtime.Object{
+				&v1.Pod{
+					ObjectMeta: metav1.ObjectMeta{
+						Labels: map[string]string{
+							PodWatcherLabel:         "kvm-operator",
+							KVMOperatorVersionLabel: "1.0.0",
+						},
+					},
+				},
+			},
+			operatorVersion: "1.0.0",
+			expectedValue:   true,
+		},
+		{
+			name: "case 2: pre-k8s 1.18 kvm-operator without matching pod",
+			pods: []runtime.Object{
+				&v1.Pod{
+					ObjectMeta: metav1.ObjectMeta{
+						Labels: map[string]string{
+							PodWatcherLabel: "kvm-operator",
+						},
+						Annotations: map[string]string{
+							KVMVersionBundleVersionAnnotation: "1.0.1",
+						},
+					},
+				},
+			},
+			operatorVersion: "1.0.0",
+			expectedValue:   false,
+		},
+		{
+			name: "case 3: k8s 1.18 kvm-operator without matching pod",
+			pods: []runtime.Object{
+				&v1.Pod{
+					ObjectMeta: metav1.ObjectMeta{
+						Labels: map[string]string{
+							PodWatcherLabel:         "kvm-operator",
+							KVMOperatorVersionLabel: "1.0.1",
+						},
+					},
+				},
+			},
+			operatorVersion: "1.0.0",
+			expectedValue:   false,
+		},
+		{
+			name:            "case 4: no pods",
+			pods:            nil,
+			operatorVersion: "1.0.0",
+			expectedValue:   false,
+		},
+	}
+
+	for i, tc := range testCases {
+		tc := tc
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Log(tc.name)
+
+			fakeK8sClient := k8sclienttest.NewClients(k8sclienttest.ClientsConfig{
+				K8sClient: fake.NewSimpleClientset(tc.pods...),
+			})
+
+			r := Resource{
+				k8sClient: fakeK8sClient,
+			}
+			result, err := r.getKVMOperatorVersionPodsExist(context.Background(), tc.operatorVersion)
+			if !cmp.Equal(err, nil) {
+				t.Fatalf("\n\n%s\n", cmp.Diff(err, nil))
+			}
+			if !cmp.Equal(result, tc.expectedValue) {
+				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedValue, result))
 			}
 		})
 	}

@@ -16,6 +16,7 @@ require (
 	github.com/prometheus/client_golang v1.8.0
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/viper v1.7.1
+	k8s.io/api v0.18.6
 	k8s.io/apimachinery v0.18.6
 	k8s.io/client-go v0.18.6
 	k8s.io/kube-openapi v0.0.0-20200410145947-bcb3869e6f29 // indirect
