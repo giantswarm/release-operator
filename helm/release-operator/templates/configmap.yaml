@@ -14,6 +14,8 @@ data:
       listen:
         address: 'http://0.0.0.0:8000'
     service:
+      app:
+        extraAnnotations: '{{ .Values.Installation.V1.GiantSwarm.AppOperator.PauseAnnotation }}:true'
       kubernetes:
         address: ''
         inCluster: true
