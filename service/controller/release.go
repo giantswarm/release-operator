@@ -20,6 +20,8 @@ var (
 type ReleaseConfig struct {
 	K8sClient k8sclient.Interface
 	Logger    micrologger.Logger
+
+	ExtraAnnotations []string
 }
 
 type Release struct {
@@ -38,6 +40,8 @@ func NewRelease(config ReleaseConfig) (*Release, error) {
 		c := release.ResourceSetConfig{
 			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
+
+			ExtraAnnotations: config.ExtraAnnotations,
 		}
 
 		resourceSet, err = release.NewResourceSet(c)

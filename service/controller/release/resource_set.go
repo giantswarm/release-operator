@@ -15,6 +15,8 @@ import (
 type ResourceSetConfig struct {
 	K8sClient k8sclient.Interface
 	Logger    micrologger.Logger
+
+	ExtraAnnotations []string
 }
 
 func NewResourceSet(config ResourceSetConfig) ([]resource.Interface, error) {
@@ -25,6 +27,8 @@ func NewResourceSet(config ResourceSetConfig) ([]resource.Interface, error) {
 		c := apps.Config{
 			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
+
+			ExtraAnnotations: config.ExtraAnnotations,
 		}
 
 		appsResource, err = apps.New(c)

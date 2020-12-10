@@ -3,6 +3,7 @@ package apps
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	appv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
@@ -24,11 +25,15 @@ const (
 type Config struct {
 	K8sClient k8sclient.Interface
 	Logger    micrologger.Logger
+
+	ExtraAnnotations []string
 }
 
 type Resource struct {
 	k8sClient k8sclient.Interface
 	logger    micrologger.Logger
+
+	extraAnnotations map[string]string
 }
 
 func New(config Config) (*Resource, error) {
@@ -39,9 +44,15 @@ func New(config Config) (*Resource, error) {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Logger must not be empty", config)
 	}
 
+	extraAnnotations, err := parseExtraAnnotations(config.ExtraAnnotations)
+	if err != nil {
+		return nil, microerror.Mask(err)
+	}
 	r := &Resource{
 		k8sClient: config.K8sClient,
 		logger:    config.Logger,
+
+		extraAnnotations: extraAnnotations,
 	}
 
 	return r, nil
@@ -107,6 +118,10 @@ func (r *Resource) ensureState(ctx context.Context) error {
 	for _, app := range appsToCreate.Items {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating app %#q in namespace %#q", app.Name, app.Namespace))
 
+		for key, value := range r.extraAnnotations {
+			app.Annotations[key] = value
+		}
+
 		err := r.k8sClient.CtrlClient().Create(
 			ctx,
 			&app,
@@ -171,4 +186,16 @@ func excludeDeletedRelease(releases releasev1alpha1.ReleaseList) releasev1alpha1
 		}
 	}
 	return active
+}
+
+func parseExtraAnnotations(list []string) (map[string]string, error) {
+	out := map[string]string{}
+	for _, item := range list {
+		elements := strings.Split(item, ":")
+		if len(item) != 2 {
+			return nil, microerror.Maskf(invalidConfigError, "malformed ExtraAnnotations entry: %q, expected \"key:value\" format", item)
+		}
+		out[elements[0]] = elements[1]
+	}
+	return out, nil
 }
