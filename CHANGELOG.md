@@ -9,11 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Add `ExtraAnnotations` flag, which allows setting extra annotations on each created App CR.
+
 ## [2.1.2] - 2020-11-10
 
 ### Fixed
 
-- Change `inUse` status of KVM releases to `true` when any pods remain for that release to fix an issue with draining 
+- Change `inUse` status of KVM releases to `true` when any pods remain for that release to fix an issue with draining
   the last cluster of a deprecated release.
 
 ## [2.1.1] - 2020-10-12
