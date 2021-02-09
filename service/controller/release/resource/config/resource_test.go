@@ -370,9 +370,11 @@ func configForComponent(operator releasev1alpha1.ReleaseSpecComponent) corev1alp
 			Name: key.BuildConfigName(operator),
 		},
 		Spec: corev1alpha1.ConfigSpec{
-			Catalog: operator.Catalog,
-			Name:    operator.Name,
-			Version: operator.Version,
+			App: corev1alpha1.ConfigSpecApp{
+				Catalog: operator.Catalog,
+				Name:    operator.Name,
+				Version: operator.Version,
+			},
 		},
 	}
 }

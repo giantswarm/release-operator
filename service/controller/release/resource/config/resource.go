@@ -142,8 +142,8 @@ func calculateMissingConfigs(components map[string]releasev1alpha1.ReleaseSpecCo
 	var missingConfigs corev1alpha1.ConfigList
 
 	for _, component := range components {
-		if !key.ComponentCreated(component, configs.Items) {
-			missingConfig := key.ConstructApp(component)
+		if !key.ComponentConfigCreated(component, configs.Items) {
+			missingConfig := key.ConstructConfig(component)
 			missingConfigs.Items = append(missingConfigs.Items, missingConfig)
 		}
 	}
@@ -151,11 +151,11 @@ func calculateMissingConfigs(components map[string]releasev1alpha1.ReleaseSpecCo
 	return missingConfigs
 }
 
-func calculateObsoleteApps(components map[string]releasev1alpha1.ReleaseSpecComponent, configs corev1alpha1.ConfigList) corev1alpha1.ConfigList {
-	var obsoleteApps corev1alpha1.ConfigList
+func calculateObsoleteConfigs(components map[string]releasev1alpha1.ReleaseSpecComponent, configs corev1alpha1.ConfigList) corev1alpha1.ConfigList {
+	var obsoleteConfigs corev1alpha1.ConfigList
 
 	for _, config := range configs.Items {
-		if !key.AppReferenced(config, components) {
+		if !key.ConfigReferenced(config, components) {
 			obsoleteConfigs.Items = append(obsoleteConfigs.Items, config)
 		}
 	}

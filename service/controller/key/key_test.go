@@ -394,7 +394,7 @@ func Test_IsSameApp(t *testing.T) {
 	}
 }
 
-func Test_componentCreated(t *testing.T) {
+func Test_componentAppCreated(t *testing.T) {
 	testCases := []struct {
 		name           string
 		component      releasev1alpha1.ReleaseSpecComponent
@@ -428,7 +428,7 @@ func Test_componentCreated(t *testing.T) {
 	}
 }
 
-func Test_componentDeployed(t *testing.T) {
+func Test_componentAppDeployed(t *testing.T) {
 	deployedApp := ConstructApp(testComponents[0])
 	deployedApp.Status.Release.Status = AppStatusDeployed
 
@@ -462,7 +462,7 @@ func Test_componentDeployed(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Log(tc.name)
 
-			result := ComponentDeployed(tc.component, tc.apps)
+			result := ComponentAppDeployed(tc.component, tc.apps)
 
 			if !cmp.Equal(result, tc.expectedOutput) {
 				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedOutput, result))

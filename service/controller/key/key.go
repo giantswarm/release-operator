@@ -40,6 +40,15 @@ func AppReferenced(app applicationv1alpha1.App, components map[string]releasev1a
 	return false
 }
 
+func ConfigReferenced(config corev1alpha1.Config, components map[string]releasev1alpha1.ReleaseSpecComponent) bool {
+	component, ok := components[config.Name]
+	if ok && IsSameConfig(component, config) {
+		return true
+	}
+
+	return false
+}
+
 func BuildAppName(component releasev1alpha1.ReleaseSpecComponent) string {
 	return fmt.Sprintf("%s-%s", component.Name, component.Version)
 }
@@ -132,7 +141,7 @@ func IsSameApp(component releasev1alpha1.ReleaseSpecComponent, app applicationv1
 }
 
 func IsSameConfig(component releasev1alpha1.ReleaseSpecComponent, config corev1alpha1.Config) bool {
-	return BuildAppName(component) == config.Spec.App.Name &&
+	return BuildConfigName(component) == config.Name &&
 		component.Catalog == config.Spec.App.Catalog &&
 		GetComponentRef(component) == config.Spec.App.Version
 }
