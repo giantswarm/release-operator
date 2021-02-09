@@ -1,11 +1,11 @@
-package apps
+package config
 
 import (
 	"context"
 	"fmt"
 
-	appv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
+	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
 	"github.com/giantswarm/k8sclient/v4/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	Name = "apps"
+	Name = "configs"
 )
 
 type Config struct {
@@ -70,11 +70,11 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		components = key.ExtractComponents(releases)
 	}
 
-	var apps appv1alpha1.AppList
+	var configs corev1alpha1.ConfigList
 	{
 		err := r.k8sClient.CtrlClient().List(
 			ctx,
-			&apps,
+			&configs,
 			&client.ListOptions{
 				LabelSelector: labels.SelectorFromSet(labels.Set{
 					key.LabelManagedBy: project.Name(),
@@ -86,13 +86,13 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		}
 	}
 
-	appsToDelete := calculateObsoleteApps(components, apps)
-	for _, app := range appsToDelete.Items {
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting app %#q in namespace %#q", app.Name, app.Namespace))
+	configsToDelete := calculateObsoleteConfigs(components, configs)
+	for _, config := range configsToDelete.Items {
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting config %#q in namespace %#q", config.Name, config.Namespace))
 
 		err := r.k8sClient.CtrlClient().Delete(
 			ctx,
-			&app,
+			&config,
 		)
 		if apierrors.IsNotFound(err) {
 			// fall through.
@@ -100,16 +100,16 @@ func (r *Resource) ensureState(ctx context.Context) error {
 			return microerror.Mask(err)
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleted app %#q in namespace %#q", app.Name, app.Namespace))
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleted config %#q in namespace %#q", config.Name, config.Namespace))
 	}
 
-	appsToCreate := calculateMissingApps(components, apps)
-	for _, app := range appsToCreate.Items {
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating app %#q in namespace %#q", app.Name, app.Namespace))
+	configsToCreate := calculateMissingConfigs(components, configs)
+	for _, config := range configsToCreate.Items {
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating config %#q in namespace %#q", config.Name, config.Namespace))
 
 		err := r.k8sClient.CtrlClient().Create(
 			ctx,
-			&app,
+			&config,
 		)
 		if apierrors.IsAlreadyExists(err) {
 			// fall through.
@@ -117,7 +117,7 @@ func (r *Resource) ensureState(ctx context.Context) error {
 			return microerror.Mask(err)
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("created app %#q in namespace %#q", app.Name, app.Namespace))
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("created config %#q in namespace %#q", config.Name, config.Namespace))
 	}
 
 	return nil
@@ -138,29 +138,29 @@ func (r *Resource) excludeUnusedDeprecatedReleases(releases releasev1alpha1.Rele
 	return active
 }
 
-func calculateMissingApps(components map[string]releasev1alpha1.ReleaseSpecComponent, apps appv1alpha1.AppList) appv1alpha1.AppList {
-	var missingApps appv1alpha1.AppList
+func calculateMissingConfigs(components map[string]releasev1alpha1.ReleaseSpecComponent, configs corev1alpha1.ConfigList) corev1alpha1.ConfigList {
+	var missingConfigs corev1alpha1.ConfigList
 
 	for _, component := range components {
-		if !key.ComponentAppCreated(component, apps.Items) {
-			missingApp := key.ConstructApp(component)
-			missingApps.Items = append(missingApps.Items, missingApp)
+		if !key.ComponentCreated(component, configs.Items) {
+			missingConfig := key.ConstructApp(component)
+			missingConfigs.Items = append(missingConfigs.Items, missingConfig)
 		}
 	}
 
-	return missingApps
+	return missingConfigs
 }
 
-func calculateObsoleteApps(components map[string]releasev1alpha1.ReleaseSpecComponent, apps appv1alpha1.AppList) appv1alpha1.AppList {
-	var obsoleteApps appv1alpha1.AppList
+func calculateObsoleteApps(components map[string]releasev1alpha1.ReleaseSpecComponent, configs corev1alpha1.ConfigList) corev1alpha1.ConfigList {
+	var obsoleteApps corev1alpha1.ConfigList
 
-	for _, app := range apps.Items {
-		if !key.AppReferenced(app, components) {
-			obsoleteApps.Items = append(obsoleteApps.Items, app)
+	for _, config := range configs.Items {
+		if !key.AppReferenced(config, components) {
+			obsoleteConfigs.Items = append(obsoleteConfigs.Items, config)
 		}
 	}
 
-	return obsoleteApps
+	return obsoleteConfigs
 }
 
 func excludeDeletedRelease(releases releasev1alpha1.ReleaseList) releasev1alpha1.ReleaseList {

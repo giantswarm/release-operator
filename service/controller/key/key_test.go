@@ -419,7 +419,7 @@ func Test_componentCreated(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Log(tc.name)
 
-			result := ComponentCreated(tc.component, tc.apps)
+			result := ComponentAppCreated(tc.component, tc.apps)
 
 			if !cmp.Equal(result, tc.expectedOutput) {
 				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedOutput, result))
