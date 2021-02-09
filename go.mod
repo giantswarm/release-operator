@@ -28,6 +28,6 @@ require (
 replace github.com/coreos/etcd v3.3.13+incompatible => github.com/coreos/etcd v3.3.24+incompatible
 
 replace (
-	sigs.k8s.io/cluster-api v0.3.7 => github.com/giantswarm/cluster-api v0.3.7
+	sigs.k8s.io/cluster-api v0.3.13 => github.com/giantswarm/cluster-api v0.3.7
 	sigs.k8s.io/cluster-api-provider-azure v0.4.6 => github.com/giantswarm/cluster-api-provider-azure v0.4.6
 )
