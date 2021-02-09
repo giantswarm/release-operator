@@ -9,6 +9,7 @@ import (
 	"github.com/giantswarm/operatorkit/v2/pkg/resource/wrapper/retryresource"
 
 	"github.com/giantswarm/release-operator/v2/service/controller/release/resource/apps"
+	"github.com/giantswarm/release-operator/v2/service/controller/release/resource/configs"
 	"github.com/giantswarm/release-operator/v2/service/controller/release/resource/status"
 )
 
@@ -33,6 +34,19 @@ func NewResourceSet(config ResourceSetConfig) ([]resource.Interface, error) {
 		}
 	}
 
+	var configsResource resource.Interface
+	{
+		c := configs.Config{
+			K8sClient: config.K8sClient,
+			Logger:    config.Logger,
+		}
+
+		configsResource, err = configs.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+	}
+
 	var statusResource resource.Interface
 	{
 		c := status.Config{
@@ -49,6 +63,7 @@ func NewResourceSet(config ResourceSetConfig) ([]resource.Interface, error) {
 	resources := []resource.Interface{
 		statusResource,
 		appsResource,
+		configsResource,
 	}
 
 	{
