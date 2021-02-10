@@ -6,6 +6,7 @@ import (
 
 	appv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
+	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
 	"github.com/giantswarm/k8sclient/v4/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -86,6 +87,33 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		}
 	}
 
+	var configs corev1alpha1.ConfigList
+	{
+		err := r.k8sClient.CtrlClient().List(
+			ctx,
+			&configs,
+			&client.ListOptions{
+				LabelSelector: labels.SelectorFromSet(labels.Set{
+					key.LabelManagedBy: project.Name(),
+				}),
+			},
+		)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+	}
+
+	var notDeployedConfigs []corev1alpha1.Config
+	{
+		for _, component := range components {
+			if !key.ComponentConfigDeployed(component, configs.Items) {
+				notDeployedConfigs = append(notDeployedConfigs, configs.Items...)
+			}
+		}
+	}
+
+	// end check
+
 	appsToDelete := calculateObsoleteApps(components, apps)
 	for _, app := range appsToDelete.Items {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting app %#q in namespace %#q", app.Name, app.Namespace))
@@ -105,6 +133,7 @@ func (r *Resource) ensureState(ctx context.Context) error {
 
 	appsToCreate := calculateMissingApps(components, apps)
 	for _, app := range appsToCreate.Items {
+
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating app %#q in namespace %#q", app.Name, app.Namespace))
 
 		err := r.k8sClient.CtrlClient().Create(
