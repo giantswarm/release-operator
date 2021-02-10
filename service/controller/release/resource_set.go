@@ -62,8 +62,8 @@ func NewResourceSet(config ResourceSetConfig) ([]resource.Interface, error) {
 
 	resources := []resource.Interface{
 		statusResource,
-		appsResource,
 		configsResource,
+		appsResource,
 	}
 
 	{
