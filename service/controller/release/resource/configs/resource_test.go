@@ -10,6 +10,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/giantswarm/release-operator/v2/pkg/project"
 	"github.com/giantswarm/release-operator/v2/service/controller/key"
 )
 
@@ -126,6 +127,9 @@ func configForComponent(operator releasev1alpha1.ReleaseSpecComponent) corev1alp
 	return corev1alpha1.Config{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: key.BuildConfigName(operator),
+			Labels: map[string]string{
+				key.LabelManagedBy: project.Name(),
+			},
 		},
 		Spec: corev1alpha1.ConfigSpec{
 			App: corev1alpha1.ConfigSpecApp{

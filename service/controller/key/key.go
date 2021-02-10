@@ -165,15 +165,19 @@ func IsSameApp(component releasev1alpha1.ReleaseSpecComponent, app applicationv1
 }
 
 func IsSameConfig(component releasev1alpha1.ReleaseSpecComponent, config corev1alpha1.Config) bool {
+	_, managedByReleaseOperator := config.Labels[LabelManagedBy]
 	return component.Name == config.Spec.App.Name &&
 		component.Catalog == config.Spec.App.Catalog &&
-		GetComponentRef(component) == config.Spec.App.Version
+		GetComponentRef(component) == config.Spec.App.Version &&
+		managedByReleaseOperator
 }
 
 func IsSameConfigDeployed(component releasev1alpha1.ReleaseSpecComponent, config corev1alpha1.Config) bool {
+	_, managedByReleaseOperator := config.Labels[LabelManagedBy]
 	return component.Name == config.Status.App.Name &&
 		component.Catalog == config.Status.App.Catalog &&
-		GetComponentRef(component) == config.Status.App.Version
+		GetComponentRef(component) == config.Status.App.Version &&
+		managedByReleaseOperator
 }
 
 func ComponentAppCreated(component releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {
