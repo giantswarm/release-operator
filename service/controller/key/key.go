@@ -31,6 +31,22 @@ const (
 	ProviderOperatorKVM   = "kvm-operator"
 )
 
+func AppConfigDeployed(app applicationv1alpha1.App, configs corev1alpha1.ConfigList) bool {
+	for _, config := range configs.Items {
+		_, configManagedByReleaseOperator := config.Labels[LabelManagedBy]
+
+		if app.Name == config.Name &&
+			app.Spec.Name == config.Status.App.Name &&
+			app.Spec.Version == config.Status.App.Version &&
+			app.Spec.Catalog == config.Status.App.Catalog &&
+			configManagedByReleaseOperator {
+			return true
+		}
+	}
+
+	return false
+}
+
 func AppReferenced(app applicationv1alpha1.App, components map[string]releasev1alpha1.ReleaseSpecComponent) bool {
 	component, ok := components[app.Name]
 	if ok && IsSameApp(component, app) {
@@ -165,11 +181,11 @@ func IsSameApp(component releasev1alpha1.ReleaseSpecComponent, app applicationv1
 }
 
 func IsSameConfig(component releasev1alpha1.ReleaseSpecComponent, config corev1alpha1.Config) bool {
-	_, managedByReleaseOperator := config.Labels[LabelManagedBy]
+	_, configManagedByReleaseOperator := config.Labels[LabelManagedBy]
 	return component.Name == config.Spec.App.Name &&
 		component.Catalog == config.Spec.App.Catalog &&
 		GetComponentRef(component) == config.Spec.App.Version &&
-		managedByReleaseOperator
+		configManagedByReleaseOperator
 }
 
 func ComponentAppCreated(component releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {

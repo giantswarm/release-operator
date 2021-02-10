@@ -103,17 +103,6 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		}
 	}
 
-	var notDeployedConfigs []corev1alpha1.Config
-	{
-		for _, component := range components {
-			if !key.ComponentConfigDeployed(component, configs.Items) {
-				notDeployedConfigs = append(notDeployedConfigs, configs.Items...)
-			}
-		}
-	}
-
-	// end check
-
 	appsToDelete := calculateObsoleteApps(components, apps)
 	for _, app := range appsToDelete.Items {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting app %#q in namespace %#q", app.Name, app.Namespace))
@@ -133,6 +122,11 @@ func (r *Resource) ensureState(ctx context.Context) error {
 
 	appsToCreate := calculateMissingApps(components, apps)
 	for _, app := range appsToCreate.Items {
+		if !key.AppConfigDeployed(app, configs) {
+			// Skip this app
+			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("skipping app %#q as its config is not deployed", app.Name))
+			continue
+		}
 
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating app %#q in namespace %#q", app.Name, app.Namespace))
 
