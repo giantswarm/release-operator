@@ -98,6 +98,30 @@ func ConstructConfig(component releasev1alpha1.ReleaseSpecComponent) corev1alpha
 	}
 }
 
+func ExcludeDeletedRelease(releases releasev1alpha1.ReleaseList) releasev1alpha1.ReleaseList {
+	var active releasev1alpha1.ReleaseList
+	for _, release := range releases.Items {
+		if release.DeletionTimestamp == nil {
+			active.Items = append(active.Items, release)
+		}
+	}
+	return active
+}
+
+func ExcludeUnusedDeprecatedReleases(releases releasev1alpha1.ReleaseList) releasev1alpha1.ReleaseList {
+	var active releasev1alpha1.ReleaseList
+
+	for _, release := range releases.Items {
+		if release.Spec.State == releasev1alpha1.StateDeprecated && !release.Status.InUse {
+			// skip
+		} else {
+			active.Items = append(active.Items, release)
+		}
+	}
+
+	return active
+}
+
 // ExtractComponents extracts the components that this operator is responsible for.
 func ExtractComponents(releases releasev1alpha1.ReleaseList) map[string]releasev1alpha1.ReleaseSpecComponent {
 	var components = make(map[string]releasev1alpha1.ReleaseSpecComponent)
@@ -141,13 +165,13 @@ func IsSameApp(component releasev1alpha1.ReleaseSpecComponent, app applicationv1
 }
 
 func IsSameConfig(component releasev1alpha1.ReleaseSpecComponent, config corev1alpha1.Config) bool {
-	return BuildConfigName(component) == config.Name &&
+	return component.Name == config.Spec.App.Name &&
 		component.Catalog == config.Spec.App.Catalog &&
 		GetComponentRef(component) == config.Spec.App.Version
 }
 
 func IsSameConfigDeployed(component releasev1alpha1.ReleaseSpecComponent, config corev1alpha1.Config) bool {
-	return BuildAppName(component) == config.Status.App.Name &&
+	return component.Name == config.Status.App.Name &&
 		component.Catalog == config.Status.App.Catalog &&
 		GetComponentRef(component) == config.Status.App.Version
 }

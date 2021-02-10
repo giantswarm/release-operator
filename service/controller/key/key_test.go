@@ -74,6 +74,10 @@ func Test_AppReferenced(t *testing.T) {
 	}
 }
 
+func Test_ConfigReferenced(t *testing.T) {
+
+}
+
 func Test_ConstructApp(t *testing.T) {
 	testCases := []struct {
 		name        string
@@ -171,6 +175,237 @@ func Test_ConstructApp(t *testing.T) {
 
 			if !cmp.Equal(resultApp, tc.expectedApp) {
 				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedApp, resultApp))
+			}
+		})
+	}
+}
+
+func Test_ConstructConfig(t *testing.T) {
+}
+
+func Test_ExcludeDeletedRelease(t *testing.T) {
+	testCases := []struct {
+		name             string
+		releases         releasev1alpha1.ReleaseList
+		expectedReleases releasev1alpha1.ReleaseList
+	}{
+		{
+			name: "case 0: some releases are being deleted",
+			releases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name:              "being-deleted",
+							DeletionTimestamp: &metav1.Time{},
+						},
+					},
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name:              "not-being-deleted",
+							DeletionTimestamp: nil,
+						},
+					},
+				},
+			},
+			expectedReleases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "not-being-deleted",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for i, tc := range testCases {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Log(tc.name)
+
+			resultReleases := ExcludeDeletedRelease(tc.releases)
+
+			if !cmp.Equal(resultReleases, tc.expectedReleases) {
+				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedReleases, resultReleases))
+			}
+		})
+	}
+}
+
+func Test_ExcludeDeprecatedUnusedRelease(t *testing.T) {
+	testCases := []struct {
+		name             string
+		releases         releasev1alpha1.ReleaseList
+		expectedReleases releasev1alpha1.ReleaseList
+	}{
+		{
+			name: "case 0: an unused, deprecated release is deleted",
+			releases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "ancient-release",
+						},
+						Spec: releasev1alpha1.ReleaseSpec{
+							State: releasev1alpha1.StateDeprecated,
+						},
+						Status: releasev1alpha1.ReleaseStatus{
+							InUse: false,
+						},
+					},
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "not-being-deleted",
+						},
+					},
+				},
+			},
+			expectedReleases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "not-being-deleted",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "case 1: an unused active release is not deleted",
+			releases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "active-release",
+						},
+						Spec: releasev1alpha1.ReleaseSpec{
+							State: releasev1alpha1.StateActive,
+						},
+						Status: releasev1alpha1.ReleaseStatus{
+							InUse: false,
+						},
+					},
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "not-being-deleted",
+						},
+					},
+				},
+			},
+			expectedReleases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "active-release",
+						},
+						Spec: releasev1alpha1.ReleaseSpec{
+							State: "active",
+						},
+					},
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "not-being-deleted",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "case 2: a used deprecated release is not deleted",
+			releases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "deprecated-used-release",
+						},
+						Spec: releasev1alpha1.ReleaseSpec{
+							State: releasev1alpha1.StateDeprecated,
+						},
+						Status: releasev1alpha1.ReleaseStatus{
+							InUse: true,
+						},
+					},
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "not-being-deleted",
+						},
+					},
+				},
+			},
+			expectedReleases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "deprecated-used-release",
+						},
+						Spec: releasev1alpha1.ReleaseSpec{
+							State: "deprecated",
+						},
+						Status: releasev1alpha1.ReleaseStatus{
+							InUse: true,
+						},
+					},
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "not-being-deleted",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "case 3: an unused wip release is not deleted",
+			releases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "deprecated-used-release",
+						},
+						Spec: releasev1alpha1.ReleaseSpec{
+							State: releasev1alpha1.StateWIP,
+						},
+						Status: releasev1alpha1.ReleaseStatus{
+							InUse: false,
+						},
+					},
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "not-being-deleted",
+						},
+					},
+				},
+			},
+			expectedReleases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "deprecated-used-release",
+						},
+						Spec: releasev1alpha1.ReleaseSpec{
+							State: "wip",
+						},
+						Status: releasev1alpha1.ReleaseStatus{
+							InUse: false,
+						},
+					},
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "not-being-deleted",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for i, tc := range testCases {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Log(tc.name)
+
+			resultReleases := ExcludeUnusedDeprecatedReleases(tc.releases)
+
+			if !cmp.Equal(resultReleases, tc.expectedReleases) {
+				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedReleases, resultReleases))
 			}
 		})
 	}

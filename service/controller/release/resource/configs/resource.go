@@ -61,8 +61,8 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		if err != nil {
 			return microerror.Mask(err)
 		}
-		releases = excludeDeletedRelease(releases)
-		releases = r.excludeUnusedDeprecatedReleases(releases)
+		releases = key.ExcludeDeletedRelease(releases)
+		releases = key.ExcludeUnusedDeprecatedReleases(releases)
 	}
 
 	var components map[string]releasev1alpha1.ReleaseSpecComponent
@@ -123,21 +123,6 @@ func (r *Resource) ensureState(ctx context.Context) error {
 	return nil
 }
 
-func (r *Resource) excludeUnusedDeprecatedReleases(releases releasev1alpha1.ReleaseList) releasev1alpha1.ReleaseList {
-	var active releasev1alpha1.ReleaseList
-
-	for _, release := range releases.Items {
-		if release.Spec.State == releasev1alpha1.StateDeprecated && !release.Status.InUse {
-			// Skip this release
-			r.logger.Log("level", "debug", "message", fmt.Sprintf("excluding release %s because it is deprecated and unused", release.Name))
-		} else {
-			active.Items = append(active.Items, release)
-		}
-	}
-
-	return active
-}
-
 func calculateMissingConfigs(components map[string]releasev1alpha1.ReleaseSpecComponent, configs corev1alpha1.ConfigList) corev1alpha1.ConfigList {
 	var missingConfigs corev1alpha1.ConfigList
 
@@ -161,14 +146,4 @@ func calculateObsoleteConfigs(components map[string]releasev1alpha1.ReleaseSpecC
 	}
 
 	return obsoleteConfigs
-}
-
-func excludeDeletedRelease(releases releasev1alpha1.ReleaseList) releasev1alpha1.ReleaseList {
-	var active releasev1alpha1.ReleaseList
-	for _, release := range releases.Items {
-		if release.DeletionTimestamp == nil {
-			active.Items = append(active.Items, release)
-		}
-	}
-	return active
 }
