@@ -172,14 +172,6 @@ func IsSameConfig(component releasev1alpha1.ReleaseSpecComponent, config corev1a
 		managedByReleaseOperator
 }
 
-func IsSameConfigDeployed(component releasev1alpha1.ReleaseSpecComponent, config corev1alpha1.Config) bool {
-	_, managedByReleaseOperator := config.Labels[LabelManagedBy]
-	return component.Name == config.Status.App.Name &&
-		component.Catalog == config.Status.App.Catalog &&
-		GetComponentRef(component) == config.Status.App.Version &&
-		managedByReleaseOperator
-}
-
 func ComponentAppCreated(component releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {
 	for _, a := range apps {
 		if IsSameApp(component, a) {
@@ -203,16 +195,6 @@ func ComponentAppDeployed(component releasev1alpha1.ReleaseSpecComponent, apps [
 func ComponentConfigCreated(component releasev1alpha1.ReleaseSpecComponent, configs []corev1alpha1.Config) bool {
 	for _, c := range configs {
 		if IsSameConfig(component, c) {
-			return true
-		}
-	}
-
-	return false
-}
-
-func ComponentConfigDeployed(component releasev1alpha1.ReleaseSpecComponent, configs []corev1alpha1.Config) bool {
-	for _, c := range configs {
-		if IsSameConfig(component, c) && IsSameConfigDeployed(component, c) {
 			return true
 		}
 	}
