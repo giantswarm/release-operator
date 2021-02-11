@@ -5,6 +5,7 @@ import (
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
+	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -39,7 +40,20 @@ func AppReferenced(app applicationv1alpha1.App, components map[string]releasev1a
 	return false
 }
 
+func ConfigReferenced(config corev1alpha1.Config, components map[string]releasev1alpha1.ReleaseSpecComponent) bool {
+	component, ok := components[config.Name]
+	if ok && IsSameConfig(component, config) {
+		return true
+	}
+
+	return false
+}
+
 func BuildAppName(component releasev1alpha1.ReleaseSpecComponent) string {
+	return fmt.Sprintf("%s-%s", component.Name, component.Version)
+}
+
+func BuildConfigName(component releasev1alpha1.ReleaseSpecComponent) string {
 	return fmt.Sprintf("%s-%s", component.Name, component.Version)
 }
 
@@ -63,6 +77,49 @@ func ConstructApp(component releasev1alpha1.ReleaseSpecComponent) applicationv1a
 			Version:   GetComponentRef(component),
 		},
 	}
+}
+
+func ConstructConfig(component releasev1alpha1.ReleaseSpecComponent) corev1alpha1.Config {
+	return corev1alpha1.Config{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      BuildConfigName(component),
+			Namespace: Namespace,
+			Labels: map[string]string{
+				LabelManagedBy: project.Name(),
+			},
+		},
+		Spec: corev1alpha1.ConfigSpec{
+			App: corev1alpha1.ConfigSpecApp{
+				Catalog: component.Catalog,
+				Name:    component.Name,
+				Version: GetComponentRef(component),
+			},
+		},
+	}
+}
+
+func ExcludeDeletedRelease(releases releasev1alpha1.ReleaseList) releasev1alpha1.ReleaseList {
+	var active releasev1alpha1.ReleaseList
+	for _, release := range releases.Items {
+		if release.DeletionTimestamp == nil {
+			active.Items = append(active.Items, release)
+		}
+	}
+	return active
+}
+
+func ExcludeUnusedDeprecatedReleases(releases releasev1alpha1.ReleaseList) releasev1alpha1.ReleaseList {
+	var active releasev1alpha1.ReleaseList
+
+	for _, release := range releases.Items {
+		if release.Spec.State == releasev1alpha1.StateDeprecated && !release.Status.InUse {
+			// skip
+		} else {
+			active.Items = append(active.Items, release)
+		}
+	}
+
+	return active
 }
 
 // ExtractComponents extracts the components that this operator is responsible for.
@@ -107,7 +164,15 @@ func IsSameApp(component releasev1alpha1.ReleaseSpecComponent, app applicationv1
 		GetComponentRef(component) == app.Spec.Version
 }
 
-func ComponentCreated(component releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {
+func IsSameConfig(component releasev1alpha1.ReleaseSpecComponent, config corev1alpha1.Config) bool {
+	_, managedByReleaseOperator := config.Labels[LabelManagedBy]
+	return component.Name == config.Spec.App.Name &&
+		component.Catalog == config.Spec.App.Catalog &&
+		GetComponentRef(component) == config.Spec.App.Version &&
+		managedByReleaseOperator
+}
+
+func ComponentAppCreated(component releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {
 	for _, a := range apps {
 		if IsSameApp(component, a) {
 			return true
@@ -117,9 +182,19 @@ func ComponentCreated(component releasev1alpha1.ReleaseSpecComponent, apps []app
 	return false
 }
 
-func ComponentDeployed(component releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {
+func ComponentAppDeployed(component releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {
 	for _, a := range apps {
 		if IsSameApp(component, a) && a.Status.Release.Status == AppStatusDeployed {
+			return true
+		}
+	}
+
+	return false
+}
+
+func ComponentConfigCreated(component releasev1alpha1.ReleaseSpecComponent, configs []corev1alpha1.Config) bool {
+	for _, c := range configs {
+		if IsSameConfig(component, c) {
 			return true
 		}
 	}

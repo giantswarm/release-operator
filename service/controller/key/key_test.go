@@ -6,6 +6,7 @@ import (
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
+	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
 	"github.com/google/go-cmp/cmp"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -72,6 +73,48 @@ func Test_AppReferenced(t *testing.T) {
 			}
 		})
 	}
+}
+
+func Test_ConfigReferenced(t *testing.T) {
+	testCases := []struct {
+		name           string
+		components     map[string]releasev1alpha1.ReleaseSpecComponent
+		config         corev1alpha1.Config
+		expectedResult bool
+	}{
+		{
+			name: "case 0: config is referenced",
+			components: map[string]releasev1alpha1.ReleaseSpecComponent{
+				BuildConfigName(testComponents[0]): testComponents[0],
+				BuildConfigName(testComponents[1]): testComponents[1],
+				BuildConfigName(testComponents[2]): testComponents[2],
+			},
+			config:         ConstructConfig(testComponents[1]),
+			expectedResult: true,
+		},
+		{
+			name: "case 1: config is not referenced",
+			components: map[string]releasev1alpha1.ReleaseSpecComponent{
+				BuildConfigName(testComponents[0]): testComponents[0],
+				BuildConfigName(testComponents[2]): testComponents[2],
+			},
+			config:         ConstructConfig(testComponents[1]),
+			expectedResult: false,
+		},
+	}
+
+	for i, tc := range testCases {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Log(tc.name)
+
+			result := ConfigReferenced(tc.config, tc.components)
+
+			if !cmp.Equal(result, tc.expectedResult) {
+				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedResult, result))
+			}
+		})
+	}
+
 }
 
 func Test_ConstructApp(t *testing.T) {
@@ -171,6 +214,302 @@ func Test_ConstructApp(t *testing.T) {
 
 			if !cmp.Equal(resultApp, tc.expectedApp) {
 				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedApp, resultApp))
+			}
+		})
+	}
+}
+
+func Test_ConstructConfig(t *testing.T) {
+	testCases := []struct {
+		name           string
+		component      releasev1alpha1.ReleaseSpecComponent
+		expectedConfig corev1alpha1.Config
+	}{
+		{
+			name: "case 0: component has only a version (no reference)",
+			component: releasev1alpha1.ReleaseSpecComponent{
+				Name:    "test-operator",
+				Version: "1.0.0",
+			},
+			expectedConfig: corev1alpha1.Config{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "test-operator-1.0.0",
+					Namespace: Namespace,
+					Labels: map[string]string{
+						LabelManagedBy: project.Name(),
+					},
+				},
+				Spec: corev1alpha1.ConfigSpec{
+					App: corev1alpha1.ConfigSpecApp{
+						Name:    "test-operator",
+						Version: "1.0.0",
+					},
+				},
+			},
+		},
+		{
+			name: "case 1: passes the component's catalog to the app",
+			component: releasev1alpha1.ReleaseSpecComponent{
+				Name:    "test-operator",
+				Version: "1.0.0",
+				Catalog: "the-catalog",
+			},
+			expectedConfig: corev1alpha1.Config{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "test-operator-1.0.0",
+					Namespace: Namespace,
+					Labels: map[string]string{
+						LabelManagedBy: project.Name(),
+					},
+				},
+				Spec: corev1alpha1.ConfigSpec{
+					App: corev1alpha1.ConfigSpecApp{
+						Catalog: "the-catalog",
+						Name:    "test-operator",
+						Version: "1.0.0",
+					},
+				},
+			},
+		},
+	}
+
+	for i, tc := range testCases {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Log(tc.name)
+
+			resultConfig := ConstructConfig(tc.component)
+
+			if !cmp.Equal(resultConfig, tc.expectedConfig) {
+				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedConfig, resultConfig))
+			}
+		})
+	}
+
+}
+
+func Test_ExcludeDeletedRelease(t *testing.T) {
+	testCases := []struct {
+		name             string
+		releases         releasev1alpha1.ReleaseList
+		expectedReleases releasev1alpha1.ReleaseList
+	}{
+		{
+			name: "case 0: some releases are being deleted",
+			releases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name:              "being-deleted",
+							DeletionTimestamp: &metav1.Time{},
+						},
+					},
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name:              "not-being-deleted",
+							DeletionTimestamp: nil,
+						},
+					},
+				},
+			},
+			expectedReleases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "not-being-deleted",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for i, tc := range testCases {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Log(tc.name)
+
+			resultReleases := ExcludeDeletedRelease(tc.releases)
+
+			if !cmp.Equal(resultReleases, tc.expectedReleases) {
+				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedReleases, resultReleases))
+			}
+		})
+	}
+}
+
+func Test_ExcludeDeprecatedUnusedRelease(t *testing.T) {
+	testCases := []struct {
+		name             string
+		releases         releasev1alpha1.ReleaseList
+		expectedReleases releasev1alpha1.ReleaseList
+	}{
+		{
+			name: "case 0: an unused, deprecated release is deleted",
+			releases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "ancient-release",
+						},
+						Spec: releasev1alpha1.ReleaseSpec{
+							State: releasev1alpha1.StateDeprecated,
+						},
+						Status: releasev1alpha1.ReleaseStatus{
+							InUse: false,
+						},
+					},
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "not-being-deleted",
+						},
+					},
+				},
+			},
+			expectedReleases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "not-being-deleted",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "case 1: an unused active release is not deleted",
+			releases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "active-release",
+						},
+						Spec: releasev1alpha1.ReleaseSpec{
+							State: releasev1alpha1.StateActive,
+						},
+						Status: releasev1alpha1.ReleaseStatus{
+							InUse: false,
+						},
+					},
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "not-being-deleted",
+						},
+					},
+				},
+			},
+			expectedReleases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "active-release",
+						},
+						Spec: releasev1alpha1.ReleaseSpec{
+							State: "active",
+						},
+					},
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "not-being-deleted",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "case 2: a used deprecated release is not deleted",
+			releases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "deprecated-used-release",
+						},
+						Spec: releasev1alpha1.ReleaseSpec{
+							State: releasev1alpha1.StateDeprecated,
+						},
+						Status: releasev1alpha1.ReleaseStatus{
+							InUse: true,
+						},
+					},
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "not-being-deleted",
+						},
+					},
+				},
+			},
+			expectedReleases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "deprecated-used-release",
+						},
+						Spec: releasev1alpha1.ReleaseSpec{
+							State: "deprecated",
+						},
+						Status: releasev1alpha1.ReleaseStatus{
+							InUse: true,
+						},
+					},
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "not-being-deleted",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "case 3: an unused wip release is not deleted",
+			releases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "deprecated-used-release",
+						},
+						Spec: releasev1alpha1.ReleaseSpec{
+							State: releasev1alpha1.StateWIP,
+						},
+						Status: releasev1alpha1.ReleaseStatus{
+							InUse: false,
+						},
+					},
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "not-being-deleted",
+						},
+					},
+				},
+			},
+			expectedReleases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "deprecated-used-release",
+						},
+						Spec: releasev1alpha1.ReleaseSpec{
+							State: "wip",
+						},
+						Status: releasev1alpha1.ReleaseStatus{
+							InUse: false,
+						},
+					},
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "not-being-deleted",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for i, tc := range testCases {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Log(tc.name)
+
+			resultReleases := ExcludeUnusedDeprecatedReleases(tc.releases)
+
+			if !cmp.Equal(resultReleases, tc.expectedReleases) {
+				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedReleases, resultReleases))
 			}
 		})
 	}
@@ -394,7 +733,7 @@ func Test_IsSameApp(t *testing.T) {
 	}
 }
 
-func Test_componentCreated(t *testing.T) {
+func Test_componentAppCreated(t *testing.T) {
 	testCases := []struct {
 		name           string
 		component      releasev1alpha1.ReleaseSpecComponent
@@ -419,7 +758,7 @@ func Test_componentCreated(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Log(tc.name)
 
-			result := ComponentCreated(tc.component, tc.apps)
+			result := ComponentAppCreated(tc.component, tc.apps)
 
 			if !cmp.Equal(result, tc.expectedOutput) {
 				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedOutput, result))
@@ -428,7 +767,7 @@ func Test_componentCreated(t *testing.T) {
 	}
 }
 
-func Test_componentDeployed(t *testing.T) {
+func Test_componentAppDeployed(t *testing.T) {
 	deployedApp := ConstructApp(testComponents[0])
 	deployedApp.Status.Release.Status = AppStatusDeployed
 
@@ -462,7 +801,7 @@ func Test_componentDeployed(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Log(tc.name)
 
-			result := ComponentDeployed(tc.component, tc.apps)
+			result := ComponentAppDeployed(tc.component, tc.apps)
 
 			if !cmp.Equal(result, tc.expectedOutput) {
 				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedOutput, result))
