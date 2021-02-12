@@ -128,7 +128,8 @@ func configForComponent(operator releasev1alpha1.ReleaseSpecComponent) corev1alp
 		ObjectMeta: metav1.ObjectMeta{
 			Name: key.BuildConfigName(operator),
 			Labels: map[string]string{
-				key.LabelManagedBy: project.Name(),
+				key.LabelConfigOperatorVersion: "0.0.0",
+				key.LabelManagedBy:             project.Name(),
 			},
 		},
 		Spec: corev1alpha1.ConfigSpec{

@@ -19,7 +19,7 @@ const (
 	Namespace = "giantswarm"
 
 	LabelAppOperatorVersion    = "app-operator.giantswarm.io/version"
-	LabelConfigOperatorVersion = "app-operator.giantswarm.io/version"
+	LabelConfigOperatorVersion = "config-controller.giantswarm.io/version"
 	LabelManagedBy             = "giantswarm.io/managed-by"
 	LabelServiceType           = "giantswarm.io/service-type"
 

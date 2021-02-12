@@ -236,7 +236,8 @@ func Test_ConstructConfig(t *testing.T) {
 					Name:      "test-operator-1.0.0",
 					Namespace: Namespace,
 					Labels: map[string]string{
-						LabelManagedBy: project.Name(),
+						LabelConfigOperatorVersion: "0.0.0",
+						LabelManagedBy:             project.Name(),
 					},
 				},
 				Spec: corev1alpha1.ConfigSpec{
@@ -259,7 +260,8 @@ func Test_ConstructConfig(t *testing.T) {
 					Name:      "test-operator-1.0.0",
 					Namespace: Namespace,
 					Labels: map[string]string{
-						LabelManagedBy: project.Name(),
+						LabelConfigOperatorVersion: "0.0.0",
+						LabelManagedBy:             project.Name(),
 					},
 				},
 				Spec: corev1alpha1.ConfigSpec{
