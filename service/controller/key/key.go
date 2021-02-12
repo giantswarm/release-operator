@@ -18,9 +18,10 @@ const (
 	// Namespace is the namespace where App CRs are created.
 	Namespace = "giantswarm"
 
-	LabelAppOperatorVersion = "app-operator.giantswarm.io/version"
-	LabelManagedBy          = "giantswarm.io/managed-by"
-	LabelServiceType        = "giantswarm.io/service-type"
+	LabelAppOperatorVersion    = "app-operator.giantswarm.io/version"
+	LabelConfigOperatorVersion = "app-operator.giantswarm.io/version"
+	LabelManagedBy             = "giantswarm.io/managed-by"
+	LabelServiceType           = "giantswarm.io/service-type"
 
 	ValueServiceTypeManaged = "managed"
 )
@@ -33,13 +34,14 @@ const (
 
 func AppConfigDeployed(app applicationv1alpha1.App, configs corev1alpha1.ConfigList) bool {
 	for _, config := range configs.Items {
-		_, configManagedByReleaseOperator := config.Labels[LabelManagedBy]
+		configManagedByLabel, configIsManagedByReleaseOperator := config.Labels[LabelManagedBy]
 
 		if app.Name == config.Name &&
 			app.Spec.Name == config.Status.App.Name &&
 			app.Spec.Version == config.Status.App.Version &&
 			app.Spec.Catalog == config.Status.App.Catalog &&
-			configManagedByReleaseOperator {
+			configIsManagedByReleaseOperator &&
+			configManagedByLabel == project.Name() {
 			return true
 		}
 	}
@@ -101,7 +103,8 @@ func ConstructConfig(component releasev1alpha1.ReleaseSpecComponent) corev1alpha
 			Name:      BuildConfigName(component),
 			Namespace: Namespace,
 			Labels: map[string]string{
-				LabelManagedBy: project.Name(),
+				LabelConfigOperatorVersion: "0.0.0",
+				LabelManagedBy:             project.Name(),
 			},
 		},
 		Spec: corev1alpha1.ConfigSpec{
@@ -181,11 +184,12 @@ func IsSameApp(component releasev1alpha1.ReleaseSpecComponent, app applicationv1
 }
 
 func IsSameConfig(component releasev1alpha1.ReleaseSpecComponent, config corev1alpha1.Config) bool {
-	_, configManagedByReleaseOperator := config.Labels[LabelManagedBy]
+	configManagedByLabel, configIsManagedByReleaseOperator := config.Labels[LabelManagedBy]
 	return component.Name == config.Spec.App.Name &&
 		component.Catalog == config.Spec.App.Catalog &&
 		GetComponentRef(component) == config.Spec.App.Version &&
-		configManagedByReleaseOperator
+		configIsManagedByReleaseOperator &&
+		configManagedByLabel == project.Name()
 }
 
 func ComponentAppCreated(component releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {
