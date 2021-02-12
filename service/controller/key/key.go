@@ -32,23 +32,6 @@ const (
 	ProviderOperatorKVM   = "kvm-operator"
 )
 
-func AppConfigDeployed(app applicationv1alpha1.App, configs corev1alpha1.ConfigList) bool {
-	for _, config := range configs.Items {
-		configManagedByLabel, configIsManagedByReleaseOperator := config.Labels[LabelManagedBy]
-
-		if app.Name == config.Name &&
-			app.Spec.Name == config.Status.App.Name &&
-			app.Spec.Version == config.Status.App.Version &&
-			app.Spec.Catalog == config.Status.App.Catalog &&
-			configIsManagedByReleaseOperator &&
-			configManagedByLabel == project.Name() {
-			return true
-		}
-	}
-
-	return false
-}
-
 func AppReferenced(app applicationv1alpha1.App, components map[string]releasev1alpha1.ReleaseSpecComponent) bool {
 	component, ok := components[app.Name]
 	if ok && IsSameApp(component, app) {
@@ -175,6 +158,28 @@ func GetComponentRef(comp releasev1alpha1.ReleaseSpecComponent) string {
 
 func GetProviderOperators() []string {
 	return []string{ProviderOperatorAWS, ProviderOperatorAzure, ProviderOperatorKVM}
+}
+
+func GetAppConfig(app applicationv1alpha1.App, configs corev1alpha1.ConfigList) (
+	corev1alpha1.ConfigStatusConfigConfigMapRef, corev1alpha1.ConfigStatusConfigSecretRef) {
+	var cmRef corev1alpha1.ConfigStatusConfigConfigMapRef
+	var secretRef corev1alpha1.ConfigStatusConfigSecretRef
+
+	for _, config := range configs.Items {
+		configManagedByLabel, configIsManagedByReleaseOperator := config.Labels[LabelManagedBy]
+
+		if app.Name == config.Name &&
+			app.Spec.Name == config.Status.App.Name &&
+			app.Spec.Version == config.Status.App.Version &&
+			app.Spec.Catalog == config.Status.App.Catalog &&
+			configIsManagedByReleaseOperator &&
+			configManagedByLabel == project.Name() {
+			cmRef = config.Status.Config.ConfigMapRef
+			secretRef = config.Status.Config.SecretRef
+		}
+	}
+
+	return cmRef, secretRef
 }
 
 func IsSameApp(component releasev1alpha1.ReleaseSpecComponent, app applicationv1alpha1.App) bool {
