@@ -6,6 +6,7 @@ import (
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
 	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
+	apiexlabels "github.com/giantswarm/apiextensions/v3/pkg/label"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -85,7 +86,8 @@ func ConstructConfig(component releasev1alpha1.ReleaseSpecComponent) corev1alpha
 			Name:      BuildConfigName(component),
 			Namespace: Namespace,
 			Labels: map[string]string{
-				LabelManagedBy: project.Name(),
+				apiexlabels.ConfigControllerVersion: "0.0.0",
+				LabelManagedBy:                      project.Name(),
 			},
 		},
 		Spec: corev1alpha1.ConfigSpec{
@@ -158,6 +160,31 @@ func GetProviderOperators() []string {
 	return []string{ProviderOperatorAWS, ProviderOperatorAzure, ProviderOperatorKVM}
 }
 
+func GetAppConfig(app applicationv1alpha1.App, configs corev1alpha1.ConfigList) (
+	appConfig corev1alpha1.ConfigStatusConfig) {
+
+	for _, config := range configs.Items {
+		configManagedByLabel, configIsManagedByReleaseOperator := config.Labels[LabelManagedBy]
+
+		matches := true
+		matches = matches && app.Name == config.Name
+		matches = matches && app.Spec.Name == config.Status.App.Name
+		matches = matches && app.Spec.Version == config.Status.App.Version
+		matches = matches && app.Spec.Catalog == config.Status.App.Catalog
+		matches = matches && configIsManagedByReleaseOperator
+		matches = matches && configManagedByLabel == project.Name()
+
+		if matches {
+
+			appConfig.ConfigMapRef = config.Status.Config.ConfigMapRef
+			appConfig.SecretRef = config.Status.Config.SecretRef
+			break
+		}
+	}
+
+	return appConfig
+}
+
 func IsSameApp(component releasev1alpha1.ReleaseSpecComponent, app applicationv1alpha1.App) bool {
 	return BuildAppName(component) == app.Name &&
 		component.Catalog == app.Spec.Catalog &&
@@ -165,11 +192,12 @@ func IsSameApp(component releasev1alpha1.ReleaseSpecComponent, app applicationv1
 }
 
 func IsSameConfig(component releasev1alpha1.ReleaseSpecComponent, config corev1alpha1.Config) bool {
-	_, managedByReleaseOperator := config.Labels[LabelManagedBy]
+	configManagedByLabel, configIsManagedByReleaseOperator := config.Labels[LabelManagedBy]
 	return component.Name == config.Spec.App.Name &&
 		component.Catalog == config.Spec.App.Catalog &&
 		GetComponentRef(component) == config.Spec.App.Version &&
-		managedByReleaseOperator
+		configIsManagedByReleaseOperator &&
+		configManagedByLabel == project.Name()
 }
 
 func ComponentAppCreated(component releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {

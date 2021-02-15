@@ -6,6 +6,7 @@ import (
 
 	appv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
+	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
 	"github.com/giantswarm/k8sclient/v4/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -86,6 +87,22 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		}
 	}
 
+	var configs corev1alpha1.ConfigList
+	{
+		err := r.k8sClient.CtrlClient().List(
+			ctx,
+			&configs,
+			&client.ListOptions{
+				LabelSelector: labels.SelectorFromSet(labels.Set{
+					key.LabelManagedBy: project.Name(),
+				}),
+			},
+		)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+	}
+
 	appsToDelete := calculateObsoleteApps(components, apps)
 	for _, app := range appsToDelete.Items {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting app %#q in namespace %#q", app.Name, app.Namespace))
@@ -105,6 +122,18 @@ func (r *Resource) ensureState(ctx context.Context) error {
 
 	appsToCreate := calculateMissingApps(components, apps)
 	for _, app := range appsToCreate.Items {
+		appConfig := key.GetAppConfig(app, configs)
+		if appConfig.ConfigMapRef.Name == "" && appConfig.SecretRef.Name == "" {
+			// Skip this app
+			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("skipping app %#q as its config is not ready", app.Name))
+			continue
+		}
+
+		app.Spec.Config.ConfigMap.Name = appConfig.ConfigMapRef.Name
+		app.Spec.Config.ConfigMap.Namespace = appConfig.ConfigMapRef.Namespace
+		app.Spec.Config.Secret.Name = appConfig.SecretRef.Name
+		app.Spec.Config.Secret.Namespace = appConfig.SecretRef.Namespace
+
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating app %#q in namespace %#q", app.Name, app.Namespace))
 
 		err := r.k8sClient.CtrlClient().Create(

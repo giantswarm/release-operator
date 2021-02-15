@@ -7,6 +7,7 @@ import (
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
 	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
+	apiexlabels "github.com/giantswarm/apiextensions/v3/pkg/label"
 	"github.com/google/go-cmp/cmp"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -236,7 +237,8 @@ func Test_ConstructConfig(t *testing.T) {
 					Name:      "test-operator-1.0.0",
 					Namespace: Namespace,
 					Labels: map[string]string{
-						LabelManagedBy: project.Name(),
+						apiexlabels.ConfigControllerVersion: "0.0.0",
+						LabelManagedBy:                      project.Name(),
 					},
 				},
 				Spec: corev1alpha1.ConfigSpec{
@@ -259,7 +261,8 @@ func Test_ConstructConfig(t *testing.T) {
 					Name:      "test-operator-1.0.0",
 					Namespace: Namespace,
 					Labels: map[string]string{
-						LabelManagedBy: project.Name(),
+						apiexlabels.ConfigControllerVersion: "0.0.0",
+						LabelManagedBy:                      project.Name(),
 					},
 				},
 				Spec: corev1alpha1.ConfigSpec{
