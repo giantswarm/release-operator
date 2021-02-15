@@ -161,9 +161,7 @@ func GetProviderOperators() []string {
 }
 
 func GetAppConfig(app applicationv1alpha1.App, configs corev1alpha1.ConfigList) (
-	corev1alpha1.ConfigStatusConfigConfigMapRef, corev1alpha1.ConfigStatusConfigSecretRef) {
-	var cmRef corev1alpha1.ConfigStatusConfigConfigMapRef
-	var secretRef corev1alpha1.ConfigStatusConfigSecretRef
+	appConfig corev1alpha1.ConfigStatusConfig) {
 
 	for _, config := range configs.Items {
 		configManagedByLabel, configIsManagedByReleaseOperator := config.Labels[LabelManagedBy]
@@ -177,13 +175,14 @@ func GetAppConfig(app applicationv1alpha1.App, configs corev1alpha1.ConfigList) 
 		matches = matches && configManagedByLabel == project.Name()
 
 		if matches {
-			cmRef = config.Status.Config.ConfigMapRef
-			secretRef = config.Status.Config.SecretRef
+
+			appConfig.ConfigMapRef = config.Status.Config.ConfigMapRef
+			appConfig.SecretRef = config.Status.Config.SecretRef
 			break
 		}
 	}
 
-	return cmRef, secretRef
+	return appConfig
 }
 
 func IsSameApp(component releasev1alpha1.ReleaseSpecComponent, app applicationv1alpha1.App) bool {
