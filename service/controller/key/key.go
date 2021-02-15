@@ -168,14 +168,18 @@ func GetAppConfig(app applicationv1alpha1.App, configs corev1alpha1.ConfigList) 
 	for _, config := range configs.Items {
 		configManagedByLabel, configIsManagedByReleaseOperator := config.Labels[LabelManagedBy]
 
-		if app.Name == config.Name &&
-			app.Spec.Name == config.Status.App.Name &&
-			app.Spec.Version == config.Status.App.Version &&
-			app.Spec.Catalog == config.Status.App.Catalog &&
-			configIsManagedByReleaseOperator &&
-			configManagedByLabel == project.Name() {
+		matches := true
+		matches = matches && app.Name == config.Name
+		matches = matches && app.Spec.Name == config.Status.App.Name
+		matches = matches && app.Spec.Version == config.Status.App.Version
+		matches = matches && app.Spec.Catalog == config.Status.App.Catalog
+		matches = matches && configIsManagedByReleaseOperator
+		matches = matches && configManagedByLabel == project.Name()
+
+		if matches {
 			cmRef = config.Status.Config.ConfigMapRef
 			secretRef = config.Status.Config.SecretRef
+			break
 		}
 	}
 
