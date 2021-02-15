@@ -13,10 +13,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add `Config` CR resource management into the `release` controller.
 
-### Changed
-
-- Skip `App` CR resource creation if corresponding `Config` CR has no expected status.
-
 ## [2.1.2] - 2020-11-10
 
 ### Fixed

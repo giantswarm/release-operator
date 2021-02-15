@@ -6,6 +6,7 @@ import (
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
 	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
+	apiexlabels "github.com/giantswarm/apiextensions/v3/pkg/label"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -18,10 +19,9 @@ const (
 	// Namespace is the namespace where App CRs are created.
 	Namespace = "giantswarm"
 
-	LabelAppOperatorVersion    = "app-operator.giantswarm.io/version"
-	LabelConfigOperatorVersion = "config-controller.giantswarm.io/version"
-	LabelManagedBy             = "giantswarm.io/managed-by"
-	LabelServiceType           = "giantswarm.io/service-type"
+	LabelAppOperatorVersion = "app-operator.giantswarm.io/version"
+	LabelManagedBy          = "giantswarm.io/managed-by"
+	LabelServiceType        = "giantswarm.io/service-type"
 
 	ValueServiceTypeManaged = "managed"
 )
@@ -86,8 +86,8 @@ func ConstructConfig(component releasev1alpha1.ReleaseSpecComponent) corev1alpha
 			Name:      BuildConfigName(component),
 			Namespace: Namespace,
 			Labels: map[string]string{
-				LabelConfigOperatorVersion: "0.0.0",
-				LabelManagedBy:             project.Name(),
+				apiexlabels.ConfigControllerVersion: "0.0.0",
+				LabelManagedBy:                      project.Name(),
 			},
 		},
 		Spec: corev1alpha1.ConfigSpec{
