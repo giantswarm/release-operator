@@ -12,7 +12,7 @@ require (
 	github.com/giantswarm/microkit v0.2.2
 	github.com/giantswarm/micrologger v0.5.0
 	github.com/giantswarm/operatorkit/v2 v2.0.2
-	github.com/google/go-cmp v0.5.4
+	github.com/google/go-cmp v0.5.5
 	github.com/onsi/ginkgo v1.14.0 // indirect
 	github.com/prometheus/client_golang v1.9.0
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
