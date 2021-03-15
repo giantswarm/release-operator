@@ -4,3 +4,5 @@ description: "Helm chart for release-operator."
 home: "https://github.com/giantswarm/release-operator"
 version: "[[ .Version ]]"
 appVersion: "[[ .AppVersion ]]"
+annotations:
+  application.giantswarm.io/team: "ludacris"
