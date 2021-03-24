@@ -87,12 +87,12 @@ func (r *Resource) ensureState(ctx context.Context) error {
 	}
 
 	configsToDelete := calculateObsoleteConfigs(components, configs)
-	for _, config := range configsToDelete.Items {
+	for i, config := range configsToDelete.Items {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting config %#q in namespace %#q", config.Name, config.Namespace))
 
 		err := r.k8sClient.CtrlClient().Delete(
 			ctx,
-			&config,
+			&configsToDelete.Items[i],
 		)
 		if apierrors.IsNotFound(err) {
 			// fall through.
@@ -104,12 +104,12 @@ func (r *Resource) ensureState(ctx context.Context) error {
 	}
 
 	configsToCreate := calculateMissingConfigs(components, configs)
-	for _, config := range configsToCreate.Items {
+	for i, config := range configsToCreate.Items {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating config %#q in namespace %#q", config.Name, config.Namespace))
 
 		err := r.k8sClient.CtrlClient().Create(
 			ctx,
-			&config,
+			&configsToCreate.Items[i],
 		)
 		if apierrors.IsAlreadyExists(err) {
 			// fall through.
