@@ -104,12 +104,12 @@ func (r *Resource) ensureState(ctx context.Context) error {
 	}
 
 	appsToDelete := calculateObsoleteApps(components, apps)
-	for _, app := range appsToDelete.Items {
+	for i, app := range appsToDelete.Items {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting app %#q in namespace %#q", app.Name, app.Namespace))
 
 		err := r.k8sClient.CtrlClient().Delete(
 			ctx,
-			&app,
+			&appsToDelete.Items[i],
 		)
 		if apierrors.IsNotFound(err) {
 			// fall through.
@@ -121,7 +121,7 @@ func (r *Resource) ensureState(ctx context.Context) error {
 	}
 
 	appsToCreate := calculateMissingApps(components, apps)
-	for _, app := range appsToCreate.Items {
+	for i, app := range appsToCreate.Items {
 		appConfig := key.GetAppConfig(app, configs)
 		if appConfig.ConfigMapRef.Name == "" && appConfig.SecretRef.Name == "" {
 			// Skip this app
@@ -138,7 +138,7 @@ func (r *Resource) ensureState(ctx context.Context) error {
 
 		err := r.k8sClient.CtrlClient().Create(
 			ctx,
-			&app,
+			&appsToCreate.Items[i],
 		)
 		if apierrors.IsAlreadyExists(err) {
 			// fall through.

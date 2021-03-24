@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  architect: giantswarm/architect@2.1.0
+  architect: giantswarm/architect@2.4.1
 
 workflows:
   version: 2
@@ -50,6 +50,19 @@ workflows:
             - push-release-operator-to-aliyun
             - push-release-operator-to-quay
           filters:
+            tags:
+              only: /^v.*/
+
+      - architect/push-to-app-collection:
+          context: architect
+          name: push-release-operator-to-shared-app-collection
+          app_name: "release-operator"
+          app_collection_repo: "shared-app-collection"
+          requires:
+            - push-release-operator-to-control-plane-app-catalog
+          filters:
+            branches:
+              ignore: /.*/
             tags:
               only: /^v.*/
 
