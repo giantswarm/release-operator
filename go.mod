@@ -30,6 +30,7 @@ replace github.com/coreos/etcd v3.3.13+incompatible => github.com/coreos/etcd v3
 replace github.com/coreos/etcd v3.3.10+incompatible => github.com/coreos/etcd v3.3.24+incompatible
 
 replace (
+	github.com/gogo/protobuf v1.3.1 => github.com/gogo/protobuf v1.3.2
 	sigs.k8s.io/cluster-api v0.3.13 => github.com/giantswarm/cluster-api v0.3.7
 	sigs.k8s.io/cluster-api-provider-azure v0.4.6 => github.com/giantswarm/cluster-api-provider-azure v0.4.6
 )
