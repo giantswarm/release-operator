@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	appv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
-	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
+	appv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/application/v1alpha1"
 	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/k8sclient/v4/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
@@ -66,6 +66,20 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		releases = key.ExcludeUnusedDeprecatedReleases(releases)
 	}
 
+	// Method 1: new wrapper type for components
+	// var components []key.ReleaseComponentWrapper
+	// {
+	// 	components = key.NExtractComponents(releases)
+	// 	// name-version: <full component>
+	// 	// {
+	// 	//		release
+	// 	//		name-version
+	// 	//		component
+	// 	// }
+	// }
+	// Maybe change name in original logic instead?
+
+	// Method 2: change name creation behavior
 	var components map[string]releasev1alpha1.ReleaseSpecComponent
 	{
 		components = key.ExtractComponents(releases)

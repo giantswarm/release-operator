@@ -3,7 +3,7 @@ package status
 import (
 	"context"
 
-	apiexlabels "github.com/giantswarm/apiextensions/v2/pkg/label"
+	apiexlabels "github.com/giantswarm/apiextensions/v3/pkg/label"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	capiv1alpha2 "sigs.k8s.io/cluster-api/api/v1alpha2"

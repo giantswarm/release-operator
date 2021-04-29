@@ -2,10 +2,11 @@ package key
 
 import (
 	"fmt"
+	"reflect"
 
-	applicationv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
-	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
+	applicationv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/application/v1alpha1"
 	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 	apiexlabels "github.com/giantswarm/apiextensions/v3/pkg/label"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -32,6 +33,13 @@ const (
 	ProviderOperatorKVM   = "kvm-operator"
 )
 
+// ReleaseComponentWrapper contains a release component and the name and release version as context.
+type ReleaseComponentWrapper struct {
+	Release   string
+	AppName   string
+	Component releasev1alpha1.ReleaseSpecComponent
+}
+
 func AppReferenced(app applicationv1alpha1.App, components map[string]releasev1alpha1.ReleaseSpecComponent) bool {
 	component, ok := components[app.Name]
 	if ok && IsSameApp(component, app) {
@@ -51,6 +59,14 @@ func ConfigReferenced(config corev1alpha1.Config, components map[string]releasev
 }
 
 func BuildAppName(component releasev1alpha1.ReleaseSpecComponent) string {
+	return fmt.Sprintf("%s-%s", component.Name, component.Version)
+}
+
+func xBuildAppName(component releasev1alpha1.ReleaseSpecComponent, release string) string {
+	if component.DeployedOncePerRelease {
+		rel := fmt.Sprintf("rel%s", release)
+		return fmt.Sprintf("%s-%s-%s", component.Name, component.Version, rel)
+	}
 	return fmt.Sprintf("%s-%s", component.Name, component.Version)
 }
 
@@ -124,14 +140,44 @@ func ExcludeUnusedDeprecatedReleases(releases releasev1alpha1.ReleaseList) relea
 	return active
 }
 
+func componentExistsForRelease(component releasev1alpha1.ReleaseSpecComponent, release string, components []ReleaseComponentWrapper) bool {
+	for _, component := range components {
+		if component.Release == release && component.AppName == BuildAppName(component.Component) {
+			return true
+		}
+	}
+	return false
+}
+
+// ExtractComponents extracts the components that this operator is responsible for.
+func NExtractComponents(releases releasev1alpha1.ReleaseList) []ReleaseComponentWrapper {
+	var components []ReleaseComponentWrapper
+
+	for _, release := range releases.Items {
+		for _, component := range release.Spec.Components {
+			if !componentExistsForRelease(component, release.Name, components) {
+				c := ReleaseComponentWrapper{
+					AppName:   BuildAppName(component),
+					Release:   release.Name,
+					Component: component,
+				}
+
+				components = append(components, c)
+			}
+		}
+	}
+	return components
+}
+
 // ExtractComponents extracts the components that this operator is responsible for.
 func ExtractComponents(releases releasev1alpha1.ReleaseList) map[string]releasev1alpha1.ReleaseSpecComponent {
 	var components = make(map[string]releasev1alpha1.ReleaseSpecComponent)
 
 	for _, release := range releases.Items {
 		for _, component := range release.Spec.Components {
-			if component.ReleaseOperatorDeploy && (components[BuildAppName(component)] == releasev1alpha1.ReleaseSpecComponent{}) {
-				components[BuildAppName(component)] = component
+			// if component.ReleaseOperatorDeploy && (components[xBuildAppName(component, release.Name)] == releasev1alpha1.ReleaseSpecComponent{}) {
+			if component.ReleaseOperatorDeploy && (reflect.DeepEqual(components[xBuildAppName(component, release.Name)], releasev1alpha1.ReleaseSpecComponent{})) {
+				components[xBuildAppName(component, release.Name)] = component
 			}
 		}
 	}

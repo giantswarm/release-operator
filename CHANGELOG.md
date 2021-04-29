@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add possibility to specify chart names for a component with `charts` field.
+- Add possibility to deploy a copy of a component for each release with `uniquePerRelease` field.
+
 ## [2.2.0] - 2021-02-16
 
 ### Added
