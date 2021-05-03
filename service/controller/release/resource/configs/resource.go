@@ -9,7 +9,9 @@ import (
 	"github.com/giantswarm/k8sclient/v4/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
+	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -86,6 +88,24 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		}
 	}
 
+	// These are ConfigMaps which are managed by release-operator and attached to Apps it manages.
+	var perReleaseConfigMaps *corev1.ConfigMapList
+	{
+		var err error
+		perReleaseConfigMaps, err = r.k8sClient.K8sClient().CoreV1().ConfigMaps("").List(ctx,
+			metav1.ListOptions{
+				LabelSelector: labels.SelectorFromSet(labels.Set{
+					key.LabelManagedBy: project.Name(),
+				}).String(),
+			},
+		)
+		if err != nil {
+			return microerror.Mask(err)
+		}
+	}
+
+	fmt.Println(perReleaseConfigMaps)
+
 	configsToDelete := calculateObsoleteConfigs(components, configs)
 	for i, config := range configsToDelete.Items {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting config %#q in namespace %#q", config.Name, config.Namespace))
@@ -125,6 +145,20 @@ func (r *Resource) ensureState(ctx context.Context) error {
 
 func calculateMissingConfigs(components map[string]releasev1alpha1.ReleaseSpecComponent, configs corev1alpha1.ConfigList) corev1alpha1.ConfigList {
 	var missingConfigs corev1alpha1.ConfigList
+
+	for _, component := range components {
+		if !key.ComponentConfigCreated(component, configs.Items) {
+			missingConfig := key.ConstructConfig(component)
+			missingConfigs.Items = append(missingConfigs.Items, missingConfig)
+		}
+	}
+
+	return missingConfigs
+}
+
+// calculateMissingPerReleaseConfigs handles configmaps which release-operator creates per-release where this component is used.
+func calculateMissingPerReleaseConfigs(components map[string]releasev1alpha1.ReleaseSpecComponent, configs corev1.ConfigMapList) corev1.ConfigMapList {
+	var missingConfigs corev1.ConfigMapList
 
 	for _, component := range components {
 		if !key.ComponentConfigCreated(component, configs.Items) {

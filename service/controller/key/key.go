@@ -9,6 +9,7 @@ import (
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 	apiexlabels "github.com/giantswarm/apiextensions/v3/pkg/label"
 	"github.com/giantswarm/microerror"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/release-operator/v2/pkg/project"
@@ -74,10 +75,19 @@ func BuildConfigName(component releasev1alpha1.ReleaseSpecComponent) string {
 	return fmt.Sprintf("%s-%s", component.Name, component.Version)
 }
 
-func ConstructApp(component releasev1alpha1.ReleaseSpecComponent) applicationv1alpha1.App {
-	return applicationv1alpha1.App{
+func BuildConfigMapName(name string) string {
+	return fmt.Sprintf("%s-values", name)
+}
+
+func BuildConfigMapNameForComponent(component releasev1alpha1.ReleaseSpecComponent, release string) string {
+	return BuildConfigMapName(fmt.Sprintf("%s-%s", BuildAppName(component), fmt.Sprintf("rel%s", release)))
+}
+
+func ConstructApp(name string, component releasev1alpha1.ReleaseSpecComponent) applicationv1alpha1.App {
+
+	app := applicationv1alpha1.App{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      BuildAppName(component),
+			Name:      name,
 			Namespace: Namespace,
 			Labels: map[string]string{
 				LabelAppOperatorVersion: "0.0.0",
@@ -94,6 +104,18 @@ func ConstructApp(component releasev1alpha1.ReleaseSpecComponent) applicationv1a
 			Version:   GetComponentRef(component),
 		},
 	}
+
+	// Attach an optional ConfigMap to this App containing the release version
+	if component.DeployedOncePerRelease {
+		app.Spec.UserConfig = applicationv1alpha1.AppSpecUserConfig{
+			ConfigMap: applicationv1alpha1.AppSpecUserConfigConfigMap{
+				Name:      fmt.Sprintf("%s-values", name),
+				Namespace: Namespace,
+			},
+		}
+	}
+
+	return app
 }
 
 func ConstructConfig(component releasev1alpha1.ReleaseSpecComponent) corev1alpha1.Config {
@@ -246,6 +268,18 @@ func IsSameConfig(component releasev1alpha1.ReleaseSpecComponent, config corev1a
 		configManagedByLabel == project.Name()
 }
 
+func IsSamePerReleaseConfig(component releasev1alpha1.ReleaseSpecComponent, config corev1.ConfigMap) bool {
+	configManagedByLabel, configIsManagedByReleaseOperator := config.Labels[LabelManagedBy]
+	// Apply release label
+	// Apply parent app label
+	// Need to know release version of apps here...
+	return component.Name == config.Spec.App.Name &&
+		component.Catalog == config.Spec.App.Catalog &&
+		GetComponentRef(component) == config.Spec.App.Version &&
+		configIsManagedByReleaseOperator &&
+		configManagedByLabel == project.Name()
+}
+
 func ComponentAppCreated(component releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {
 	for _, a := range apps {
 		if IsSameApp(component, a) {
@@ -268,6 +302,16 @@ func ComponentAppDeployed(component releasev1alpha1.ReleaseSpecComponent, apps [
 
 func ComponentConfigCreated(component releasev1alpha1.ReleaseSpecComponent, configs []corev1alpha1.Config) bool {
 	for _, c := range configs {
+		if IsSameConfig(component, c) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func ComponentPerReleaseConfigExists(component releasev1alpha1.ReleaseSpecComponent, configs corev1.ConfigMapList) bool {
+	for _, c := range configs.Items {
 		if IsSameConfig(component, c) {
 			return true
 		}

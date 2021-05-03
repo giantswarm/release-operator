@@ -117,6 +117,22 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		}
 	}
 
+	// var perReleaseConfigs
+	// {
+	// 	err := r.k8sClient.CtrlClient().List(
+	// 		ctx,
+	// 		&perReleaseConfigs,
+	// 		&client.ListOptions{
+	// 			LabelSelector: labels.SelectorFromSet(labels.Set{
+	// 				key.LabelManagedBy: project.Name(),
+	// 			}),
+	// 		},
+	// 	)
+	// 	if err != nil {
+	// 		return microerror.Mask(err)
+	// 	}
+	// }
+
 	appsToDelete := calculateObsoleteApps(components, apps)
 	for i, app := range appsToDelete.Items {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting app %#q in namespace %#q", app.Name, app.Namespace))
@@ -169,9 +185,9 @@ func (r *Resource) ensureState(ctx context.Context) error {
 func calculateMissingApps(components map[string]releasev1alpha1.ReleaseSpecComponent, apps appv1alpha1.AppList) appv1alpha1.AppList {
 	var missingApps appv1alpha1.AppList
 
-	for _, component := range components {
+	for name, component := range components {
 		if !key.ComponentAppCreated(component, apps.Items) {
-			missingApp := key.ConstructApp(component)
+			missingApp := key.ConstructApp(name, component)
 			missingApps.Items = append(missingApps.Items, missingApp)
 		}
 	}
