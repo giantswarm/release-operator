@@ -98,7 +98,8 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 	{
 		releaseDeployed = true
 		for _, component := range components {
-			if !key.ComponentAppDeployed(component, apps.Items) {
+			w := key.WrapReleaseComponent(release.Name, component)
+			if !key.ComponentAppDeployed(w, apps.Items) {
 				releaseDeployed = false
 
 				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("component %#q in release %#q is not deployed", component.Name, release.Name))

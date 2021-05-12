@@ -2,7 +2,6 @@ package key
 
 import (
 	"fmt"
-	"reflect"
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/application/v1alpha1"
 	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
@@ -22,6 +21,8 @@ const (
 	Namespace = "giantswarm"
 
 	LabelAppOperatorVersion = "app-operator.giantswarm.io/version"
+	LabelBaseAppName        = "release-operator.giantswarm.io/base-app-name"
+	LabelParentRelease      = "release-operator.giantswarm.io/parent-release"
 	LabelManagedBy          = "giantswarm.io/managed-by"
 	LabelServiceType        = "giantswarm.io/service-type"
 
@@ -41,12 +42,13 @@ type ReleaseComponentWrapper struct {
 	Component releasev1alpha1.ReleaseSpecComponent
 }
 
-func AppReferenced(app applicationv1alpha1.App, components map[string]releasev1alpha1.ReleaseSpecComponent) bool {
-	component, ok := components[app.Name]
-	if ok && IsSameApp(component, app) {
-		return true
+func AppReferenced(app applicationv1alpha1.App, components []ReleaseComponentWrapper) bool {
+	wrapper, found := getItemByName(app.Name, components)
+	if found {
+		if IsSameApp(wrapper, app) {
+			return true
+		}
 	}
-
 	return false
 }
 
@@ -59,11 +61,23 @@ func ConfigReferenced(config corev1alpha1.Config, components map[string]releasev
 	return false
 }
 
-func BuildAppName(component releasev1alpha1.ReleaseSpecComponent) string {
+func BuildAppNameForComponent(component releasev1alpha1.ReleaseSpecComponent) string {
 	return fmt.Sprintf("%s-%s", component.Name, component.Version)
 }
 
-func xBuildAppName(component releasev1alpha1.ReleaseSpecComponent, release string) string {
+// func BuildAppNameForWrappedComponent(component ReleaseComponentWrapper) string {
+// 	return fmt.Sprintf("%s-%s", component.Component.Name, component.Component.Version)
+// }
+
+func BuildReleaseVersionedAppName(wrapper ReleaseComponentWrapper) string {
+	if wrapper.Component.DeployedOncePerRelease {
+		rel := fmt.Sprintf("rel%s", wrapper.Release)
+		return fmt.Sprintf("%s-%s-%s", wrapper.Component.Name, wrapper.Component.Version, rel)
+	}
+	return fmt.Sprintf("%s-%s", wrapper.Component.Name, wrapper.Component.Version)
+}
+
+func xxBuildAppName(component releasev1alpha1.ReleaseSpecComponent, release string) string {
 	if component.DeployedOncePerRelease {
 		rel := fmt.Sprintf("rel%s", release)
 		return fmt.Sprintf("%s-%s-%s", component.Name, component.Version, rel)
@@ -79,15 +93,15 @@ func BuildConfigMapName(name string) string {
 	return fmt.Sprintf("%s-values", name)
 }
 
-func BuildConfigMapNameForComponent(component releasev1alpha1.ReleaseSpecComponent, release string) string {
-	return BuildConfigMapName(fmt.Sprintf("%s-%s", BuildAppName(component), fmt.Sprintf("rel%s", release)))
+func BuildConfigMapNameForComponent(component ReleaseComponentWrapper, release string) string {
+	return BuildConfigMapName(fmt.Sprintf("%s-%s", BuildReleaseVersionedAppName(component), fmt.Sprintf("rel%s", release))) // TODO: BANFWC?
 }
 
-func ConstructApp(name string, component releasev1alpha1.ReleaseSpecComponent) applicationv1alpha1.App {
+func ConstructApp(wrapper ReleaseComponentWrapper) applicationv1alpha1.App {
 
 	app := applicationv1alpha1.App{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
+			Name:      BuildReleaseVersionedAppName(wrapper), // TODO BuildAppNameForWrappedComponent?
 			Namespace: Namespace,
 			Labels: map[string]string{
 				LabelAppOperatorVersion: "0.0.0",
@@ -95,21 +109,21 @@ func ConstructApp(name string, component releasev1alpha1.ReleaseSpecComponent) a
 			},
 		},
 		Spec: applicationv1alpha1.AppSpec{
-			Catalog: component.Catalog,
+			Catalog: wrapper.Component.Catalog,
 			KubeConfig: applicationv1alpha1.AppSpecKubeConfig{
 				InCluster: true,
 			},
-			Name:      component.Name,
+			Name:      wrapper.Component.Name,
 			Namespace: Namespace,
-			Version:   GetComponentRef(component),
+			Version:   GetComponentRef(wrapper.Component),
 		},
 	}
 
 	// Attach an optional ConfigMap to this App containing the release version
-	if component.DeployedOncePerRelease {
+	if wrapper.Component.DeployedOncePerRelease {
 		app.Spec.UserConfig = applicationv1alpha1.AppSpecUserConfig{
 			ConfigMap: applicationv1alpha1.AppSpecUserConfigConfigMap{
-				Name:      fmt.Sprintf("%s-values", name),
+				Name:      fmt.Sprintf("%s-values", BuildReleaseVersionedAppName(wrapper)), // TODO: BANFWC?
 				Namespace: Namespace,
 			},
 		}
@@ -134,6 +148,26 @@ func ConstructConfig(component releasev1alpha1.ReleaseSpecComponent) corev1alpha
 				Name:    component.Name,
 				Version: GetComponentRef(component),
 			},
+		},
+	}
+}
+
+func ConstructPerReleaseConfig(wrapper ReleaseComponentWrapper) corev1.ConfigMap {
+	return corev1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      BuildConfigMapName(BuildReleaseVersionedAppName(wrapper)),
+			Namespace: Namespace,
+			Labels: map[string]string{
+				apiexlabels.ConfigControllerVersion: "0.0.0",
+				LabelManagedBy:                      project.Name(),
+			},
+			Annotations: map[string]string{
+				LabelBaseAppName:   wrapper.AppName,
+				LabelParentRelease: wrapper.Release,
+			},
+		},
+		Data: map[string]string{
+			"values": fmt.Sprintf("releaseVersion: %s", wrapper.Release),
 		},
 	}
 }
@@ -164,7 +198,7 @@ func ExcludeUnusedDeprecatedReleases(releases releasev1alpha1.ReleaseList) relea
 
 func componentExistsForRelease(component releasev1alpha1.ReleaseSpecComponent, release string, components []ReleaseComponentWrapper) bool {
 	for _, component := range components {
-		if component.Release == release && component.AppName == BuildAppName(component.Component) {
+		if component.Release == release && component.AppName == BuildReleaseVersionedAppName(component) { // TODO: BANFWC?
 			return true
 		}
 	}
@@ -178,13 +212,8 @@ func NExtractComponents(releases releasev1alpha1.ReleaseList) []ReleaseComponent
 	for _, release := range releases.Items {
 		for _, component := range release.Spec.Components {
 			if !componentExistsForRelease(component, release.Name, components) {
-				c := ReleaseComponentWrapper{
-					AppName:   BuildAppName(component),
-					Release:   release.Name,
-					Component: component,
-				}
-
-				components = append(components, c)
+				w := WrapReleaseComponent(release.Name, component)
+				components = append(components, w)
 			}
 		}
 	}
@@ -192,19 +221,19 @@ func NExtractComponents(releases releasev1alpha1.ReleaseList) []ReleaseComponent
 }
 
 // ExtractComponents extracts the components that this operator is responsible for.
-func ExtractComponents(releases releasev1alpha1.ReleaseList) map[string]releasev1alpha1.ReleaseSpecComponent {
-	var components = make(map[string]releasev1alpha1.ReleaseSpecComponent)
+// func ExtractComponents(releases releasev1alpha1.ReleaseList) map[string]releasev1alpha1.ReleaseSpecComponent {
+// 	var components = make(map[string]releasev1alpha1.ReleaseSpecComponent)
 
-	for _, release := range releases.Items {
-		for _, component := range release.Spec.Components {
-			// if component.ReleaseOperatorDeploy && (components[xBuildAppName(component, release.Name)] == releasev1alpha1.ReleaseSpecComponent{}) {
-			if component.ReleaseOperatorDeploy && (reflect.DeepEqual(components[xBuildAppName(component, release.Name)], releasev1alpha1.ReleaseSpecComponent{})) {
-				components[xBuildAppName(component, release.Name)] = component
-			}
-		}
-	}
-	return components
-}
+// 	for _, release := range releases.Items {
+// 		for _, component := range release.Spec.Components {
+// 			// if component.ReleaseOperatorDeploy && (components[xBuildAppName(component, release.Name)] == releasev1alpha1.ReleaseSpecComponent{}) {
+// 			if component.ReleaseOperatorDeploy && (reflect.DeepEqual(components[xBuildAppName(component, release.Name)], releasev1alpha1.ReleaseSpecComponent{})) {
+// 				components[xBuildAppName(component, release.Name)] = component
+// 			}
+// 		}
+// 	}
+// 	return components
+// }
 
 // FilterComponents filters the components that this operator is responsible for.
 func FilterComponents(comps []releasev1alpha1.ReleaseSpecComponent) []releasev1alpha1.ReleaseSpecComponent {
@@ -253,10 +282,10 @@ func GetAppConfig(app applicationv1alpha1.App, configs corev1alpha1.ConfigList) 
 	return appConfig
 }
 
-func IsSameApp(component releasev1alpha1.ReleaseSpecComponent, app applicationv1alpha1.App) bool {
-	return BuildAppName(component) == app.Name &&
-		component.Catalog == app.Spec.Catalog &&
-		GetComponentRef(component) == app.Spec.Version
+func IsSameApp(wrapper ReleaseComponentWrapper, app applicationv1alpha1.App) bool {
+	return BuildReleaseVersionedAppName(wrapper) == app.Name &&
+		wrapper.Component.Catalog == app.Spec.Catalog &&
+		GetComponentRef(wrapper.Component) == app.Spec.Version
 }
 
 func IsSameConfig(component releasev1alpha1.ReleaseSpecComponent, config corev1alpha1.Config) bool {
@@ -280,7 +309,7 @@ func IsSamePerReleaseConfig(component releasev1alpha1.ReleaseSpecComponent, conf
 		configManagedByLabel == project.Name()
 }
 
-func ComponentAppCreated(component releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {
+func ComponentAppCreated(component ReleaseComponentWrapper, apps []applicationv1alpha1.App) bool {
 	for _, a := range apps {
 		if IsSameApp(component, a) {
 			return true
@@ -290,7 +319,7 @@ func ComponentAppCreated(component releasev1alpha1.ReleaseSpecComponent, apps []
 	return false
 }
 
-func ComponentAppDeployed(component releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {
+func ComponentAppDeployed(component ReleaseComponentWrapper, apps []applicationv1alpha1.App) bool {
 	for _, a := range apps {
 		if IsSameApp(component, a) && a.Status.Release.Status == AppStatusDeployed {
 			return true
@@ -312,7 +341,7 @@ func ComponentConfigCreated(component releasev1alpha1.ReleaseSpecComponent, conf
 
 func ComponentPerReleaseConfigExists(component releasev1alpha1.ReleaseSpecComponent, configs corev1.ConfigMapList) bool {
 	for _, c := range configs.Items {
-		if IsSameConfig(component, c) {
+		if IsSamePerReleaseConfig(component, c) {
 			return true
 		}
 	}
@@ -328,4 +357,24 @@ func ToReleaseCR(v interface{}) (*releasev1alpha1.Release, error) {
 	}
 
 	return x, nil
+}
+
+func WrapReleaseComponent(release string, component releasev1alpha1.ReleaseSpecComponent) ReleaseComponentWrapper {
+	w := ReleaseComponentWrapper{
+		AppName:   BuildAppNameForComponent(component),
+		Release:   release,
+		Component: component,
+	}
+	return w
+}
+
+// getItemByName returns the ReleaseComponentWrapper from the list with a matching app name,
+// and a boolean indicating whether the item was found.
+func getItemByName(name string, list []ReleaseComponentWrapper) (ReleaseComponentWrapper, bool) {
+	for _, item := range list {
+		if BuildReleaseVersionedAppName(item) == name {
+			return item, true
+		}
+	}
+	return ReleaseComponentWrapper{}, false
 }

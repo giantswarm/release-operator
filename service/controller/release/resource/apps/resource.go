@@ -67,23 +67,23 @@ func (r *Resource) ensureState(ctx context.Context) error {
 	}
 
 	// Method 1: new wrapper type for components
-	// var components []key.ReleaseComponentWrapper
-	// {
-	// 	components = key.NExtractComponents(releases)
-	// 	// name-version: <full component>
-	// 	// {
-	// 	//		release
-	// 	//		name-version
-	// 	//		component
-	// 	// }
-	// }
+	var components []key.ReleaseComponentWrapper
+	{
+		components = key.NExtractComponents(releases)
+		// name-version: <full component>
+		// {
+		//		release
+		//		name-version
+		//		component
+		// }
+	}
 	// Maybe change name in original logic instead?
 
 	// Method 2: change name creation behavior
-	var components map[string]releasev1alpha1.ReleaseSpecComponent
-	{
-		components = key.ExtractComponents(releases)
-	}
+	// var components map[string]releasev1alpha1.ReleaseSpecComponent
+	// {
+	// 	components = key.ExtractComponents(releases)
+	// }
 
 	var apps appv1alpha1.AppList
 	{
@@ -116,22 +116,6 @@ func (r *Resource) ensureState(ctx context.Context) error {
 			return microerror.Mask(err)
 		}
 	}
-
-	// var perReleaseConfigs
-	// {
-	// 	err := r.k8sClient.CtrlClient().List(
-	// 		ctx,
-	// 		&perReleaseConfigs,
-	// 		&client.ListOptions{
-	// 			LabelSelector: labels.SelectorFromSet(labels.Set{
-	// 				key.LabelManagedBy: project.Name(),
-	// 			}),
-	// 		},
-	// 	)
-	// 	if err != nil {
-	// 		return microerror.Mask(err)
-	// 	}
-	// }
 
 	appsToDelete := calculateObsoleteApps(components, apps)
 	for i, app := range appsToDelete.Items {
@@ -182,12 +166,12 @@ func (r *Resource) ensureState(ctx context.Context) error {
 	return nil
 }
 
-func calculateMissingApps(components map[string]releasev1alpha1.ReleaseSpecComponent, apps appv1alpha1.AppList) appv1alpha1.AppList {
+func calculateMissingApps(components []key.ReleaseComponentWrapper, apps appv1alpha1.AppList) appv1alpha1.AppList {
 	var missingApps appv1alpha1.AppList
 
-	for name, component := range components {
+	for _, component := range components {
 		if !key.ComponentAppCreated(component, apps.Items) {
-			missingApp := key.ConstructApp(name, component)
+			missingApp := key.ConstructApp(component)
 			missingApps.Items = append(missingApps.Items, missingApp)
 		}
 	}
@@ -195,7 +179,7 @@ func calculateMissingApps(components map[string]releasev1alpha1.ReleaseSpecCompo
 	return missingApps
 }
 
-func calculateObsoleteApps(components map[string]releasev1alpha1.ReleaseSpecComponent, apps appv1alpha1.AppList) appv1alpha1.AppList {
+func calculateObsoleteApps(components []key.ReleaseComponentWrapper, apps appv1alpha1.AppList) appv1alpha1.AppList {
 	var obsoleteApps appv1alpha1.AppList
 
 	for _, app := range apps.Items {
