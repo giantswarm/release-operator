@@ -129,10 +129,10 @@ func (r *Resource) ensureState(ctx context.Context) error {
 			continue
 		}
 
-		app.Spec.Config.ConfigMap.Name = appConfig.ConfigMapRef.Name
-		app.Spec.Config.ConfigMap.Namespace = appConfig.ConfigMapRef.Namespace
-		app.Spec.Config.Secret.Name = appConfig.SecretRef.Name
-		app.Spec.Config.Secret.Namespace = appConfig.SecretRef.Namespace
+		appsToCreate.Items[i].Spec.Config.ConfigMap.Name = appConfig.ConfigMapRef.Name
+		appsToCreate.Items[i].Spec.Config.ConfigMap.Namespace = appConfig.ConfigMapRef.Namespace
+		appsToCreate.Items[i].Spec.Config.Secret.Name = appConfig.SecretRef.Name
+		appsToCreate.Items[i].Spec.Config.Secret.Namespace = appConfig.SecretRef.Namespace
 
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating app %#q in namespace %#q", app.Name, app.Namespace))
 
