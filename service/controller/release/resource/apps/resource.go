@@ -121,7 +121,7 @@ func (r *Resource) ensureState(ctx context.Context) error {
 	}
 
 	appsToCreate := calculateMissingApps(components, apps)
-	for _, app := range appsToCreate.Items {
+	for i, app := range appsToCreate.Items {
 		appConfig := key.GetAppConfig(app, configs)
 		if appConfig.ConfigMapRef.Name == "" && appConfig.SecretRef.Name == "" {
 			// Skip this app
@@ -129,16 +129,16 @@ func (r *Resource) ensureState(ctx context.Context) error {
 			continue
 		}
 
-		app.Spec.Config.ConfigMap.Name = appConfig.ConfigMapRef.Name
-		app.Spec.Config.ConfigMap.Namespace = appConfig.ConfigMapRef.Namespace
-		app.Spec.Config.Secret.Name = appConfig.SecretRef.Name
-		app.Spec.Config.Secret.Namespace = appConfig.SecretRef.Namespace
+		appsToCreate.Items[i].Spec.Config.ConfigMap.Name = appConfig.ConfigMapRef.Name
+		appsToCreate.Items[i].Spec.Config.ConfigMap.Namespace = appConfig.ConfigMapRef.Namespace
+		appsToCreate.Items[i].Spec.Config.Secret.Name = appConfig.SecretRef.Name
+		appsToCreate.Items[i].Spec.Config.Secret.Namespace = appConfig.SecretRef.Namespace
 
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating app %#q in namespace %#q", app.Name, app.Namespace))
 
 		err := r.k8sClient.CtrlClient().Create(
 			ctx,
-			&app,
+			&appsToCreate.Items[i],
 		)
 		if apierrors.IsAlreadyExists(err) {
 			// fall through.
