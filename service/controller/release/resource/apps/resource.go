@@ -121,7 +121,7 @@ func (r *Resource) ensureState(ctx context.Context) error {
 	}
 
 	appsToCreate := calculateMissingApps(components, apps)
-	for i, app := range appsToCreate.Items {
+	for _, app := range appsToCreate.Items {
 		appConfig := key.GetAppConfig(app, configs)
 		if appConfig.ConfigMapRef.Name == "" && appConfig.SecretRef.Name == "" {
 			// Skip this app
@@ -138,7 +138,7 @@ func (r *Resource) ensureState(ctx context.Context) error {
 
 		err := r.k8sClient.CtrlClient().Create(
 			ctx,
-			&appsToCreate.Items[i],
+			&app,
 		)
 		if apierrors.IsAlreadyExists(err) {
 			// fall through.
