@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Update `operatorkit` to v5.0.0.
+- Update `k8sclient` to v5.11.0.
+
 ## [2.3.2] - 2021-05-26
 
 ### Fixed
@@ -38,7 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Change `inUse` status of KVM releases to `true` when any pods remain for that release to fix an issue with draining 
+- Change `inUse` status of KVM releases to `true` when any pods remain for that release to fix an issue with draining
   the last cluster of a deprecated release.
 
 ## [2.1.1] - 2020-10-12
