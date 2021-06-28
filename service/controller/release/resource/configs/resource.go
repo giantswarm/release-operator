@@ -89,7 +89,7 @@ func (r *Resource) ensureState(ctx context.Context) error {
 	r.logger.LogCtx(ctx, "level", "debug", "message", "Component list:")
 
 	for _, component := range components {
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("\t Component: %s reference: %s version: %s", component.Name,component.Reference, component.Version))
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("\t Component: %s reference: %s version: %s", component.Name, component.Reference, component.Version))
 	}
 
 	r.logger.LogCtx(ctx, "level", "debug", "message", "Config list:")
