@@ -86,6 +86,19 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		}
 	}
 
+
+	r.logger.LogCtx(ctx, "level", "debug", "message", "Component list:")
+	for i, conponent := range components.Items {
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("\t Component: %s", conponent.Name))
+	}
+
+	r.logger.LogCtx(ctx, "level", "debug", "message", "Config list:")
+
+	for i, config := range configs.Items {
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("config %#q in namespace %#q", config.Name, config.Namespace))
+	}
+
+
 	configsToDelete := calculateObsoleteConfigs(components, configs)
 	for i, config := range configsToDelete.Items {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting config %#q in namespace %#q", config.Name, config.Namespace))
