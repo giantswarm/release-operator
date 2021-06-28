@@ -131,11 +131,23 @@ func ExtractComponents(releases releasev1alpha1.ReleaseList) map[string]releasev
 	for _, release := range releases.Items {
 		for _, component := range release.Spec.Components {
 			if component.ReleaseOperatorDeploy && (components[BuildAppName(component)] == releasev1alpha1.ReleaseSpecComponent{}) {
+
+				if components[BuildAppName(component)].Name != "name" { //not the first time adding data
+
+					// If the component reference is different to a previously defined component. 
+					// Then the component is different. 
+					// This likely means that two releases have two diferent references set but same version of the component
+
+					if components[BuildAppName(component)].Reference != component.Reference {
+                      return nil, microerror.Maskf(invalidConfigError, "Component %s has a bad reference; likely caused by a bad release CR", BuildAppName(component))
+					}
+				}
+
 				components[BuildAppName(component)] = component
 			}
 		}
 	}
-	return components
+	return components, nil
 }
 
 // FilterComponents filters the components that this operator is responsible for.
