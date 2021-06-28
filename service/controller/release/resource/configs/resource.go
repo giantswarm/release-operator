@@ -89,13 +89,13 @@ func (r *Resource) ensureState(ctx context.Context) error {
 	r.logger.LogCtx(ctx, "level", "debug", "message", "Component list:")
 
 	for _, component := range components {
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("\t Component: %s", component.Name))
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("\t Component: %s reference: %#q version: %#q", component.Name,component.Reference, component.Version))
 	}
 
 	r.logger.LogCtx(ctx, "level", "debug", "message", "Config list:")
 
 	for _, config := range configs.Items {
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("config %#q in namespace %#q", config.Name, config.Namespace))
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("config %#q ", config.Name))
 	}
 
 	configsToDelete := calculateObsoleteConfigs(components, configs)
