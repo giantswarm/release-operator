@@ -132,6 +132,9 @@ func ExtractComponents(releases releasev1alpha1.ReleaseList) map[string]releasev
 		for _, component := range release.Spec.Components {
 			if component.ReleaseOperatorDeploy && (components[BuildAppName(component)] == releasev1alpha1.ReleaseSpecComponent{}) {
 				components[BuildAppName(component)] = component
+				fmt.PrintLn("Debug here:")
+				fmt.PrintLn(component.Name, component.Reference, component.Version)
+				fmt.PrintLn(components[BuildAppName(component)].Name, components[BuildAppName(component)].Reference, components[BuildAppName(component)].Version)
 			}
 		}
 	}
@@ -188,7 +191,7 @@ func GetAppConfig(app applicationv1alpha1.App, configs corev1alpha1.ConfigList) 
 func IsSameApp(component releasev1alpha1.ReleaseSpecComponent, app applicationv1alpha1.App) bool {
 	return BuildAppName(component) == app.Name &&
 		component.Catalog == app.Spec.Catalog &&
-		GetComponentRef(component) == app.Spec.Version
+		GetComponentRef(component) == app.Spec.Version //egraf: possibly wrong here because it gets it from ref maybe should just be from .Version
 }
 
 func IsSameConfig(component releasev1alpha1.ReleaseSpecComponent, config corev1alpha1.Config) bool {
