@@ -125,16 +125,15 @@ func ExcludeUnusedDeprecatedReleases(releases releasev1alpha1.ReleaseList) relea
 }
 
 // ExtractComponents extracts the components that this operator is responsible for.
-func ExtractComponents(releases releasev1alpha1.ReleaseList) map[string]releasev1alpha1.ReleaseSpecComponent {
+func ExtractComponents(releases releasev1alpha1.ReleaseList, r *Resource) map[string]releasev1alpha1.ReleaseSpecComponent {
 	var components = make(map[string]releasev1alpha1.ReleaseSpecComponent)
 
 	for _, release := range releases.Items {
 		for _, component := range release.Spec.Components {
 			if component.ReleaseOperatorDeploy && (components[BuildAppName(component)] == releasev1alpha1.ReleaseSpecComponent{}) {
 				components[BuildAppName(component)] = component
-				fmt.PrintLn("Debug here:")
-				fmt.PrintLn(component.Name, component.Reference, component.Version)
-				fmt.PrintLn(components[BuildAppName(component)].Name, components[BuildAppName(component)].Reference, components[BuildAppName(component)].Version)
+				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("Release Component %s %s %s:", component.Name, component.Reference, component.Version))
+				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("New array Component %s %s %s ", components[BuildAppName(component)].Name, components[BuildAppName(component)].Reference, components[BuildAppName(component)].Version))
 			}
 		}
 	}
