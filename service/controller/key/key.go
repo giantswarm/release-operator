@@ -135,11 +135,11 @@ func ExtractComponents(releases releasev1alpha1.ReleaseList) map[string]releasev
 				if components[BuildAppName(component)].Name != "name" { //not the first time adding data
 
 					// If the component reference is different to a previously defined component. 
-					// Then the component is different. 
+					// Then the component is different and could cause a component to be deployed 
 					// This likely means that two releases have two diferent references set but same version of the component
 
 					if components[BuildAppName(component)].Reference != component.Reference {
-                      return nil, microerror.Maskf(invalidConfigError, "Component %s has a bad reference; likely caused by a bad release CR", BuildAppName(component))
+                       return nil, microerror.Maskf(invalidConfigError, "Component %s has a bad reference; likely caused by a bad release CR", BuildAppName(component))
 					}
 				}
 
