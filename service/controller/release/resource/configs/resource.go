@@ -65,6 +65,13 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		releases = key.ExcludeUnusedDeprecatedReleases(releases)
 	}
 
+	for _, release := range releases.Items {
+		//r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("\t Release: %s reference: %s version: %s", component.Name, component.Reference, component.Version))
+		for _, component := range release.Spec.Components {
+			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("\t - Release Component: %s reference: %s version: %s", component.Name, component.Reference, component.Version))
+		}
+	}
+
 	var components map[string]releasev1alpha1.ReleaseSpecComponent
 	{
 		components = key.ExtractComponents(releases)
@@ -84,6 +91,18 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		if err != nil {
 			return microerror.Mask(err)
 		}
+	}
+
+	r.logger.LogCtx(ctx, "level", "debug", "message", "Component list:")
+
+	for _, component := range components {
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("\t Component: %s reference: %s version: %s", component.Name, component.Reference, component.Version))
+	}
+
+	r.logger.LogCtx(ctx, "level", "debug", "message", "Config list:")
+
+	for _, config := range configs.Items {
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("config %#q ", config.Name))
 	}
 
 	configsToDelete := calculateObsoleteConfigs(components, configs)

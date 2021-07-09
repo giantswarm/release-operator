@@ -125,13 +125,15 @@ func ExcludeUnusedDeprecatedReleases(releases releasev1alpha1.ReleaseList) relea
 }
 
 // ExtractComponents extracts the components that this operator is responsible for.
-func ExtractComponents(releases releasev1alpha1.ReleaseList) map[string]releasev1alpha1.ReleaseSpecComponent {
+func ExtractComponents(releases releasev1alpha1.ReleaseList, r *Resource) map[string]releasev1alpha1.ReleaseSpecComponent {
 	var components = make(map[string]releasev1alpha1.ReleaseSpecComponent)
 
 	for _, release := range releases.Items {
 		for _, component := range release.Spec.Components {
 			if component.ReleaseOperatorDeploy && (components[BuildAppName(component)] == releasev1alpha1.ReleaseSpecComponent{}) {
 				components[BuildAppName(component)] = component
+				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("Release Component %s %s %s:", component.Name, component.Reference, component.Version))
+				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("New array Component %s %s %s ", components[BuildAppName(component)].Name, components[BuildAppName(component)].Reference, components[BuildAppName(component)].Version))
 			}
 		}
 	}
@@ -188,7 +190,7 @@ func GetAppConfig(app applicationv1alpha1.App, configs corev1alpha1.ConfigList) 
 func IsSameApp(component releasev1alpha1.ReleaseSpecComponent, app applicationv1alpha1.App) bool {
 	return BuildAppName(component) == app.Name &&
 		component.Catalog == app.Spec.Catalog &&
-		GetComponentRef(component) == app.Spec.Version
+		GetComponentRef(component) == app.Spec.Version //egraf: possibly wrong here because it gets it from ref maybe should just be from .Version
 }
 
 func IsSameConfig(component releasev1alpha1.ReleaseSpecComponent, config corev1alpha1.Config) bool {
