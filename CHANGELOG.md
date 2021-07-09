@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Replace `jwt-go` with `golang-jwt/jwt`.
 - Update `operatorkit` to v5.0.0.
 - Update `k8sclient` to v5.11.0.
 
