@@ -29,11 +29,6 @@ const (
 	ValueServiceTypeManaged = "managed"
 )
 
-type Resource struct {
-	k8sClient k8sclient.Interface
-	logger    micrologger.Logger
-}
-
 const (
 	ProviderOperatorAWS   = "aws-operator"
 	ProviderOperatorAzure = "azure-operator"
