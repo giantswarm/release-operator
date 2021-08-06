@@ -4,16 +4,14 @@ import (
 	"context"
 	"fmt"
 
-
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
 	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
 	apiexlabels "github.com/giantswarm/apiextensions/v3/pkg/label"
-	"github.com/giantswarm/microerror"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
-	"github.com/giantswarm/micrologger"
-
+	"github.com/giantswarm/microerror"
+	"github.com/giantswarm/micrologger"	
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/release-operator/v2/pkg/project"
 )
