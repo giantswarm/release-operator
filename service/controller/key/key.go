@@ -134,7 +134,7 @@ func ExtractComponents(releases releasev1alpha1.ReleaseList, logger micrologger.
 		for _, component := range release.Spec.Components {
 			if component.ReleaseOperatorDeploy && (components[BuildAppName(component)] == releasev1alpha1.ReleaseSpecComponent{}) {
 				components[BuildAppName(component)] = component
-				logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("Release Component %s %s %s:", component.Name, component.Reference, component.Version))
+				logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("Release Component %s %s %s", component.Name, component.Reference, component.Version))
 				logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("New array Component %s %s %s ", components[BuildAppName(component)].Name, components[BuildAppName(component)].Reference, components[BuildAppName(component)].Version))
 			}
 		}

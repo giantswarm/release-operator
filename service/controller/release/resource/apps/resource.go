@@ -122,7 +122,11 @@ func (r *Resource) ensureState(ctx context.Context) error {
 
 	appsToCreate := calculateMissingApps(components, apps)
 	for i, app := range appsToCreate.Items {
-		appConfig := key.GetAppConfig(app, configs)
+		appConfig := key.GetAppConfig(app, configs)			
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("app.Name %s", app.Name))
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("appConfig.ConfigMapRef.Name %s", appConfig.ConfigMapRef.Name))
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("appConfig.SecretRef.Name %s", appConfig.SecretRef.Name))
+
 		if appConfig.ConfigMapRef.Name == "" && appConfig.SecretRef.Name == "" {
 			// Skip this app
 			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("skipping app %#q as its config is not ready", app.Name))
