@@ -584,17 +584,6 @@ func Test_ExtractComponents(t *testing.T) {
 		},
 	}
 
-	for i, tc := range testCases {
-		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			t.Log(tc.name)
-
-			resultcomponents := ExtractComponents(tc.releases)
-
-			if !cmp.Equal(resultcomponents, tc.expectedcomponents) {
-				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedcomponents, resultcomponents))
-			}
-		})
-	}
 }
 
 func Test_FilterComponents(t *testing.T) {
