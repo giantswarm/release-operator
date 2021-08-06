@@ -10,7 +10,7 @@ import (
 	apiexlabels "github.com/giantswarm/apiextensions/v3/pkg/label"
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/micrologger"	
+	"github.com/giantswarm/micrologger"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/release-operator/v2/pkg/project"
@@ -29,12 +29,10 @@ const (
 	ValueServiceTypeManaged = "managed"
 )
 
-
 type Resource struct {
 	k8sClient k8sclient.Interface
 	logger    micrologger.Logger
 }
-
 
 const (
 	ProviderOperatorAWS   = "aws-operator"
