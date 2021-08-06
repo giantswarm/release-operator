@@ -1,7 +1,9 @@
 package key
 
 import (
+	"context"
 	"fmt"
+
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
@@ -9,6 +11,9 @@ import (
 	apiexlabels "github.com/giantswarm/apiextensions/v3/pkg/label"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
+	"github.com/giantswarm/micrologger"
+
 
 	"github.com/giantswarm/release-operator/v2/pkg/project"
 )
@@ -25,6 +30,13 @@ const (
 
 	ValueServiceTypeManaged = "managed"
 )
+
+
+type Resource struct {
+	k8sClient k8sclient.Interface
+	logger    micrologger.Logger
+}
+
 
 const (
 	ProviderOperatorAWS   = "aws-operator"
@@ -125,15 +137,15 @@ func ExcludeUnusedDeprecatedReleases(releases releasev1alpha1.ReleaseList) relea
 }
 
 // ExtractComponents extracts the components that this operator is responsible for.
-func ExtractComponents(releases releasev1alpha1.ReleaseList, r *Resource) map[string]releasev1alpha1.ReleaseSpecComponent {
+func ExtractComponents(releases releasev1alpha1.ReleaseList, logger micrologger.Logger, ctx context.Context) map[string]releasev1alpha1.ReleaseSpecComponent {
 	var components = make(map[string]releasev1alpha1.ReleaseSpecComponent)
 
 	for _, release := range releases.Items {
 		for _, component := range release.Spec.Components {
 			if component.ReleaseOperatorDeploy && (components[BuildAppName(component)] == releasev1alpha1.ReleaseSpecComponent{}) {
 				components[BuildAppName(component)] = component
-				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("Release Component %s %s %s:", component.Name, component.Reference, component.Version))
-				r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("New array Component %s %s %s ", components[BuildAppName(component)].Name, components[BuildAppName(component)].Reference, components[BuildAppName(component)].Version))
+				logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("Release Component %s %s %s:", component.Name, component.Reference, component.Version))
+				logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("New array Component %s %s %s ", components[BuildAppName(component)].Name, components[BuildAppName(component)].Reference, components[BuildAppName(component)].Version))
 			}
 		}
 	}
