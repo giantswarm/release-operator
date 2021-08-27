@@ -202,7 +202,7 @@ func compareArgoApplications(a, b unstructured.Unstructured) bool {
 	if !ok || err {
 		return false
 	}
-	aName, ok, err := unstructured.NestedString(b, "metadata", "name")
+	bName, ok, err := unstructured.NestedString(b, "metadata", "name")
 	if !ok || err {
 		return false
 	}
