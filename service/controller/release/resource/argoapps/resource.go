@@ -181,23 +181,6 @@ func calculateObsoleteApps(componentApps map[string]unstructured.Unstructured, a
 	return obsoleteApps
 }
 
-// func (r *Resource) getApplication(ctx context.Context, name string) (argoapp.ApplicationConfig, error) {
-// 	var a argoapp.ApplicationConfig
-//
-// 	u := &unstructured.Unstructured{}
-// 	u.SetGroupVersionKind(argoAPISchema.WithKind(argoApplicationKind))
-// 	err := c.Get(ctx, client.ObjectKey{Namespace: argoCDNamespace, Name: name}, u)
-// 	if err == nil {
-// 		return a, microerror.Mask(err)
-// 	}
-// 	a, err = unstructuredToArgoApplicationConfig(u)
-// 	if err == nil {
-// 		return a, microerror.Mask(err)
-// 	}
-//
-// 	return a, nil
-// }
-
 func compareArgoApplications(a, b unstructured.Unstructured) bool {
 	aName, ok, err := unstructured.NestedString(a, "metadata", "name")
 	if !ok || err {
