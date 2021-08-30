@@ -17,6 +17,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/release-operator/v2/service/controller/key"
+	"github.com/giantswarm/release-operator/v2/service/controller/release/resource/argoapps/configversion"
 )
 
 const (
@@ -36,8 +37,9 @@ type Config struct {
 }
 
 type Resource struct {
-	k8sClient k8sclient.Interface
-	logger    micrologger.Logger
+	k8sClient            k8sclient.Interface
+	configVersionService *configversion.Service
+	logger               micrologger.Logger
 }
 
 func New(config Config) (*Resource, error) {
@@ -51,6 +53,17 @@ func New(config Config) (*Resource, error) {
 	r := &Resource{
 		k8sClient: config.K8sClient,
 		logger:    config.Logger,
+	}
+
+	{
+		c := configversion.Config{
+			K8sClient: config.K8sClient,
+		}
+		svc, err := configversion.New(c)
+		if err != nil {
+			return nil, microerror.Mask(err)
+		}
+		r.configVersionService = svc
 	}
 
 	return r, nil
@@ -223,18 +236,23 @@ func (r *Resource) listApplications(ctx context.Context) (u *unstructured.Unstru
 	return
 }
 
-func (r *Resource) componentToArgoApplication(ctx context.Context, component releasev1alpha1.ReleaseSpecComponent) (unstructured.Unstructured, error) {
+func (r *Resource) componentToArgoApplication(ctx context.Context, component releasev1alpha1.ReleaseSpecComponent) (app unstructured.Unstructured, err error) {
 	ac := argoapp.ApplicationConfig{
 		Name:                    key.BuildAppName(component),
 		AppName:                 component.Name,
 		AppVersion:              key.GetComponentRef(component),
 		AppCatalog:              component.Catalog,
 		AppDestinationNamespace: key.Namespace,
-		// TODO(kuba): check catalog for version
-		ConfigRef: "does-not-matter",
+		ConfigRef:               "FIXME",
 	}
 
-	app, err := argoapp.NewApplication(ac)
+	configVersion, err := r.configVersionService.Get(ctx, ac)
+	if err != nil {
+		return app, microerror.Mask(err)
+	}
+	ac.ConfigRef = configVersion
+
+	app, err = argoapp.NewApplication(ac)
 	if err != nil {
 		return app, microerror.Mask(err)
 	}
