@@ -27,7 +27,7 @@ func NewResourceSet(config ResourceSetConfig) ([]resource.Interface, error) {
 			Logger:    config.Logger,
 		}
 
-		argoappsResource, err = argoapps.New(c)
+		argoAppsResource, err = argoapps.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -48,7 +48,7 @@ func NewResourceSet(config ResourceSetConfig) ([]resource.Interface, error) {
 
 	resources := []resource.Interface{
 		statusResource,
-		argoappsResource,
+		argoAppsResource,
 	}
 
 	{
