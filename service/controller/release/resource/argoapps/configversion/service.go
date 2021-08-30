@@ -41,7 +41,7 @@ func New(config Config) (*Service, error) {
 // It returns error matched by IsNotFound if the app version does not have
 // "config.giantswarm.io/version" annotation in the catalog.
 func (s *Service) Get(ctx context.Context, ac argoapp.ApplicationConfig) (string, error) {
-	if app.Catalog == "releases" {
+	if ac.AppCatalog == "releases" {
 		return "", microerror.Maskf(executionFailedError, "catalog %#q is not supported", ac.AppCatalog)
 	}
 
