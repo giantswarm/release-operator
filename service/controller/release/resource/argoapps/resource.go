@@ -30,7 +30,6 @@ var (
 		Group:   "argoproj.io",
 		Version: "v1alpha1",
 	}
-	argoApplicationKind     = "Application"
 	argoApplicationListKind = "ApplicationList"
 	argoCDNamespace         = "argocd"
 )
@@ -96,7 +95,7 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		components = key.ExtractComponents(releases)
 	}
 
-	var componentApps map[string]unstructured.Unstructured
+	componentApps := map[string]unstructured.Unstructured{}
 	{
 		for name, component := range components {
 			argoApp, err := r.componentToArgoApplication(ctx, component)
