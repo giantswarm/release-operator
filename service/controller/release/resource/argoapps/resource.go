@@ -79,16 +79,27 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		components = key.ExtractComponents(releases)
 	}
 
-	var apps []unstructured.Unstructured
+	var componentApps map[string]unstructured.Unstructured
 	{
-		list, err := r.listApplications(ctx, "*")
+		for name, component := range components {
+			argoApp, err := r.componentToArgoApplication(ctx, component)
+			if err != nil {
+				return microerror.Mask(err)
+			}
+			componentApps[name] = argoApp
+		}
+	}
+
+	var apps unstructured.UnstructuredList
+	{
+		list, err := r.listApplications(ctx)
 		if err != nil {
 			return microerror.Mask(err)
 		}
-		apps = list.Items
+		apps.Items = list.Items
 	}
 
-	appsToDelete := calculateObsoleteApps(components, apps)
+	appsToDelete := calculateObsoleteApps(componentApps, apps)
 	for i, app := range appsToDelete.Items {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting app %#q in namespace %#q", app.Name, app.Namespace))
 
@@ -105,7 +116,7 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleted app %#q in namespace %#q", app.Name, app.Namespace))
 	}
 
-	appsToCreate := calculateMissingApps(components, apps)
+	appsToCreate := calculateMissingApps(componentApps, apps)
 	for i, app := range appsToCreate.Items {
 		appConfig := key.GetAppConfig(app, configs)
 		if appConfig.ConfigMapRef.Name == "" && appConfig.SecretRef.Name == "" {
@@ -137,65 +148,55 @@ func (r *Resource) ensureState(ctx context.Context) error {
 	return nil
 }
 
-func calculateMissingApps(components map[string]releasev1alpha1.ReleaseSpecComponent, apps unstructured.UnstructuredList) unstructured.UnstructuredList {
+func calculateMissingApps(componentApps map[string]unstructured.Unstructured, apps unstructured.UnstructuredList) unstructured.UnstructuredList {
 	var missingApps unstructured.UnstructuredList
 
-	for _, component := range components {
-		// TODO(kuba): move code to key.ComponentAppCreated
-		// if !key.ComponentAppCreated(component, apps.Items) {
-		ac := argoapp.ApplicationConfig{
-			Name:       key.BuildAppName(component),
-			AppName:    component.Name,
-			AppVersion: key.GetComponentRef(component),
-			AppCatalog: component.Catalog,
-			// TODO(kuba): Where does release-operator get this now? Do we copy
-			// code that calls to github from config-controller? Do we need
-			// those 2 values to compare apps at all?
-			AppDestinationNamespace: "???",
-			ConfigRef:               "???",
-		}
-		// NOTE(kuba): Comparing unstructured argo apps is a bit of a hassle.
-		// Also release-operator would need access to catalog index. Is there
-		// any way we can make this easier?
-
-		// TODO(kuba): handle this err
-		missingApp, _ := argoapp.NewApplication(ac)
+	for _, component := range componentApps {
 		for _, app := range apps.Items {
-			if !compareArgoApplications(missingApp, app) {
-				missingApps.Items = append(missingApps.Items, missingApp)
+			if !compareArgoApplications(componentApp, app) {
+				missingApps.Items = append(missingApps.Items, componentApp)
 			}
 		}
 	}
+
+	return missingApps
 }
 
-func calculateObsoleteApps(components map[string]releasev1alpha1.ReleaseSpecComponent, apps appv1alpha1.AppList) appv1alpha1.AppList {
-	var obsoleteApps appv1alpha1.AppList
+func calculateObsoleteApps(componentApps map[string]unstructured.Unstructured, apps unstructured.UnstructuredList) unstructured.UnstructuredList {
+	var obsoleteApps unstructured.UnstructuredList
 
 	for _, app := range apps.Items {
-		if !key.AppReferenced(app, components) {
-			obsoleteApps.Items = append(obsoleteApps.Items, app)
+		obsoleteApp := true
+		for _, componentApp := range componentApps {
+			if compareArgoApplications(componentApp, app) {
+				obsoleteApp = false
+				break
+			}
+		}
+		if obsoleteApp {
+			obsoleteApps = append(obsoleteApps.Items, app)
 		}
 	}
 
 	return obsoleteApps
 }
 
-func (r *Resource) getApplication(ctx context.Context, name string) (argoapp.ApplicationConfig, error) {
-	var a argoapp.ApplicationConfig
-
-	u := &unstructured.Unstructured{}
-	u.SetGroupVersionKind(argoAPISchema.WithKind(argoApplicationKind))
-	err := c.Get(ctx, client.ObjectKey{Namespace: argoCDNamespace, Name: name}, u)
-	if err == nil {
-		return a, microerror.Mask(err)
-	}
-	a, err = unstructuredToArgoApplicationConfig(u)
-	if err == nil {
-		return a, microerror.Mask(err)
-	}
-
-	return a, nil
-}
+// func (r *Resource) getApplication(ctx context.Context, name string) (argoapp.ApplicationConfig, error) {
+// 	var a argoapp.ApplicationConfig
+//
+// 	u := &unstructured.Unstructured{}
+// 	u.SetGroupVersionKind(argoAPISchema.WithKind(argoApplicationKind))
+// 	err := c.Get(ctx, client.ObjectKey{Namespace: argoCDNamespace, Name: name}, u)
+// 	if err == nil {
+// 		return a, microerror.Mask(err)
+// 	}
+// 	a, err = unstructuredToArgoApplicationConfig(u)
+// 	if err == nil {
+// 		return a, microerror.Mask(err)
+// 	}
+//
+// 	return a, nil
+// }
 
 func compareArgoApplications(a, b unstructured.Unstructured) bool {
 	aName, ok, err := unstructured.NestedString(a, "metadata", "name")
@@ -211,11 +212,12 @@ func compareArgoApplications(a, b unstructured.Unstructured) bool {
 		return false
 	}
 
-	aSpec, ok, err := unstructured.NestedMap(a, "spec")
+	// .spec.source.plugin contains information about app name, version, and catalog.
+	aSpec, ok, err := unstructured.NestedMap(a, "spec", "source", "plugin")
 	if !ok || err {
 		return false
 	}
-	bSpec, ok, err := unstructured.NestedMap(b, "spec")
+	bSpec, ok, err := unstructured.NestedMap(b, "spec", "source", "plugin")
 	if !ok || err {
 		return false
 	}
@@ -224,56 +226,34 @@ func compareArgoApplications(a, b unstructured.Unstructured) bool {
 
 }
 
-// func unstructuredToArgoApplicationConfig(u unstructured.Unstructured) (ac argoapp.ApplicationConfig, err error) {
-// 	var ok bool
-//
-// 	ac.Name, ok, err = unstructured.NestedString(u, "metadata", "name")
-// 	if err != nil {
-// 		return ac, microerror.Mask(err)
-// 	} else if !ok {
-// 		return microerror.Maskf(executionFailedError, "unstructured key missing")
-// 	}
-//
-// 	env, ok, err := unstructured.NestedSlice(u, "spec", "source", "plugin", "env")
-// 	if err != nil {
-// 		return ac, microerror.Mask(err)
-// 	} else if !ok {
-// 		return microerror.Maskf(executionFailedError, "unstructured key missing")
-// 	}
-//
-// 	for _, envItem := range env {
-// 		m, ok := envItem.(map[string]string)
-// 		if !ok {
-// 			return microerror.Maskf(executionFailedError, "could not cast to map[string]string: %q", envItem)
-// 		}
-//
-// 		name, nameOk := m["name"]
-// 		value, valueOk := m["value"]
-// 		if !nameOk || !valueOk {
-// 			return microerror.Maskf(executionFailedError, "could extract name/value: %q", m)
-// 		}
-//
-// 		switch name {
-// 		case "KONFIGURE_APP_NAME":
-// 			ac.AppName = value
-// 		case "KONFIGURE_APP_VERSION":
-// 			ac.AppVersion = value
-// 		}
-//
-// 	}
-//
-// }
+func (r *Resource) listApplications(ctx context.Context) (u *unstructured.UnstructuredList, err error) {
+	u = &unstructured.UnstructuredList{}
+	u.SetGroupVersionKind(argoAPISchema.WithKind(argoApplicationListKind))
+	err = r.k8sClient.CtrlClient().List(ctx, u,
+		&client.ListOptions{
+			Namespace: argoCDNamespace,
+			LabelSelector: labels.SelectorFromSet(labels.Set{
+				key.LabelManagedBy: project.Name(),
+			}),
+		},
+	)
+	return
+}
 
-// func (r *Resource) listApplications(ctx context.Context) (u *unstructured.UnstructuredList, err error) {
-// 	u = &unstructured.UnstructuredList{}
-// 	u.SetGroupVersionKind(argoAPISchema.WithKind(argoApplicationListKind))
-// 	err = r.k8sClient.CtrlClient().List(ctx, u,
-// 		&client.ListOptions{
-// 			Namespace: argoCDNamespace,
-// 			LabelSelector: labels.SelectorFromSet(labels.Set{
-// 				key.LabelManagedBy: project.Name(),
-// 			}),
-// 		},
-// 	)
-// 	return
-// }
+func (r *Resource) componentToArgoApplication(ctx context.Context, component releasev1alpha1.ReleaseSpecComponent) (unstructured.Unstructured, error) {
+	ac := argoapp.ApplicationConfig{
+		Name:                    key.BuildAppName(component),
+		AppName:                 component.Name,
+		AppVersion:              key.GetComponentRef(component),
+		AppCatalog:              component.Catalog,
+		AppDestinationNamespace: key.Namespace,
+		// TODO(kuba): check catalog for version
+		ConfigRef: "does-not-matter",
+	}
+
+	app, err := argoapp.NewApplication(ac)
+	if err != nil {
+		return app, microerror.Mask(err)
+	}
+	return app, nil
+}
