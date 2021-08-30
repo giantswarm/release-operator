@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"reflect"
 
-	appv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/argoapp/pkg/argoapp"
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
@@ -13,9 +12,11 @@ import (
 	"github.com/giantswarm/micrologger"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/giantswarm/release-operator/v2/pkg/project"
 	"github.com/giantswarm/release-operator/v2/service/controller/key"
 	"github.com/giantswarm/release-operator/v2/service/controller/release/resource/argoapps/configversion"
 )
@@ -25,10 +26,13 @@ const (
 )
 
 var (
-	argoAPISchema       = schema.GroupVersion{"argoproj.io", "v1alpha1"}
-	argoApplicationKind = "Application"
-	argoApplicationList = "ApplicationList"
-	argoCDNamespace     = "argocd"
+	argoAPISchema = schema.GroupVersion{
+		Group:   "argoproj.io",
+		Version: "v1alpha1",
+	}
+	argoApplicationKind     = "Application"
+	argoApplicationListKind = "ApplicationList"
+	argoCDNamespace         = "argocd"
 )
 
 type Config struct {
@@ -99,7 +103,7 @@ func (r *Resource) ensureState(ctx context.Context) error {
 			if err != nil {
 				return microerror.Mask(err)
 			}
-			componentApps[name] = argoApp
+			componentApps[name] = *argoApp
 		}
 	}
 
@@ -114,7 +118,7 @@ func (r *Resource) ensureState(ctx context.Context) error {
 
 	appsToDelete := calculateObsoleteApps(componentApps, apps)
 	for i, app := range appsToDelete.Items {
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting app %#q in namespace %#q", app.Name, app.Namespace))
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleting app %#q in namespace %#q", app.GetName(), app.GetNamespace()))
 
 		err := r.k8sClient.CtrlClient().Delete(
 			ctx,
@@ -126,24 +130,12 @@ func (r *Resource) ensureState(ctx context.Context) error {
 			return microerror.Mask(err)
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleted app %#q in namespace %#q", app.Name, app.Namespace))
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("deleted app %#q in namespace %#q", app.GetName(), app.GetNamespace()))
 	}
 
 	appsToCreate := calculateMissingApps(componentApps, apps)
 	for i, app := range appsToCreate.Items {
-		appConfig := key.GetAppConfig(app, configs)
-		if appConfig.ConfigMapRef.Name == "" && appConfig.SecretRef.Name == "" {
-			// Skip this app
-			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("skipping app %#q as its config is not ready", app.Name))
-			continue
-		}
-
-		appsToCreate.Items[i].Spec.Config.ConfigMap.Name = appConfig.ConfigMapRef.Name
-		appsToCreate.Items[i].Spec.Config.ConfigMap.Namespace = appConfig.ConfigMapRef.Namespace
-		appsToCreate.Items[i].Spec.Config.Secret.Name = appConfig.SecretRef.Name
-		appsToCreate.Items[i].Spec.Config.Secret.Namespace = appConfig.SecretRef.Namespace
-
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating app %#q in namespace %#q", app.Name, app.Namespace))
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("creating app %#q in namespace %#q", app.GetName(), app.GetNamespace()))
 
 		err := r.k8sClient.CtrlClient().Create(
 			ctx,
@@ -155,7 +147,7 @@ func (r *Resource) ensureState(ctx context.Context) error {
 			return microerror.Mask(err)
 		}
 
-		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("created app %#q in namespace %#q", app.Name, app.Namespace))
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("created app %#q in namespace %#q", app.GetName(), app.GetNamespace()))
 	}
 
 	return nil
@@ -164,7 +156,7 @@ func (r *Resource) ensureState(ctx context.Context) error {
 func calculateMissingApps(componentApps map[string]unstructured.Unstructured, apps unstructured.UnstructuredList) unstructured.UnstructuredList {
 	var missingApps unstructured.UnstructuredList
 
-	for _, component := range componentApps {
+	for _, componentApp := range componentApps {
 		for _, app := range apps.Items {
 			if !compareArgoApplications(componentApp, app) {
 				missingApps.Items = append(missingApps.Items, componentApp)
@@ -187,7 +179,7 @@ func calculateObsoleteApps(componentApps map[string]unstructured.Unstructured, a
 			}
 		}
 		if obsoleteApp {
-			obsoleteApps = append(obsoleteApps.Items, app)
+			obsoleteApps.Items = append(obsoleteApps.Items, app)
 		}
 	}
 
@@ -195,26 +187,21 @@ func calculateObsoleteApps(componentApps map[string]unstructured.Unstructured, a
 }
 
 func compareArgoApplications(a, b unstructured.Unstructured) bool {
-	aName, ok, err := unstructured.NestedString(a, "metadata", "name")
-	if !ok || err {
-		return false
-	}
-	bName, ok, err := unstructured.NestedString(b, "metadata", "name")
-	if !ok || err {
-		return false
-	}
-
-	if aName != bName {
+	match := true
+	match = match && a.GetAPIVersion() == b.GetAPIVersion()
+	match = match && a.GetKind() == b.GetKind()
+	match = match && a.GetName() == b.GetName()
+	if !match {
 		return false
 	}
 
 	// .spec.source.plugin contains information about app name, version, and catalog.
-	aSpec, ok, err := unstructured.NestedMap(a, "spec", "source", "plugin")
-	if !ok || err {
+	aSpec, ok, err := unstructured.NestedMap(a.UnstructuredContent(), "spec", "source", "plugin")
+	if !ok || err != nil {
 		return false
 	}
-	bSpec, ok, err := unstructured.NestedMap(b, "spec", "source", "plugin")
-	if !ok || err {
+	bSpec, ok, err := unstructured.NestedMap(b.UnstructuredContent(), "spec", "source", "plugin")
+	if !ok || err != nil {
 		return false
 	}
 
@@ -236,7 +223,7 @@ func (r *Resource) listApplications(ctx context.Context) (u *unstructured.Unstru
 	return
 }
 
-func (r *Resource) componentToArgoApplication(ctx context.Context, component releasev1alpha1.ReleaseSpecComponent) (app unstructured.Unstructured, err error) {
+func (r *Resource) componentToArgoApplication(ctx context.Context, component releasev1alpha1.ReleaseSpecComponent) (app *unstructured.Unstructured, err error) {
 	ac := argoapp.ApplicationConfig{
 		Name:                    key.BuildAppName(component),
 		AppName:                 component.Name,

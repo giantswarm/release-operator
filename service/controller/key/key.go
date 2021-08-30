@@ -160,6 +160,7 @@ func GetProviderOperators() []string {
 	return []string{ProviderOperatorAWS, ProviderOperatorAzure, ProviderOperatorKVM}
 }
 
+//TODO(kuba): check if used; remove if not
 func GetAppConfig(app applicationv1alpha1.App, configs corev1alpha1.ConfigList) (
 	appConfig corev1alpha1.ConfigStatusConfig) {
 
