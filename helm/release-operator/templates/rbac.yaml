@@ -60,11 +60,24 @@ rules:
       - patch
       - update
   - apiGroups:
+      - argoproj.io
+    resources:
+      - applications
+    verbs:
+      - "*"
+  - apiGroups:
       - application.giantswarm.io
     resources:
       - apps
     verbs:
       - "*"
+  - apiGroups:
+      - application.giantswarm.io
+    resources:
+      - appcatalogs
+    verbs:
+      - get
+      - list
   - apiGroups:
       - core.giantswarm.io
     resources:
