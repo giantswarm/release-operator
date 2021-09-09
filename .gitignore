@@ -3,4 +3,5 @@
 
 # build result
 /release-operator
+/release-operator-*
 !helm/release-operator
