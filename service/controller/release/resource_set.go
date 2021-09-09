@@ -8,8 +8,7 @@ import (
 	"github.com/giantswarm/operatorkit/v5/pkg/resource/wrapper/metricsresource"
 	"github.com/giantswarm/operatorkit/v5/pkg/resource/wrapper/retryresource"
 
-	"github.com/giantswarm/release-operator/v2/service/controller/release/resource/apps"
-	"github.com/giantswarm/release-operator/v2/service/controller/release/resource/configs"
+	"github.com/giantswarm/release-operator/v2/service/controller/release/resource/argoapps"
 	"github.com/giantswarm/release-operator/v2/service/controller/release/resource/status"
 )
 
@@ -21,27 +20,14 @@ type ResourceSetConfig struct {
 func NewResourceSet(config ResourceSetConfig) ([]resource.Interface, error) {
 	var err error
 
-	var appsResource resource.Interface
+	var argoAppsResource resource.Interface
 	{
-		c := apps.Config{
+		c := argoapps.Config{
 			K8sClient: config.K8sClient,
 			Logger:    config.Logger,
 		}
 
-		appsResource, err = apps.New(c)
-		if err != nil {
-			return nil, microerror.Mask(err)
-		}
-	}
-
-	var configsResource resource.Interface
-	{
-		c := configs.Config{
-			K8sClient: config.K8sClient,
-			Logger:    config.Logger,
-		}
-
-		configsResource, err = configs.New(c)
+		argoAppsResource, err = argoapps.New(c)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
@@ -62,8 +48,7 @@ func NewResourceSet(config ResourceSetConfig) ([]resource.Interface, error) {
 
 	resources := []resource.Interface{
 		statusResource,
-		configsResource,
-		appsResource,
+		argoAppsResource,
 	}
 
 	{

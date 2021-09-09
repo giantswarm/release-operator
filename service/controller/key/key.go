@@ -4,9 +4,7 @@ import (
 	"fmt"
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
-	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
-	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
-	apiexlabels "github.com/giantswarm/apiextensions/v3/pkg/label"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -41,15 +39,6 @@ func AppReferenced(app applicationv1alpha1.App, components map[string]releasev1a
 	return false
 }
 
-func ConfigReferenced(config corev1alpha1.Config, components map[string]releasev1alpha1.ReleaseSpecComponent) bool {
-	component, ok := components[config.Name]
-	if ok && IsSameConfig(component, config) {
-		return true
-	}
-
-	return false
-}
-
 func BuildAppName(component releasev1alpha1.ReleaseSpecComponent) string {
 	return fmt.Sprintf("%s-%s", component.Name, component.Version)
 }
@@ -76,26 +65,6 @@ func ConstructApp(component releasev1alpha1.ReleaseSpecComponent) applicationv1a
 			Name:      component.Name,
 			Namespace: Namespace,
 			Version:   GetComponentRef(component),
-		},
-	}
-}
-
-func ConstructConfig(component releasev1alpha1.ReleaseSpecComponent) corev1alpha1.Config {
-	return corev1alpha1.Config{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      BuildConfigName(component),
-			Namespace: Namespace,
-			Labels: map[string]string{
-				apiexlabels.ConfigControllerVersion: "0.0.0",
-				LabelManagedBy:                      project.Name(),
-			},
-		},
-		Spec: corev1alpha1.ConfigSpec{
-			App: corev1alpha1.ConfigSpecApp{
-				Catalog: component.Catalog,
-				Name:    component.Name,
-				Version: GetComponentRef(component),
-			},
 		},
 	}
 }
@@ -160,44 +129,10 @@ func GetProviderOperators() []string {
 	return []string{ProviderOperatorAWS, ProviderOperatorAzure, ProviderOperatorKVM}
 }
 
-func GetAppConfig(app applicationv1alpha1.App, configs corev1alpha1.ConfigList) (
-	appConfig corev1alpha1.ConfigStatusConfig) {
-
-	for _, config := range configs.Items {
-		configManagedByLabel, configIsManagedByReleaseOperator := config.Labels[LabelManagedBy]
-
-		matches := true
-		matches = matches && app.Name == config.Name
-		matches = matches && app.Spec.Name == config.Status.App.Name
-		matches = matches && app.Spec.Version == config.Status.App.Version
-		matches = matches && app.Spec.Catalog == config.Status.App.Catalog
-		matches = matches && configIsManagedByReleaseOperator
-		matches = matches && configManagedByLabel == project.Name()
-
-		if matches {
-
-			appConfig.ConfigMapRef = config.Status.Config.ConfigMapRef
-			appConfig.SecretRef = config.Status.Config.SecretRef
-			break
-		}
-	}
-
-	return appConfig
-}
-
 func IsSameApp(component releasev1alpha1.ReleaseSpecComponent, app applicationv1alpha1.App) bool {
 	return BuildAppName(component) == app.Name &&
 		component.Catalog == app.Spec.Catalog &&
 		GetComponentRef(component) == app.Spec.Version
-}
-
-func IsSameConfig(component releasev1alpha1.ReleaseSpecComponent, config corev1alpha1.Config) bool {
-	configManagedByLabel, configIsManagedByReleaseOperator := config.Labels[LabelManagedBy]
-	return component.Name == config.Spec.App.Name &&
-		component.Catalog == config.Spec.App.Catalog &&
-		GetComponentRef(component) == config.Spec.App.Version &&
-		configIsManagedByReleaseOperator &&
-		configManagedByLabel == project.Name()
 }
 
 func ComponentAppCreated(component releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {
@@ -213,16 +148,6 @@ func ComponentAppCreated(component releasev1alpha1.ReleaseSpecComponent, apps []
 func ComponentAppDeployed(component releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {
 	for _, a := range apps {
 		if IsSameApp(component, a) && a.Status.Release.Status == AppStatusDeployed {
-			return true
-		}
-	}
-
-	return false
-}
-
-func ComponentConfigCreated(component releasev1alpha1.ReleaseSpecComponent, configs []corev1alpha1.Config) bool {
-	for _, c := range configs {
-		if IsSameConfig(component, c) {
 			return true
 		}
 	}

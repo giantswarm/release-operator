@@ -7,8 +7,8 @@ import (
 
 	appv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
 	infrastructurev1alpha2 "github.com/giantswarm/apiextensions/v2/pkg/apis/infrastructure/v1alpha2"
-	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
 	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
+	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
 	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
 	"github.com/giantswarm/k8sclient/v5/pkg/k8srestconfig"
 	"github.com/giantswarm/microendpoint/service/version"
@@ -18,6 +18,8 @@ import (
 	"k8s.io/client-go/rest"
 	capiv1alpha2 "sigs.k8s.io/cluster-api/api/v1alpha2"
 	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
+
+	argoappv1alpha1 "github.com/giantswarm/argoapp/pkg/apis/application/v1alpha1"
 
 	"github.com/giantswarm/release-operator/v2/flag"
 	"github.com/giantswarm/release-operator/v2/pkg/project"
@@ -84,6 +86,7 @@ func New(config Config) (*Service, error) {
 		c := k8sclient.ClientsConfig{
 			SchemeBuilder: k8sclient.SchemeBuilder{
 				appv1alpha1.AddToScheme,
+				argoappv1alpha1.AddToScheme,
 				corev1alpha1.AddToScheme,
 				infrastructurev1alpha2.AddToScheme,
 				releasev1alpha1.AddToScheme,
