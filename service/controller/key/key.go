@@ -5,10 +5,9 @@ import (
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
+	argoappv1alpha1 "github.com/giantswarm/argoapp/pkg/apis/application/v1alpha1"
+	"github.com/giantswarm/argoapp/pkg/argoapp"
 	"github.com/giantswarm/microerror"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	"github.com/giantswarm/release-operator/v2/pkg/project"
 )
 
 const (
@@ -30,43 +29,31 @@ const (
 	ProviderOperatorKVM   = "kvm-operator"
 )
 
-func AppReferenced(app applicationv1alpha1.App, components map[string]releasev1alpha1.ReleaseSpecComponent) bool {
-	component, ok := components[app.Name]
-	if ok && IsSameApp(component, app) {
-		return true
-	}
-
-	return false
-}
-
 func BuildAppName(component releasev1alpha1.ReleaseSpecComponent) string {
 	return fmt.Sprintf("%s-%s", component.Name, component.Version)
 }
 
-func BuildConfigName(component releasev1alpha1.ReleaseSpecComponent) string {
-	return fmt.Sprintf("%s-%s", component.Name, component.Version)
-}
-
-func ConstructApp(component releasev1alpha1.ReleaseSpecComponent) applicationv1alpha1.App {
-	return applicationv1alpha1.App{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      BuildAppName(component),
-			Namespace: Namespace,
-			Labels: map[string]string{
-				LabelAppOperatorVersion: "0.0.0",
-				LabelManagedBy:          project.Name(),
-			},
-		},
-		Spec: applicationv1alpha1.AppSpec{
-			Catalog: component.Catalog,
-			KubeConfig: applicationv1alpha1.AppSpecKubeConfig{
-				InCluster: true,
-			},
-			Name:      component.Name,
-			Namespace: Namespace,
-			Version:   GetComponentRef(component),
-		},
+func ComponentToArgoApplication(component releasev1alpha1.ReleaseSpecComponent) (app *argoappv1alpha1.Application, err error) {
+	configRef := "main"
+	if component.ConfigReference != "" {
+		configRef = component.ConfigReference
 	}
+
+	ac := argoapp.ApplicationConfig{
+		Name:                    BuildAppName(component),
+		AppName:                 component.Name,
+		AppVersion:              GetComponentRef(component),
+		AppCatalog:              component.Catalog,
+		AppDestinationNamespace: Namespace,
+		ConfigRef:               configRef,
+	}
+
+	app, err = argoapp.NewApplication(ac)
+	if err != nil {
+		return app, microerror.Mask(err)
+	}
+
+	return app, nil
 }
 
 func ExcludeDeletedRelease(releases releasev1alpha1.ReleaseList) releasev1alpha1.ReleaseList {
@@ -94,17 +81,21 @@ func ExcludeUnusedDeprecatedReleases(releases releasev1alpha1.ReleaseList) relea
 }
 
 // ExtractComponents extracts the components that this operator is responsible for.
-func ExtractComponents(releases releasev1alpha1.ReleaseList) map[string]releasev1alpha1.ReleaseSpecComponent {
-	var components = make(map[string]releasev1alpha1.ReleaseSpecComponent)
+func ExtractComponents(releases releasev1alpha1.ReleaseList) []releasev1alpha1.ReleaseSpecComponent {
+	var componentDedupe = map[string]bool{}
+	var componentSlice = []releasev1alpha1.ReleaseSpecComponent{}
 
 	for _, release := range releases.Items {
 		for _, component := range release.Spec.Components {
-			if component.ReleaseOperatorDeploy && (components[BuildAppName(component)] == releasev1alpha1.ReleaseSpecComponent{}) {
-				components[BuildAppName(component)] = component
+			_, ok := componentDedupe[BuildAppName(component)]
+			if component.ReleaseOperatorDeploy && !ok {
+				componentDedupe[BuildAppName(component)] = true
+				componentSlice = append(componentSlice, component)
 			}
 		}
 	}
-	return components
+
+	return componentSlice
 }
 
 // FilterComponents filters the components that this operator is responsible for.
@@ -133,16 +124,6 @@ func IsSameApp(component releasev1alpha1.ReleaseSpecComponent, app applicationv1
 	return BuildAppName(component) == app.Name &&
 		component.Catalog == app.Spec.Catalog &&
 		GetComponentRef(component) == app.Spec.Version
-}
-
-func ComponentAppCreated(component releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {
-	for _, a := range apps {
-		if IsSameApp(component, a) {
-			return true
-		}
-	}
-
-	return false
 }
 
 func ComponentAppDeployed(component releasev1alpha1.ReleaseSpecComponent, apps []applicationv1alpha1.App) bool {

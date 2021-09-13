@@ -6,10 +6,9 @@ import (
 
 	applicationv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
 	releasev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/release/v1alpha1"
+	"github.com/giantswarm/release-operator/v2/pkg/project"
 	"github.com/google/go-cmp/cmp"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	"github.com/giantswarm/release-operator/v2/pkg/project"
 )
 
 var testComponents = []releasev1alpha1.ReleaseSpecComponent{
@@ -33,48 +32,7 @@ var testComponents = []releasev1alpha1.ReleaseSpecComponent{
 	},
 }
 
-func Test_AppReferenced(t *testing.T) {
-	testCases := []struct {
-		name           string
-		app            applicationv1alpha1.App
-		components     map[string]releasev1alpha1.ReleaseSpecComponent
-		expectedResult bool
-	}{
-		{
-			name: "case 0: app is referenced",
-			app:  ConstructApp(testComponents[1]),
-			components: map[string]releasev1alpha1.ReleaseSpecComponent{
-				BuildAppName(testComponents[0]): testComponents[0],
-				BuildAppName(testComponents[1]): testComponents[1],
-				BuildAppName(testComponents[2]): testComponents[2],
-			},
-			expectedResult: true,
-		},
-		{
-			name: "case 1: app is not referenced",
-			app:  ConstructApp(testComponents[1]),
-			components: map[string]releasev1alpha1.ReleaseSpecComponent{
-				BuildAppName(testComponents[0]): testComponents[0],
-				BuildAppName(testComponents[2]): testComponents[2],
-			},
-			expectedResult: false,
-		},
-	}
-
-	for i, tc := range testCases {
-		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			t.Log(tc.name)
-
-			result := AppReferenced(tc.app, tc.components)
-
-			if !cmp.Equal(result, tc.expectedResult) {
-				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedResult, result))
-			}
-		})
-	}
-}
-
-func Test_ConstructApp(t *testing.T) {
+func Test_constructApp(t *testing.T) {
 	testCases := []struct {
 		name        string
 		component   releasev1alpha1.ReleaseSpecComponent
@@ -167,7 +125,7 @@ func Test_ConstructApp(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Log(tc.name)
 
-			resultApp := ConstructApp(tc.component)
+			resultApp := constructApp(tc.component)
 
 			if !cmp.Equal(resultApp, tc.expectedApp) {
 				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedApp, resultApp))
@@ -408,7 +366,7 @@ func Test_ExtractComponents(t *testing.T) {
 	testCases := []struct {
 		name               string
 		releases           releasev1alpha1.ReleaseList
-		expectedcomponents map[string]releasev1alpha1.ReleaseSpecComponent
+		expectedcomponents []releasev1alpha1.ReleaseSpecComponent
 	}{
 		{
 			name: "case 0: extracts all components with ReleaseOperatorDeploy set",
@@ -431,10 +389,10 @@ func Test_ExtractComponents(t *testing.T) {
 					},
 				},
 			},
-			expectedcomponents: map[string]releasev1alpha1.ReleaseSpecComponent{
-				BuildAppName(testComponents[0]): testComponents[0],
-				BuildAppName(testComponents[1]): testComponents[1],
-				BuildAppName(testComponents[2]): testComponents[2],
+			expectedcomponents: []releasev1alpha1.ReleaseSpecComponent{
+				testComponents[0],
+				testComponents[1],
+				testComponents[2],
 			},
 		},
 		{
@@ -463,9 +421,9 @@ func Test_ExtractComponents(t *testing.T) {
 					},
 				},
 			},
-			expectedcomponents: map[string]releasev1alpha1.ReleaseSpecComponent{
-				BuildAppName(testComponents[0]): testComponents[0],
-				BuildAppName(testComponents[1]): testComponents[1],
+			expectedcomponents: []releasev1alpha1.ReleaseSpecComponent{
+				testComponents[0],
+				testComponents[1],
 			},
 		},
 	}
@@ -622,42 +580,8 @@ func Test_IsSameApp(t *testing.T) {
 	}
 }
 
-func Test_componentAppCreated(t *testing.T) {
-	testCases := []struct {
-		name           string
-		component      releasev1alpha1.ReleaseSpecComponent
-		apps           []applicationv1alpha1.App
-		expectedOutput bool
-	}{
-		{
-			name:           "case 0: component is created",
-			component:      testComponents[0],
-			apps:           []applicationv1alpha1.App{ConstructApp(testComponents[0])},
-			expectedOutput: true,
-		},
-		{
-			name:           "case 1: component is not created",
-			component:      testComponents[0],
-			apps:           []applicationv1alpha1.App{},
-			expectedOutput: false,
-		},
-	}
-
-	for i, tc := range testCases {
-		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			t.Log(tc.name)
-
-			result := ComponentAppCreated(tc.component, tc.apps)
-
-			if !cmp.Equal(result, tc.expectedOutput) {
-				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedOutput, result))
-			}
-		})
-	}
-}
-
 func Test_componentAppDeployed(t *testing.T) {
-	deployedApp := ConstructApp(testComponents[0])
+	deployedApp := constructApp(testComponents[0])
 	deployedApp.Status.Release.Status = AppStatusDeployed
 
 	testCases := []struct {
@@ -675,7 +599,7 @@ func Test_componentAppDeployed(t *testing.T) {
 		{
 			name:           "case 1: component is created and not deployed",
 			component:      testComponents[0],
-			apps:           []applicationv1alpha1.App{ConstructApp(testComponents[0])},
+			apps:           []applicationv1alpha1.App{constructApp(testComponents[0])},
 			expectedOutput: false,
 		},
 		{
@@ -696,5 +620,27 @@ func Test_componentAppDeployed(t *testing.T) {
 				t.Fatalf("\n\n%s\n", cmp.Diff(tc.expectedOutput, result))
 			}
 		})
+	}
+}
+
+func constructApp(component releasev1alpha1.ReleaseSpecComponent) applicationv1alpha1.App {
+	return applicationv1alpha1.App{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      BuildAppName(component),
+			Namespace: Namespace,
+			Labels: map[string]string{
+				LabelAppOperatorVersion: "0.0.0",
+				LabelManagedBy:          project.Name(),
+			},
+		},
+		Spec: applicationv1alpha1.AppSpec{
+			Catalog: component.Catalog,
+			KubeConfig: applicationv1alpha1.AppSpecKubeConfig{
+				InCluster: true,
+			},
+			Name:      component.Name,
+			Namespace: Namespace,
+			Version:   GetComponentRef(component),
+		},
 	}
 }

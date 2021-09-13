@@ -13,7 +13,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	argoappv1alpha1 "github.com/giantswarm/argoapp/pkg/apis/application/v1alpha1"
-	"github.com/giantswarm/argoapp/pkg/argoapp"
 
 	"github.com/giantswarm/release-operator/v2/pkg/project"
 	"github.com/giantswarm/release-operator/v2/service/controller/key"
@@ -71,19 +70,19 @@ func (r *Resource) ensureState(ctx context.Context) error {
 		releases = key.ExcludeUnusedDeprecatedReleases(releases)
 	}
 
-	var components map[string]releasev1alpha1.ReleaseSpecComponent
+	var components []releasev1alpha1.ReleaseSpecComponent
 	{
 		components = key.ExtractComponents(releases)
 	}
 
-	componentApps := map[string]argoappv1alpha1.Application{}
+	componentApps := []argoappv1alpha1.Application{}
 	{
-		for name, component := range components {
-			argoApp, err := r.componentToArgoApplication(ctx, component)
+		for _, component := range components {
+			argoApp, err := key.ComponentToArgoApplication(component)
 			if err != nil {
 				return microerror.Mask(err)
 			}
-			componentApps[name] = *argoApp
+			componentApps = append(componentApps, *argoApp)
 		}
 	}
 
@@ -149,7 +148,7 @@ func (r *Resource) ensureState(ctx context.Context) error {
 	return nil
 }
 
-func calculateMissingApps(componentApps map[string]argoappv1alpha1.Application, apps argoappv1alpha1.ApplicationList) argoappv1alpha1.ApplicationList {
+func calculateMissingApps(componentApps []argoappv1alpha1.Application, apps argoappv1alpha1.ApplicationList) argoappv1alpha1.ApplicationList {
 	var missingApps argoappv1alpha1.ApplicationList
 
 	for _, componentApp := range componentApps {
@@ -168,7 +167,7 @@ func calculateMissingApps(componentApps map[string]argoappv1alpha1.Application, 
 	return missingApps
 }
 
-func calculateObsoleteApps(componentApps map[string]argoappv1alpha1.Application, apps argoappv1alpha1.ApplicationList) argoappv1alpha1.ApplicationList {
+func calculateObsoleteApps(componentApps []argoappv1alpha1.Application, apps argoappv1alpha1.ApplicationList) argoappv1alpha1.ApplicationList {
 	var obsoleteApps argoappv1alpha1.ApplicationList
 
 	for _, app := range apps.Items {
@@ -229,27 +228,4 @@ func extractKonfigureVariables(app argoappv1alpha1.Application) *konfigureVariab
 	}
 
 	return v
-}
-
-func (r *Resource) componentToArgoApplication(ctx context.Context, component releasev1alpha1.ReleaseSpecComponent) (app *argoappv1alpha1.Application, err error) {
-	configRef := "main"
-	if component.ConfigReference != "" {
-		configRef = component.ConfigReference
-	}
-
-	ac := argoapp.ApplicationConfig{
-		Name:                    key.BuildAppName(component),
-		AppName:                 component.Name,
-		AppVersion:              key.GetComponentRef(component),
-		AppCatalog:              component.Catalog,
-		AppDestinationNamespace: key.Namespace,
-		ConfigRef:               configRef,
-	}
-
-	app, err = argoapp.NewApplication(ac)
-	if err != nil {
-		return app, microerror.Mask(err)
-	}
-
-	return app, nil
 }
