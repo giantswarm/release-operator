@@ -199,8 +199,8 @@ github.com/giantswarm/apiextensions/v3 v3.22.0/go.mod h1:6KBexBTOZJ+amkorxw722t2
 github.com/giantswarm/apiextensions/v3 v3.30.0/go.mod h1:PcU7LAi0E8lOXoPp2wD7AY/AOtp6sN03cnQuBZGAksg=
 github.com/giantswarm/apiextensions/v3 v3.32.1-0.20210909123429-2c9137297b66 h1:embdbD9PESOUvzabJK/SD0D2a4x0fVYxZn3iMWbSZXc=
 github.com/giantswarm/apiextensions/v3 v3.32.1-0.20210909123429-2c9137297b66/go.mod h1:T0/d4PKlGUPFIMqdStzj0JVuOk51rZNQVRnZHXdYVug=
-github.com/giantswarm/argoapp v0.1.5-0.20210909122326-6442aed3c62a h1:X0rD82VXlmMKj1py37e7dWHj/eJa+IWQ3tmpRaoWt70=
-github.com/giantswarm/argoapp v0.1.5-0.20210909122326-6442aed3c62a/go.mod h1:P1wJs+PXEx9UdejWmNFSyf/XrFh8P9MH52OrRnDZ36k=
+github.com/giantswarm/argoapp v0.1.5-0.20210913070844-b5f2859f438a h1:MjDWztRc4/hu8J0b6ck/GQgb+qf1kL1HDLaj8LQpzCE=
+github.com/giantswarm/argoapp v0.1.5-0.20210913070844-b5f2859f438a/go.mod h1:P1wJs+PXEx9UdejWmNFSyf/XrFh8P9MH52OrRnDZ36k=
 github.com/giantswarm/backoff v0.2.0 h1:kdfAf83pZ/l8X0KiA2dJ2Wq19nS9hISijVn7ZRdFhfU=
 github.com/giantswarm/backoff v0.2.0/go.mod h1:Z3WRsFilSJ5H5VlFa4XhraoPr+9pmZgYasoY2OSfNOk=
 github.com/giantswarm/cluster-api v0.3.7 h1:kl5DYVGzQCPl9zNikZ33yDPp0LFDUy5FtDB/o6h9NL8=

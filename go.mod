@@ -5,7 +5,7 @@ go 1.14
 require (
 	github.com/giantswarm/apiextensions/v2 v2.6.2
 	github.com/giantswarm/apiextensions/v3 v3.32.1-0.20210909123429-2c9137297b66
-	github.com/giantswarm/argoapp v0.1.5-0.20210909122326-6442aed3c62a
+	github.com/giantswarm/argoapp v0.1.5-0.20210913070844-b5f2859f438a
 	github.com/giantswarm/exporterkit v0.2.1
 	github.com/giantswarm/k8sclient/v5 v5.12.0
 	github.com/giantswarm/microendpoint v0.2.0
