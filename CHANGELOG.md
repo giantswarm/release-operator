@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add new annotation that forces deploying release apps and components even though the release is deprecated and not used. 
+
 ### Changed
 
 - Replace `jwt-go` with `golang-jwt/jwt`.

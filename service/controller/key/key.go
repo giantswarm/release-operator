@@ -16,6 +16,9 @@ import (
 const (
 	AppStatusDeployed = "deployed"
 
+	// ReconcileDeprecatedReleaseAnnotation makes a Release to never be skipped, even though is deprecated or not used.
+	ReconcileDeprecatedReleaseAnnotation = "release-operator.giantswarm.io/reconcile-deprecated"
+
 	// Namespace is the namespace where App CRs are created.
 	Namespace = "giantswarm"
 
@@ -114,7 +117,8 @@ func ExcludeUnusedDeprecatedReleases(releases releasev1alpha1.ReleaseList) relea
 	var active releasev1alpha1.ReleaseList
 
 	for _, release := range releases.Items {
-		if release.Spec.State == releasev1alpha1.StateDeprecated && !release.Status.InUse {
+
+		if release.Spec.State == releasev1alpha1.StateDeprecated && !release.Status.InUse && release.Annotations[ReconcileDeprecatedReleaseAnnotation] == "" {
 			// skip
 		} else {
 			active.Items = append(active.Items, release)
