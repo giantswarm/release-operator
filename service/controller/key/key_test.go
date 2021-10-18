@@ -466,7 +466,7 @@ func Test_ExcludeDeprecatedUnusedRelease(t *testing.T) {
 				Items: []releasev1alpha1.Release{
 					{
 						ObjectMeta: metav1.ObjectMeta{
-							Name: "deprecated-used-release",
+							Name: "unused-wip-release",
 						},
 						Spec: releasev1alpha1.ReleaseSpec{
 							State: releasev1alpha1.StateWIP,
@@ -486,10 +486,59 @@ func Test_ExcludeDeprecatedUnusedRelease(t *testing.T) {
 				Items: []releasev1alpha1.Release{
 					{
 						ObjectMeta: metav1.ObjectMeta{
-							Name: "deprecated-used-release",
+							Name: "unused-wip-release",
 						},
 						Spec: releasev1alpha1.ReleaseSpec{
 							State: "wip",
+						},
+						Status: releasev1alpha1.ReleaseStatus{
+							InUse: false,
+						},
+					},
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "not-being-deleted",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "case 4: an unused deprecated release is deployed if contains annotation",
+			releases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "deprecated-unused-but-forced-release",
+							Annotations: map[string]string{
+								ReconcileDeprecatedReleaseAnnotation: "true",
+							},
+						},
+						Spec: releasev1alpha1.ReleaseSpec{
+							State: releasev1alpha1.StateDeprecated,
+						},
+						Status: releasev1alpha1.ReleaseStatus{
+							InUse: false,
+						},
+					},
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "not-being-deleted",
+						},
+					},
+				},
+			},
+			expectedReleases: releasev1alpha1.ReleaseList{
+				Items: []releasev1alpha1.Release{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: "deprecated-unused-but-forced-release",
+							Annotations: map[string]string{
+								ReconcileDeprecatedReleaseAnnotation: "true",
+							},
+						},
+						Spec: releasev1alpha1.ReleaseSpec{
+							State: "deprecated",
 						},
 						Status: releasev1alpha1.ReleaseStatus{
 							InUse: false,
