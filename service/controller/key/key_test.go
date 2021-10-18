@@ -466,7 +466,7 @@ func Test_ExcludeDeprecatedUnusedRelease(t *testing.T) {
 				Items: []releasev1alpha1.Release{
 					{
 						ObjectMeta: metav1.ObjectMeta{
-							Name: "deprecated-used-release",
+							Name: "unused-wip-release",
 						},
 						Spec: releasev1alpha1.ReleaseSpec{
 							State: releasev1alpha1.StateWIP,
@@ -486,7 +486,7 @@ func Test_ExcludeDeprecatedUnusedRelease(t *testing.T) {
 				Items: []releasev1alpha1.Release{
 					{
 						ObjectMeta: metav1.ObjectMeta{
-							Name: "deprecated-used-release",
+							Name: "unused-wip-release",
 						},
 						Spec: releasev1alpha1.ReleaseSpec{
 							State: "wip",
