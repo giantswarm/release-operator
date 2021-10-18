@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.4.0] - 2021-10-18
+
 ### Added
 
 - Add new annotation that forces deploying release apps and components even though the release is deprecated and not used. 
@@ -132,7 +134,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use latest architect orb.
 
 
-[Unreleased]: https://github.com/giantswarm/release-operator/compare/v2.3.2...HEAD
+[Unreleased]: https://github.com/giantswarm/release-operator/compare/v2.4.0...HEAD
+[2.4.0]: https://github.com/giantswarm/release-operator/compare/v2.3.2...v2.4.0
 [2.3.2]: https://github.com/giantswarm/release-operator/compare/v2.3.1...v2.3.2
 [2.3.1]: https://github.com/giantswarm/release-operator/compare/v2.3.0...v2.3.1
 [2.3.0]: https://github.com/giantswarm/release-operator/compare/v2.2.0...v2.3.0
