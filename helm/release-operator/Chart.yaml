@@ -5,5 +5,5 @@ home: "https://github.com/giantswarm/release-operator"
 version: "[[ .Version ]]"
 appVersion: "[[ .AppVersion ]]"
 annotations:
-  application.giantswarm.io/team: "ludacris"
+  application.giantswarm.io/team: "honeybadger"
   config.giantswarm.io/version: 1.x.x
