@@ -21,6 +21,7 @@ require (
 	k8s.io/client-go v0.18.19
 	sigs.k8s.io/cluster-api v0.3.13
 	sigs.k8s.io/controller-runtime v0.6.4
+	sigs.k8s.io/yaml v1.2.0
 )
 
 // v3.3.13 is required by github.com/spf13/viper v1.3.2, 1.6.2, 1.4.0 and github.com/bketelsen/crypt@v0.0.3-0.20200106085610-5cbc8cc4026c. Can remove this replace when updated.
