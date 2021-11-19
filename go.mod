@@ -4,7 +4,6 @@ go 1.14
 
 require (
 	github.com/giantswarm/apiextensions-application v0.0.0-20211118184941-0e4a8fce3437
-	github.com/giantswarm/apiextensions/v3 v3.38.0
 	github.com/giantswarm/config-controller v0.4.1-0.20211119173856-8e0598526059
 	github.com/giantswarm/exporterkit v0.2.1
 	github.com/giantswarm/k8sclient/v6 v6.0.0
@@ -17,6 +16,7 @@ require (
 	github.com/google/go-cmp v0.5.6
 	github.com/prometheus/client_golang v1.11.0
 	github.com/spf13/viper v1.9.0
+	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1 // indirect
 	k8s.io/api v0.20.12
 	k8s.io/apimachinery v0.20.12
 	k8s.io/client-go v0.20.12
