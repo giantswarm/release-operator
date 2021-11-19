@@ -5,20 +5,17 @@ import (
 	"fmt"
 	"sync"
 
-	appv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
-	infrastructurev1alpha2 "github.com/giantswarm/apiextensions/v2/pkg/apis/infrastructure/v1alpha2"
-	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
-	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
-	"github.com/giantswarm/k8sclient/v5/pkg/k8sclient"
-	"github.com/giantswarm/k8sclient/v5/pkg/k8srestconfig"
+	appv1alpha1 "github.com/giantswarm/apiextensions-application/api/v1alpha1"
+	corev1alpha1 "github.com/giantswarm/config-controller/api/v1alpha1"
+	"github.com/giantswarm/k8sclient/v6/pkg/k8sclient"
+	"github.com/giantswarm/k8sclient/v6/pkg/k8srestconfig"
 	"github.com/giantswarm/microendpoint/service/version"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	"github.com/spf13/viper"
 	"k8s.io/client-go/rest"
-	capiv1alpha2 "sigs.k8s.io/cluster-api/api/v1alpha2"
-	capiv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
 
+	releasev1alpha1 "github.com/giantswarm/release-operator/v2/api/v1alpha1"
 	"github.com/giantswarm/release-operator/v2/flag"
 	"github.com/giantswarm/release-operator/v2/pkg/project"
 	"github.com/giantswarm/release-operator/v2/service/collector"
@@ -85,10 +82,7 @@ func New(config Config) (*Service, error) {
 			SchemeBuilder: k8sclient.SchemeBuilder{
 				appv1alpha1.AddToScheme,
 				corev1alpha1.AddToScheme,
-				infrastructurev1alpha2.AddToScheme,
 				releasev1alpha1.AddToScheme,
-				capiv1alpha2.AddToScheme,
-				capiv1alpha3.AddToScheme,
 			},
 			Logger: config.Logger,
 

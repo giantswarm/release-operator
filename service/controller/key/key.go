@@ -3,13 +3,13 @@ package key
 import (
 	"fmt"
 
-	applicationv1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/application/v1alpha1"
-	releasev1alpha1 "github.com/giantswarm/apiextensions/v2/pkg/apis/release/v1alpha1"
-	corev1alpha1 "github.com/giantswarm/apiextensions/v3/pkg/apis/core/v1alpha1"
-	apiexlabels "github.com/giantswarm/apiextensions/v3/pkg/label"
+	applicationv1alpha1 "github.com/giantswarm/apiextensions-application/api/v1alpha1"
+	corev1alpha1 "github.com/giantswarm/config-controller/api/v1alpha1"
+	apiexlabels "github.com/giantswarm/k8smetadata/pkg/label"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	releasev1alpha1 "github.com/giantswarm/release-operator/v2/api/v1alpha1"
 	"github.com/giantswarm/release-operator/v2/pkg/project"
 )
 
