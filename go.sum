@@ -206,13 +206,12 @@ github.com/getsentry/sentry-go v0.11.0 h1:qro8uttJGvNAMr5CLcFI9CHR0aDzXl0Vs3Pmw/
 github.com/getsentry/sentry-go v0.11.0/go.mod h1:KBQIxiZAetw62Cj8Ri964vAEWVdgfaUCn30Q3bCvANo=
 github.com/ghodss/yaml v0.0.0-20150909031657-73d445a93680/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
-github.com/giantswarm/apiextensions-application v0.0.0-20211118184941-0e4a8fce3437/go.mod h1:O6mg+EdXC9CyTLgi0d3rf6QTXrQX/79iw4kjMJRinig=
 github.com/giantswarm/apiextensions-application v0.1.0 h1:mlKPJfZ0mze+L3k7079gqw85joesGB5Lfesc7Fupgiw=
 github.com/giantswarm/apiextensions-application v0.1.0/go.mod h1:O6mg+EdXC9CyTLgi0d3rf6QTXrQX/79iw4kjMJRinig=
 github.com/giantswarm/backoff v0.2.0 h1:kdfAf83pZ/l8X0KiA2dJ2Wq19nS9hISijVn7ZRdFhfU=
 github.com/giantswarm/backoff v0.2.0/go.mod h1:Z3WRsFilSJ5H5VlFa4XhraoPr+9pmZgYasoY2OSfNOk=
-github.com/giantswarm/config-controller v0.4.1-0.20211119173856-8e0598526059 h1:k9plL6BF8nVPTrkIVmddDgVOULvB6mzzYeihqodkFlg=
-github.com/giantswarm/config-controller v0.4.1-0.20211119173856-8e0598526059/go.mod h1:hW/dFqvZdXjS+bG0JR1K0KDZ+dmAu/d3cnGIVjgjtp8=
+github.com/giantswarm/config-controller v0.5.0 h1:eZknX8EpRCudvYYuTMfvLbat2beA6p5ADBD52J5QM8Q=
+github.com/giantswarm/config-controller v0.5.0/go.mod h1:l77EQU5RzBvPzUHh8270/xeUmDp1N/HRYlHz2FkZo30=
 github.com/giantswarm/exporterkit v0.2.1 h1:M/Avqdg6O+NdyGtY+LSy5cCpJzhG15WRHQRkhOY/dKs=
 github.com/giantswarm/exporterkit v0.2.1/go.mod h1:LkZNK+2qTcbHspbizA6JBBXpQW99u7u7UisUaWrSoVY=
 github.com/giantswarm/k8sclient/v6 v6.0.0 h1:jVrB8/q12/yPDv/tv8cwj4Z11hFGvGuNO2n9O1s+xGo=
