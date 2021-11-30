@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/giantswarm/apiextensions-application v0.1.0
-	github.com/giantswarm/config-controller v0.5.0
+	github.com/giantswarm/config-controller v0.5.1
 	github.com/giantswarm/exporterkit v0.2.1
 	github.com/giantswarm/k8sclient/v6 v6.0.0
 	github.com/giantswarm/k8smetadata v0.6.0
