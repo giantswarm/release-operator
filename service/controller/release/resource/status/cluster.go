@@ -92,7 +92,7 @@ func (r *Resource) getCurrentAWSClusters(ctx context.Context) ([]tenantCluster, 
 // Returns a list of Azure clusters according to the azurecluster resource.
 func (r *Resource) getCurrentAzureClusters(ctx context.Context) ([]tenantCluster, error) {
 	azureClusters, err := r.listPartialObjectMetadata(ctx, metav1.GroupVersionKind{
-		Group:   "infrastructure.cluster.x-k8s.io.cluster.x-k8s.io",
+		Group:   "infrastructure.cluster.x-k8s.io",
 		Version: "v1alpha3",
 		Kind:    "AzureCluster",
 	}, "default")
