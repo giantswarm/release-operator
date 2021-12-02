@@ -62,16 +62,16 @@ func (r *Resource) EnsureCreated(ctx context.Context, obj interface{}) error {
 		// Get two sets of just deduplicated versions
 		releaseVersions, operatorVersions := consolidateClusterVersions(tenantClusters)
 		// Check the set of release versions and keep this release if it is used.
-		r.logger.Log("level", "debug", "message", fmt.Sprintf("checking release %s", release.Name))
+		r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("checking release %s", release.Name))
 		if releaseVersions[strings.TrimPrefix(release.Name, "v")] { // The release name has a leading `v`
-			r.logger.Log("level", "debug", "message", fmt.Sprintf("keeping release %s because it is explicitly used", release.Name))
+			r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("keeping release %s because it is explicitly used", release.Name))
 			releaseInUse = true
 		} else {
 			for _, o := range key.GetProviderOperators() {
 				operatorVersion := getOperatorVersionInRelease(o, release)
 				// Check the set of operator versions and keep this release if its operator version is used.
 				if operatorVersion != "" && operatorVersions[o][operatorVersion] {
-					r.logger.Log("level", "debug", "message", fmt.Sprintf("keeping release %s because a cluster using its operator version (%s) is present", release.Name, operatorVersion))
+					r.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("keeping release %s because a cluster using its operator version (%s) is present", release.Name, operatorVersion))
 					releaseInUse = true
 				}
 			}

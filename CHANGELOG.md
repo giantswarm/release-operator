@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Use right api group for AWS and Azure clusters when trying to find workload clusters.
+- Search workload clusters on all namespaces.
+- Take CAPI clusters into account when counting workload clusters.
+
 ## [2.5.0] - 2021-11-30
 
 ### Changed
