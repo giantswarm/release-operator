@@ -6,7 +6,6 @@ import (
 	apiexlabels "github.com/giantswarm/k8smetadata/pkg/label"
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/giantswarm/release-operator/v2/service/controller/key"
 )
@@ -29,10 +28,12 @@ func consolidateClusterVersions(clusters []tenantCluster) (releaseVersions map[s
 	for _, c := range clusters {
 		releaseVersions[c.ReleaseVersion] = true
 
-		if operatorVersions[c.ProviderOperator] == nil {
-			operatorVersions[c.ProviderOperator] = make(map[string]bool)
+		if c.ProviderOperator != "" {
+			if operatorVersions[c.ProviderOperator] == nil {
+				operatorVersions[c.ProviderOperator] = make(map[string]bool)
+			}
+			operatorVersions[c.ProviderOperator][c.OperatorVersion] = true
 		}
-		operatorVersions[c.ProviderOperator][c.OperatorVersion] = true
 	}
 
 	return
@@ -41,10 +42,8 @@ func consolidateClusterVersions(clusters []tenantCluster) (releaseVersions map[s
 // Returns a list of tenant clusters currently running on the installation.
 func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]tenantCluster, error) {
 	tcGetters := []func(context.Context) ([]tenantCluster, error){
+		r.getCAPIClusters,
 		r.getCurrentAWSClusters,
-		r.getCurrentAzureClusters,
-		r.getLegacyAWSClusters,
-		r.getLegacyAzureClusters,
 		r.getLegacyKVMClusters,
 	}
 
@@ -67,10 +66,10 @@ func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]tenantCluste
 // Returns a list of AWS clusters according to the awscluster resource.
 func (r *Resource) getCurrentAWSClusters(ctx context.Context) ([]tenantCluster, error) {
 	awsClusters, err := r.listPartialObjectMetadata(ctx, metav1.GroupVersionKind{
-		Group:   "infrastructure.cluster.x-k8s.io",
+		Group:   "infrastructure.giantswarm.io",
 		Version: "v1alpha2",
 		Kind:    "AWSCluster",
-	}, "default")
+	})
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -89,76 +88,26 @@ func (r *Resource) getCurrentAWSClusters(ctx context.Context) ([]tenantCluster, 
 	return clusters, nil
 }
 
-// Returns a list of Azure clusters according to the azurecluster resource.
-func (r *Resource) getCurrentAzureClusters(ctx context.Context) ([]tenantCluster, error) {
-	azureClusters, err := r.listPartialObjectMetadata(ctx, metav1.GroupVersionKind{
-		Group:   "infrastructure.cluster.x-k8s.io",
+// Returns a list of CAPI clusters.
+func (r *Resource) getCAPIClusters(ctx context.Context) ([]tenantCluster, error) {
+	capiClusters, err := r.listPartialObjectMetadata(ctx, metav1.GroupVersionKind{
+		Group:   "cluster.x-k8s.io",
 		Version: "v1alpha3",
-		Kind:    "AzureCluster",
-	}, "default")
+		Kind:    "Cluster",
+	})
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
 
 	var clusters []tenantCluster
-	for _, cluster := range azureClusters {
+	for _, cluster := range capiClusters {
 		c := tenantCluster{
-			ID:               cluster.Name,
-			OperatorVersion:  cluster.Labels[apiexlabels.AzureOperatorVersion],
-			ProviderOperator: key.ProviderOperatorAzure,
-			ReleaseVersion:   cluster.Labels[apiexlabels.ReleaseVersion],
+			ID:             cluster.Name,
+			ReleaseVersion: cluster.Labels[apiexlabels.ReleaseVersion],
 		}
 		clusters = append(clusters, c)
 	}
 
-	return clusters, nil
-}
-
-// Returns a list of running AWS legacy clusters based on awsconfig resources.
-func (r *Resource) getLegacyAWSClusters(ctx context.Context) ([]tenantCluster, error) {
-	configs, err := r.listPartialObjectMetadata(ctx, metav1.GroupVersionKind{
-		Group:   "provider.giantswarm.io",
-		Version: "v1alpha1",
-		Kind:    "AWSConfig",
-	}, "default")
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
-	var clusters []tenantCluster
-	for _, cluster := range configs {
-		c := tenantCluster{
-			ID:               cluster.Name,
-			OperatorVersion:  cluster.Labels[apiexlabels.AWSOperatorVersion],
-			ProviderOperator: key.ProviderOperatorAWS,
-			ReleaseVersion:   cluster.Labels[apiexlabels.ReleaseVersion],
-		}
-		clusters = append(clusters, c)
-	}
-	return clusters, nil
-}
-
-// Returns a list of running Azure legacy clusters based on azureconfig resources.
-func (r *Resource) getLegacyAzureClusters(ctx context.Context) ([]tenantCluster, error) {
-	configs, err := r.listPartialObjectMetadata(ctx, metav1.GroupVersionKind{
-		Group:   "provider.giantswarm.io",
-		Version: "v1alpha1",
-		Kind:    "AzureConfig",
-	}, "default")
-	if err != nil {
-		return nil, microerror.Mask(err)
-	}
-
-	var clusters []tenantCluster
-	for _, cluster := range configs {
-		c := tenantCluster{
-			ID:               cluster.Name,
-			OperatorVersion:  cluster.Labels[apiexlabels.AzureOperatorVersion],
-			ProviderOperator: key.ProviderOperatorAzure,
-			ReleaseVersion:   cluster.Labels[apiexlabels.ReleaseVersion],
-		}
-		clusters = append(clusters, c)
-	}
 	return clusters, nil
 }
 
@@ -168,7 +117,7 @@ func (r *Resource) getLegacyKVMClusters(ctx context.Context) ([]tenantCluster, e
 		Group:   "provider.giantswarm.io",
 		Version: "v1alpha1",
 		Kind:    "KVMConfig",
-	}, "default")
+	})
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
@@ -187,7 +136,7 @@ func (r *Resource) getLegacyKVMClusters(ctx context.Context) ([]tenantCluster, e
 	return clusters, nil
 }
 
-func (r *Resource) listPartialObjectMetadata(ctx context.Context, gvk metav1.GroupVersionKind, namespace string) ([]metav1.PartialObjectMetadata, error) {
+func (r *Resource) listPartialObjectMetadata(ctx context.Context, gvk metav1.GroupVersionKind) ([]metav1.PartialObjectMetadata, error) {
 	results := metav1.PartialObjectMetadataList{
 		TypeMeta: metav1.TypeMeta{
 			Kind: gvk.Kind,
@@ -197,9 +146,7 @@ func (r *Resource) listPartialObjectMetadata(ctx context.Context, gvk metav1.Gro
 			}.String(),
 		},
 	}
-	err := r.k8sClient.CtrlClient().List(ctx, &results, &client.ListOptions{
-		Namespace: namespace,
-	})
+	err := r.k8sClient.CtrlClient().List(ctx, &results)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
