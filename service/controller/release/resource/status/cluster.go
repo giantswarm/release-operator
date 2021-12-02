@@ -67,7 +67,7 @@ func (r *Resource) getCurrentTenantClusters(ctx context.Context) ([]tenantCluste
 func (r *Resource) getCurrentAWSClusters(ctx context.Context) ([]tenantCluster, error) {
 	awsClusters, err := r.listPartialObjectMetadata(ctx, metav1.GroupVersionKind{
 		Group:   "infrastructure.giantswarm.io",
-		Version: "v1alpha2",
+		Version: "v1alpha3",
 		Kind:    "AWSCluster",
 	})
 	if err != nil {
