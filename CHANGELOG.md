@@ -11,8 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Restore `.spec.notice` which was accidentally lost in the previous release (v2.5.0)
-  during the migration of the Release API from `apiextensions`.
+- Restore `.spec.notice` which was accidentally lost during the migration of the 
+  `Release` API from `apiextensions` (v2.5.0).
+
+## [3.0.0] - 2021-12-02
+
+### Fixed
+
+- Use right api group for AWS and Azure clusters when trying to find workload clusters.
+- Search workload clusters on all namespaces.
+- Take CAPI clusters into account when counting workload clusters.
 
 ## [2.5.0] - 2021-11-30
 
@@ -145,7 +153,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use latest architect orb.
 
 
-[Unreleased]: https://github.com/giantswarm/release-operator/compare/v2.5.0...HEAD
+[Unreleased]: https://github.com/giantswarm/release-operator/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/giantswarm/release-operator/compare/v2.5.0...v3.0.0
 [2.5.0]: https://github.com/giantswarm/release-operator/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/giantswarm/release-operator/compare/v2.3.2...v2.4.0
 [2.3.2]: https://github.com/giantswarm/release-operator/compare/v2.3.1...v2.3.2
