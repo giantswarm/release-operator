@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Restore `.spec.notice` which was accidentally lost during the migration of the 
+  `Release` API from `apiextensions` (v2.5.0).
+
 ## [3.0.0] - 2021-12-02
 
 ### Fixed
