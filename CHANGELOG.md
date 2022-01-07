@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.0] - 2022-01-07
+
 ### Added
 
 - Add a 'preview' release state
@@ -159,7 +161,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use latest architect orb.
 
 
-[Unreleased]: https://github.com/giantswarm/release-operator/compare/v3.0.1...HEAD
+[Unreleased]: https://github.com/giantswarm/release-operator/compare/v3.1.0...HEAD
+[3.1.0]: https://github.com/giantswarm/release-operator/compare/v3.0.1...v3.1.0
 [3.0.1]: https://github.com/giantswarm/release-operator/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/giantswarm/release-operator/compare/v2.5.0...v3.0.0
 [2.5.0]: https://github.com/giantswarm/release-operator/compare/v2.4.0...v2.5.0
