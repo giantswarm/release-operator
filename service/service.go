@@ -15,11 +15,11 @@ import (
 	"github.com/spf13/viper"
 	"k8s.io/client-go/rest"
 
-	releasev1alpha1 "github.com/giantswarm/release-operator/v2/api/v1alpha1"
-	"github.com/giantswarm/release-operator/v2/flag"
-	"github.com/giantswarm/release-operator/v2/pkg/project"
-	"github.com/giantswarm/release-operator/v2/service/collector"
-	"github.com/giantswarm/release-operator/v2/service/controller"
+	releasev1alpha1 "github.com/giantswarm/release-operator/v3/api/v1alpha1"
+	"github.com/giantswarm/release-operator/v3/flag"
+	"github.com/giantswarm/release-operator/v3/pkg/project"
+	"github.com/giantswarm/release-operator/v3/service/collector"
+	"github.com/giantswarm/release-operator/v3/service/controller"
 )
 
 // Config represents the configuration used to create a new service.

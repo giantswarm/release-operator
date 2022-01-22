@@ -7,10 +7,10 @@ import (
 	"github.com/giantswarm/micrologger"
 	"github.com/spf13/viper"
 
-	"github.com/giantswarm/release-operator/v2/flag"
-	"github.com/giantswarm/release-operator/v2/pkg/project"
-	"github.com/giantswarm/release-operator/v2/server"
-	"github.com/giantswarm/release-operator/v2/service"
+	"github.com/giantswarm/release-operator/v3/flag"
+	"github.com/giantswarm/release-operator/v3/pkg/project"
+	"github.com/giantswarm/release-operator/v3/server"
+	"github.com/giantswarm/release-operator/v3/service"
 )
 
 var (
