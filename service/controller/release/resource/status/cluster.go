@@ -7,7 +7,7 @@ import (
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/giantswarm/release-operator/v2/service/controller/key"
+	"github.com/giantswarm/release-operator/v3/service/controller/key"
 )
 
 type tenantCluster struct {

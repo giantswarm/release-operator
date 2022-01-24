@@ -8,9 +8,9 @@ import (
 	"github.com/giantswarm/operatorkit/v6/pkg/resource/wrapper/metricsresource"
 	"github.com/giantswarm/operatorkit/v6/pkg/resource/wrapper/retryresource"
 
-	"github.com/giantswarm/release-operator/v2/service/controller/release/resource/apps"
-	"github.com/giantswarm/release-operator/v2/service/controller/release/resource/configs"
-	"github.com/giantswarm/release-operator/v2/service/controller/release/resource/status"
+	"github.com/giantswarm/release-operator/v3/service/controller/release/resource/apps"
+	"github.com/giantswarm/release-operator/v3/service/controller/release/resource/configs"
+	"github.com/giantswarm/release-operator/v3/service/controller/release/resource/status"
 )
 
 type ResourceSetConfig struct {
