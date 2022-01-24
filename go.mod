@@ -7,7 +7,7 @@ require (
 	github.com/giantswarm/config-controller v0.5.1
 	github.com/giantswarm/exporterkit v0.2.1
 	github.com/giantswarm/k8sclient/v6 v6.1.0
-	github.com/giantswarm/k8smetadata v0.6.0
+	github.com/giantswarm/k8smetadata v0.9.1
 	github.com/giantswarm/microendpoint v0.2.0
 	github.com/giantswarm/microerror v0.4.0
 	github.com/giantswarm/microkit v0.2.2
