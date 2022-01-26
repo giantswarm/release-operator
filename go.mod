@@ -16,9 +16,9 @@ require (
 	github.com/google/go-cmp v0.5.6
 	github.com/prometheus/client_golang v1.11.0
 	github.com/spf13/viper v1.9.0
-	k8s.io/api v0.20.12
-	k8s.io/apimachinery v0.20.12
-	k8s.io/client-go v0.20.12
+	k8s.io/api v0.20.15
+	k8s.io/apimachinery v0.20.15
+	k8s.io/client-go v0.20.15
 	sigs.k8s.io/controller-runtime v0.8.3
 	sigs.k8s.io/yaml v1.3.0
 )
@@ -90,7 +90,7 @@ require (
 	k8s.io/apiextensions-apiserver v0.20.12 // indirect
 	k8s.io/component-base v0.20.12 // indirect
 	k8s.io/klog/v2 v2.9.0 // indirect
-	k8s.io/kube-openapi v0.0.0-20210421082810-95288971da7e // indirect
+	k8s.io/kube-openapi v0.0.0-20211110013926-83f114cd0513 // indirect
 	k8s.io/utils v0.0.0-20210819203725-bdf08cb9a70a // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.1.2 // indirect
 )
