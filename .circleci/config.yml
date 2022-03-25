@@ -104,16 +104,3 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v.*/
-
-      - architect/push-to-app-collection:
-          context: architect
-          name: push-release-operator-to-vsphere-app-collection
-          app_name: "release-operator"
-          app_collection_repo: "vsphere-app-collection"
-          requires:
-            - push-release-operator-to-control-plane-app-catalog
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v.*/
