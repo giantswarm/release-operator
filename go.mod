@@ -13,9 +13,9 @@ require (
 	github.com/giantswarm/microkit v1.0.0
 	github.com/giantswarm/micrologger v1.0.0
 	github.com/giantswarm/operatorkit/v6 v6.0.0
-	github.com/google/go-cmp v0.5.7
-	github.com/prometheus/client_golang v1.12.1
-	github.com/spf13/viper v1.10.0
+	github.com/google/go-cmp v0.5.8
+	github.com/prometheus/client_golang v1.12.2
+	github.com/spf13/viper v1.12.0
 	k8s.io/api v0.24.2
 	k8s.io/apimachinery v0.24.2
 	k8s.io/client-go v0.24.2
