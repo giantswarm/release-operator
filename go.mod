@@ -13,7 +13,7 @@ require (
 	github.com/giantswarm/microkit v0.2.2
 	github.com/giantswarm/micrologger v0.6.0
 	github.com/giantswarm/operatorkit/v6 v6.0.0
-	github.com/google/go-cmp v0.5.6
+	github.com/google/go-cmp v0.5.7
 	github.com/prometheus/client_golang v1.11.0
 	github.com/spf13/viper v1.9.0
 	k8s.io/api v0.20.15
@@ -26,7 +26,7 @@ require (
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
-	github.com/cespare/xxhash/v2 v2.1.1 // indirect
+	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/evanphx/json-patch v4.11.0+incompatible // indirect
@@ -51,37 +51,35 @@ require (
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
-	github.com/json-iterator/go v1.1.11 // indirect
-	github.com/kr/text v0.2.0 // indirect
+	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
-	github.com/mitchellh/mapstructure v1.4.2 // indirect
+	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
-	github.com/modern-go/reflect2 v1.0.1 // indirect
+	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
-	github.com/prometheus/common v0.26.0 // indirect
-	github.com/prometheus/procfs v0.6.0 // indirect
+	github.com/prometheus/common v0.32.1 // indirect
+	github.com/prometheus/procfs v0.7.3 // indirect
 	github.com/spf13/afero v1.6.0 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
 	github.com/spf13/cobra v1.2.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
-	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5 // indirect
-	golang.org/x/net v0.0.0-20210520170846-37e1c6afe023 // indirect
+	golang.org/x/crypto v0.0.0-20220315160706-3147a52a75dd // indirect
+	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
 	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20210823070655-63515b42dcdf // indirect
-	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d // indirect
-	golang.org/x/text v0.3.6 // indirect
-	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
+	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9 // indirect
+	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
+	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/time v0.0.0-20211116232009-f0f3c7e86c11 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.1.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/protobuf v1.27.1 // indirect
-	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
+	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.63.2 // indirect
 	gopkg.in/resty.v1 v1.12.0 // indirect
@@ -96,7 +94,20 @@ require (
 )
 
 replace (
+	// Fix reported vulnerabilities
+	github.com/aws/aws-sdk-go v1.27.0 => github.com/aws/aws-sdk-go v1.44.36
 	github.com/coreos/etcd => github.com/coreos/etcd v3.3.25+incompatible
 	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt v3.2.1+incompatible
+	github.com/gin-gonic/gin v1.4.0 => github.com/gin-gonic/gin v1.8.1
 	github.com/gogo/protobuf v1.3.1 => github.com/gogo/protobuf v1.3.2
+	github.com/hashicorp/consul/api v1.10.1 => github.com/hashicorp/consul/api v1.13.0
+	github.com/hashicorp/consul/sdk v0.8.0 => github.com/hashicorp/consul/sdk v0.9.0
+	github.com/hashicorp/vault/api v1.3.0 => github.com/hashicorp/vault/api v1.6.0
+	github.com/labstack/echo/v4 v4.1.11 => github.com/labstack/echo/v4 v4.7.2
+	github.com/microcosm-cc/bluemonday v1.0.2 => github.com/microcosm-cc/bluemonday v1.0.18
+	github.com/nats-io/jwt => github.com/nats-io/jwt/v2 v2.2.0
+	github.com/nats-io/nats-server/v2 v2.1.2 => github.com/nats-io/nats-server/v2 v2.8.4
+	github.com/pkg/sftp v1.10.1 => github.com/pkg/sftp v1.13.4
+	github.com/prometheus/client_golang v1.11.0 => github.com/prometheus/client_golang v1.12.2
+	github.com/valyala/fasthttp v1.6.0 => github.com/valyala/fasthttp v1.37.0
 )
