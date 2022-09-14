@@ -1,6 +1,6 @@
 module github.com/giantswarm/apiextensions/hack/tools/code-generator
 
-go 1.18
+go 1.19
 
 require sigs.k8s.io/controller-tools v0.9.2
 
