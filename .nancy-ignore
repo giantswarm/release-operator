@@ -9,3 +9,8 @@ CVE-2022-29153 until=2022-12-31
 sonatype-2021-3619 until=2022-12-31
 pkg:golang/github.com/urfave/negroni@v1.0.0
 sonatype-2021-1485 until=2022-12-31
+
+# pkg:golang/github.com/hashicorp/vault/api@v1.8.0
+# pkg:golang/github.com/hashicorp/vault/sdk@v0.6.0
+CVE-2022-36129 until=2022-12-31
+

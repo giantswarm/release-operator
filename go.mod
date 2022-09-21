@@ -76,16 +76,17 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.3.0 // indirect
-	golang.org/x/net v0.0.0-20220708220712-1185a9018129 // indirect
+	go.uber.org/atomic v1.10.0 // indirect
+	golang.org/x/net v0.0.0-20220920203100-d0c6ba3f52d9 // indirect
 	golang.org/x/oauth2 v0.0.0-20220718184931-c8730f7fcb92 // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
-	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
+	golang.org/x/sys v0.0.0-20220919091848-fb04ddd9f9c8 // indirect
 	golang.org/x/term v0.0.0-20220526004731-065cf7ba2467 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	golang.org/x/time v0.0.0-20220609170525-579cf78fd858 // indirect
+	golang.org/x/time v0.0.0-20220920022843-2ce7c2934d45 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/protobuf v1.28.0 // indirect
+	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.66.6 // indirect
 	gopkg.in/resty.v1 v1.12.0 // indirect
@@ -110,7 +111,9 @@ replace (
 	github.com/hashicorp/consul/api v1.10.1 => github.com/hashicorp/consul/api v1.13.0
 	github.com/hashicorp/consul/sdk v0.8.0 => github.com/hashicorp/consul/sdk v0.9.0
 	github.com/hashicorp/vault/api v1.3.0 => github.com/hashicorp/vault/api v1.6.0
-	github.com/labstack/echo/v4 v4.1.11 => github.com/labstack/echo/v4 v4.7.2
+	github.com/hashicorp/vault/api v1.7.2 => github.com/hashicorp/vault/api v1.8.0
+	github.com/hashicorp/vault/sdk v0.5.3 => github.com/hashicorp/vault/sdk v0.6.0
+	github.com/labstack/echo/v4 v4.1.11 => github.com/labstack/echo/v4 v4.9.0
 	github.com/microcosm-cc/bluemonday v1.0.2 => github.com/microcosm-cc/bluemonday v1.0.18
 	github.com/nats-io/jwt => github.com/nats-io/jwt/v2 v2.2.0
 	github.com/nats-io/nats-server/v2 v2.1.2 => github.com/nats-io/nats-server/v2 v2.8.4
