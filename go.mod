@@ -1,6 +1,6 @@
 module github.com/giantswarm/release-operator/v3
 
-go 1.18
+go 1.19
 
 require (
 	github.com/giantswarm/apiextensions-application v0.5.1
@@ -13,9 +13,9 @@ require (
 	github.com/giantswarm/microkit v1.0.0
 	github.com/giantswarm/micrologger v1.0.0
 	github.com/giantswarm/operatorkit/v6 v6.1.0
-	github.com/google/go-cmp v0.5.8
-	github.com/prometheus/client_golang v1.12.2
-	github.com/spf13/viper v1.12.0
+	github.com/google/go-cmp v0.5.9
+	github.com/prometheus/client_golang v1.13.0
+	github.com/spf13/viper v1.13.0
 	k8s.io/api v0.24.3
 	k8s.io/apimachinery v0.24.3
 	k8s.io/client-go v0.24.3
@@ -104,8 +104,8 @@ require (
 replace (
 	// Fix reported vulnerabilities
 	github.com/aws/aws-sdk-go v1.27.0 => github.com/aws/aws-sdk-go v1.44.36
-	github.com/coreos/etcd => github.com/coreos/etcd v3.3.25+incompatible
-	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt v3.2.1+incompatible
+	github.com/coreos/etcd => github.com/coreos/etcd v3.3.27+incompatible+incompatible
+	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt v3.2.2+incompatible+incompatible
 	github.com/gin-gonic/gin v1.4.0 => github.com/gin-gonic/gin v1.8.1
 	github.com/gogo/protobuf v1.3.1 => github.com/gogo/protobuf v1.3.2
 	github.com/hashicorp/consul/api v1.10.1 => github.com/hashicorp/consul/api v1.13.0
@@ -115,7 +115,7 @@ replace (
 	github.com/hashicorp/vault/sdk v0.5.3 => github.com/hashicorp/vault/sdk v0.6.0
 	github.com/labstack/echo/v4 v4.1.11 => github.com/labstack/echo/v4 v4.9.0
 	github.com/microcosm-cc/bluemonday v1.0.2 => github.com/microcosm-cc/bluemonday v1.0.18
-	github.com/nats-io/jwt => github.com/nats-io/jwt/v2 v2.2.0
+	github.com/nats-io/jwt => github.com/nats-io/jwt/v2 v2.3.0
 	github.com/nats-io/nats-server/v2 v2.1.2 => github.com/nats-io/nats-server/v2 v2.8.4
 	github.com/nats-io/nats-server/v2 v2.5.0 => github.com/nats-io/nats-server/v2 v2.8.4
 	github.com/pkg/sftp v1.10.1 => github.com/pkg/sftp v1.13.4
