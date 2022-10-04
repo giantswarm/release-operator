@@ -1,6 +1,6 @@
 module github.com/giantswarm/release-operator/v3
 
-go 1.19
+go 1.18
 
 require (
 	github.com/giantswarm/apiextensions-application v0.5.1
