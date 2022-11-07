@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"regexp"
 	goruntime "runtime"
@@ -144,12 +144,12 @@ func Test_GenerateReleaseYAML(t *testing.T) {
 			rendered = statusRegex.ReplaceAll(rendered, []byte(""))
 
 			if *update {
-				err := ioutil.WriteFile(path, rendered, 0644) // nolint
+				err := os.WriteFile(path, rendered, 0644)
 				if err != nil {
 					t.Fatal(err)
 				}
 			}
-			goldenFile, err := ioutil.ReadFile(path)
+			goldenFile, err := os.ReadFile(path)
 			if err != nil {
 				t.Fatal(err)
 			}
