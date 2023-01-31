@@ -27,3 +27,8 @@ spec:
 ```
 
 More information on how this operator works can be found [here](docs/workflow.md).
+
+# How to generate the CRD
+
+When you change anything in the `api` directory you might need to regenerate the Release CRD and the generated boilerplate code.
+You can do that by running `make generate`.
