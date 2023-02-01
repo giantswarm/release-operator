@@ -9,8 +9,8 @@ import (
 	"github.com/google/go-cmp/cmp"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	releasev1alpha1 "github.com/giantswarm/release-operator/v3/api/v1alpha1"
-	"github.com/giantswarm/release-operator/v3/service/controller/key"
+	releasev1alpha1 "github.com/giantswarm/release-operator/v4/api/v1alpha1"
+	"github.com/giantswarm/release-operator/v4/service/controller/key"
 )
 
 var testComponents = []releasev1alpha1.ReleaseSpecComponent{

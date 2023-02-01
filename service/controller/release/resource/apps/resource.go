@@ -13,9 +13,9 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	releasev1alpha1 "github.com/giantswarm/release-operator/v3/api/v1alpha1"
-	"github.com/giantswarm/release-operator/v3/pkg/project"
-	"github.com/giantswarm/release-operator/v3/service/controller/key"
+	releasev1alpha1 "github.com/giantswarm/release-operator/v4/api/v1alpha1"
+	"github.com/giantswarm/release-operator/v4/pkg/project"
+	"github.com/giantswarm/release-operator/v4/service/controller/key"
 )
 
 const (
