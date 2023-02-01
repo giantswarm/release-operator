@@ -1,4 +1,4 @@
-module github.com/giantswarm/release-operator/v3
+module github.com/giantswarm/release-operator/v4
 
 go 1.19
 
