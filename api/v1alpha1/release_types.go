@@ -122,6 +122,8 @@ type ReleaseSpecApp struct {
 	Catalog string `json:"catalog,omitempty"`
 	// Version of the upstream component used in the app.
 	ComponentVersion string `json:"componentVersion,omitempty"`
+	// DependsOn is the list of apps that should be installed before installation of this one is attempted.
+	DependsOn []string `json:"dependsOn,omitempty"`
 	// Name of the app.
 	Name string `json:"name"`
 	// +kubebuilder:validation:Pattern=`^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$`
