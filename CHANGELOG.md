@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add `dependsOn` field to the `Apps` item section in the `Release` CRD.
+
 ## [3.2.0] - 2022-01-24
 
 ### Fixed
