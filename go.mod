@@ -6,13 +6,13 @@ require (
 	github.com/giantswarm/apiextensions-application v0.5.1
 	github.com/giantswarm/config-controller v0.6.0
 	github.com/giantswarm/exporterkit v1.0.0
-	github.com/giantswarm/k8sclient/v6 v6.1.0
+	github.com/giantswarm/k8sclient/v7 v7.0.1
 	github.com/giantswarm/k8smetadata v0.15.0
 	github.com/giantswarm/microendpoint v1.0.0
 	github.com/giantswarm/microerror v0.4.0
 	github.com/giantswarm/microkit v1.0.0
 	github.com/giantswarm/micrologger v1.0.0
-	github.com/giantswarm/operatorkit/v6 v6.1.0
+	github.com/giantswarm/operatorkit/v7 v7.1.0
 	github.com/google/go-cmp v0.5.9
 	github.com/prometheus/client_golang v1.14.0
 	github.com/spf13/viper v1.14.0
@@ -25,15 +25,15 @@ require (
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
+	github.com/cenkalti/backoff/v4 v4.1.2 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emicklei/go-restful/v3 v3.8.0 // indirect
 	github.com/evanphx/json-patch v5.6.0+incompatible // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
-	github.com/getsentry/sentry-go v0.11.0 // indirect
-	github.com/giantswarm/backoff v0.2.0 // indirect
+	github.com/getsentry/sentry-go v0.12.0 // indirect
+	github.com/giantswarm/backoff v1.0.0 // indirect
 	github.com/giantswarm/to v0.4.0 // indirect
 	github.com/giantswarm/versionbundle v1.0.0 // indirect
 	github.com/go-kit/kit v0.12.0 // indirect
