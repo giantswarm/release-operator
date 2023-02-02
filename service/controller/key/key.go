@@ -9,8 +9,8 @@ import (
 	"github.com/giantswarm/microerror"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	releasev1alpha1 "github.com/giantswarm/release-operator/v3/api/v1alpha1"
-	"github.com/giantswarm/release-operator/v3/pkg/project"
+	releasev1alpha1 "github.com/giantswarm/release-operator/v4/api/v1alpha1"
+	"github.com/giantswarm/release-operator/v4/pkg/project"
 )
 
 const (
