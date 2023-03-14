@@ -26,6 +26,7 @@ spec:
     rule: RunAsAny
   volumes:
     - 'configMap'
+    - 
   allowPrivilegeEscalation: false
   hostNetwork: false
   hostIPC: false
