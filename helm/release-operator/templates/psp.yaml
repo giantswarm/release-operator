@@ -26,7 +26,7 @@ spec:
     rule: RunAsAny
   volumes:
     - 'configMap'
-    - 
+    - 'projected'
   allowPrivilegeEscalation: false
   hostNetwork: false
   hostIPC: false
