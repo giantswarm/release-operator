@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added the use of the runtime/default seccomp profile.
+- Added required values for pss policies.
 
 ## [4.0.0] - 2023-02-01
 

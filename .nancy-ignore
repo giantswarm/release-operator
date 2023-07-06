@@ -26,3 +26,7 @@ CVE-2022-36129 until=2023-12-31
 
 sonatype-2022-6522 until=2023-12-31
 CVE-2020-8561 
+
+#pkg:golang/github.com/gin-gonic/gin@v1.8.1
+CVE-2023-26125
+CVE-2023-29401

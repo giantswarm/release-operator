@@ -44,6 +44,10 @@
                             "type": "string"
                         }
                     }
+                },
+                "runAsNonRoot": {
+                    "type": "boolean",
+                    "default": true
                 }
             }
         },
@@ -85,11 +89,27 @@
         "securityContext": {
             "type": "object",
             "properties": {
+                "allowPrivilegeEscalation": {
+                    "type": "boolean",
+                    "default": false
+                },
                 "seccompProfile": {
                     "type": "object",
                     "properties": {
                         "type": {
                             "type": "string"
+                        }
+                    }
+                },
+                "capabilities":{
+                    "type": "object",
+                    "properties": {
+                        "drop": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "default": ["ALL"]
                         }
                     }
                 }
