@@ -56,11 +56,6 @@ func newReleaseExampleCR() *Release {
 				Version: "1.6.0",
 			},
 			{
-				Name:             "nginx-ingress-controller",
-				ComponentVersion: "0.29.0",
-				Version:          "1.5.0",
-			},
-			{
 				Name:             "node-exporter",
 				ComponentVersion: "0.18.1",
 				Version:          "1.2.0",
