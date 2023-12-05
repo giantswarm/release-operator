@@ -5,22 +5,22 @@ go 1.21
 toolchain go1.21.4
 
 require (
-	github.com/giantswarm/apiextensions-application v0.5.1
-	github.com/giantswarm/config-controller v0.6.0
+	github.com/giantswarm/apiextensions-application v0.6.1
+	github.com/giantswarm/config-controller v0.9.0
 	github.com/giantswarm/exporterkit v1.1.0
-	github.com/giantswarm/k8sclient/v6 v6.1.0
-	github.com/giantswarm/k8smetadata v0.19.0
+	github.com/giantswarm/k8sclient/v7 v7.2.0
+	github.com/giantswarm/k8smetadata v0.23.0
 	github.com/giantswarm/microendpoint v1.1.0
 	github.com/giantswarm/microerror v0.4.1
 	github.com/giantswarm/microkit v1.0.0
 	github.com/giantswarm/micrologger v1.1.1
-	github.com/giantswarm/operatorkit/v6 v6.1.0
+	github.com/giantswarm/operatorkit/v7 v7.2.0
 	github.com/google/go-cmp v0.6.0
 	github.com/prometheus/client_golang v1.17.0
 	github.com/spf13/viper v1.17.0
-	k8s.io/api v0.28.3
-	k8s.io/apimachinery v0.28.3
-	k8s.io/client-go v0.28.3
+	k8s.io/api v0.28.4
+	k8s.io/apimachinery v0.28.4
+	k8s.io/client-go v0.28.4
 	sigs.k8s.io/controller-runtime v0.16.3
 	sigs.k8s.io/yaml v1.4.0
 )
@@ -33,6 +33,7 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/emicklei/go-restful/v3 v3.11.0 // indirect
 	github.com/evanphx/json-patch v5.6.0+incompatible // indirect
+	github.com/evanphx/json-patch/v5 v5.7.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/getsentry/sentry-go v0.25.0 // indirect
 	github.com/giantswarm/backoff v1.0.0 // indirect
@@ -71,23 +72,23 @@ require (
 	github.com/prometheus/client_model v0.5.0 // indirect
 	github.com/prometheus/common v0.45.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
-	github.com/sagikazarmark/locafero v0.3.0 // indirect
+	github.com/sagikazarmark/locafero v0.4.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
-	github.com/spf13/afero v1.10.0 // indirect
-	github.com/spf13/cast v1.5.1 // indirect
-	github.com/spf13/cobra v1.7.0 // indirect
+	github.com/spf13/afero v1.11.0 // indirect
+	github.com/spf13/cast v1.6.0 // indirect
+	github.com/spf13/cobra v1.8.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/exp v0.0.0-20231110203233-9a3e6036ecaa // indirect
-	golang.org/x/net v0.18.0 // indirect
-	golang.org/x/oauth2 v0.14.0 // indirect
+	golang.org/x/exp v0.0.0-20231127185646-65229373498e // indirect
+	golang.org/x/net v0.19.0 // indirect
+	golang.org/x/oauth2 v0.15.0 // indirect
 	golang.org/x/sync v0.5.0 // indirect
-	golang.org/x/sys v0.14.0 // indirect
-	golang.org/x/term v0.14.0 // indirect
+	golang.org/x/sys v0.15.0 // indirect
+	golang.org/x/term v0.15.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
-	golang.org/x/time v0.4.0 // indirect
+	golang.org/x/time v0.5.0 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.4.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
@@ -96,11 +97,11 @@ require (
 	gopkg.in/resty.v1 v1.12.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/apiextensions-apiserver v0.28.3 // indirect
-	k8s.io/component-base v0.28.3 // indirect
+	k8s.io/apiextensions-apiserver v0.28.4 // indirect
+	k8s.io/component-base v0.28.4 // indirect
 	k8s.io/klog/v2 v2.110.1 // indirect
-	k8s.io/kube-openapi v0.0.0-20231113174909-778a5567bc1e // indirect
-	k8s.io/utils v0.0.0-20230726121419-3b25d923346b // indirect
+	k8s.io/kube-openapi v0.0.0-20231129212854-f0671cc7e66a // indirect
+	k8s.io/utils v0.0.0-20231127182322-b307cd553661 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
 )
@@ -109,7 +110,7 @@ replace (
 	// Fix reported vulnerabilities
 	github.com/aws/aws-sdk-go v1.27.0 => github.com/aws/aws-sdk-go v1.44.36
 	github.com/coreos/etcd => github.com/coreos/etcd v3.3.27+incompatible
-	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.4.2
+	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v5 v5.2.0
 	github.com/gin-gonic/gin v1.4.0 => github.com/gin-gonic/gin v1.8.1
 	github.com/gogo/protobuf v1.3.1 => github.com/gogo/protobuf v1.3.2
 	github.com/hashicorp/consul/api v1.10.1 => github.com/hashicorp/consul/api v1.13.0
@@ -119,12 +120,10 @@ replace (
 	github.com/hashicorp/vault/sdk v0.5.3 => github.com/hashicorp/vault/sdk v0.6.0
 	github.com/labstack/echo/v4 v4.1.11 => github.com/labstack/echo/v4 v4.9.0
 	github.com/microcosm-cc/bluemonday v1.0.2 => github.com/microcosm-cc/bluemonday v1.0.18
-	github.com/nats-io/jwt => github.com/nats-io/jwt/v2 v2.3.0
+	github.com/nats-io/jwt => github.com/nats-io/jwt/v2 v2.5.3
 	github.com/nats-io/nats-server/v2 v2.1.2 => github.com/nats-io/nats-server/v2 v2.8.4
 	github.com/nats-io/nats-server/v2 v2.5.0 => github.com/nats-io/nats-server/v2 v2.8.4
 	github.com/pkg/sftp v1.10.1 => github.com/pkg/sftp v1.13.4
 	github.com/prometheus/client_golang v1.11.0 => github.com/prometheus/client_golang v1.12.2
 	github.com/valyala/fasthttp v1.6.0 => github.com/valyala/fasthttp v1.37.0
-	// Fix logging library incompatibilties
-	sigs.k8s.io/controller-runtime => sigs.k8s.io/controller-runtime v0.12.2
 )
