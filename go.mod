@@ -105,7 +105,7 @@ replace (
 	// Fix reported vulnerabilities
 	github.com/aws/aws-sdk-go v1.27.0 => github.com/aws/aws-sdk-go v1.44.36
 	github.com/coreos/etcd => github.com/coreos/etcd v3.3.27+incompatible
-	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.4.2
+	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v5 v5.2.0
 	github.com/gin-gonic/gin v1.4.0 => github.com/gin-gonic/gin v1.8.1
 	github.com/gogo/protobuf v1.3.1 => github.com/gogo/protobuf v1.3.2
 	github.com/hashicorp/consul/api v1.10.1 => github.com/hashicorp/consul/api v1.13.0
