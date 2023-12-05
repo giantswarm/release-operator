@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  architect: giantswarm/architect@4.27.0
+  architect: giantswarm/architect@4.35.5
 
 workflows:
   version: 2
@@ -15,28 +15,13 @@ workflows:
             tags:
               only: /^v.*/
 
-      - architect/push-to-docker:
+      - architect/push-to-registries:
           context: architect
-          name: push-release-operator-to-quay
-          image: "quay.io/giantswarm/release-operator"
-          username_envar: "QUAY_USERNAME"
-          password_envar: "QUAY_PASSWORD"
+          name: push-to-registries
           requires:
             - go-build-release-operator
           filters:
             # Trigger the job also on git tag.
-            tags:
-              only: /^v.*/
-
-      - architect/push-to-docker:
-          context: architect
-          name: push-release-operator-to-aliyun
-          image: "giantswarm-registry.cn-shanghai.cr.aliyuncs.com/giantswarm/release-operator"
-          username_envar: "ALIYUN_USERNAME"
-          password_envar: "ALIYUN_PASSWORD"
-          requires:
-            - go-build-release-operator
-          filters:
             tags:
               only: /^v.*/
 
@@ -47,22 +32,8 @@ workflows:
           app_catalog_test: "control-plane-test-catalog"
           chart: "release-operator"
           requires:
-            - push-release-operator-to-aliyun
-            - push-release-operator-to-quay
+            - push-to-registries
           filters:
-            tags:
-              only: /^v.*/
-
-      - architect/push-to-app-collection:
-          context: architect
-          name: push-release-operator-to-shared-app-collection
-          app_name: "release-operator"
-          app_collection_repo: "shared-app-collection"
-          requires:
-            - push-release-operator-to-control-plane-app-catalog
-          filters:
-            branches:
-              ignore: /.*/
             tags:
               only: /^v.*/
 

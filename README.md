@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/giantswarm/release-operator.svg?style=shield&circle-token=7b8b0735a20cc338a802eda120ae33db180bf263)](https://circleci.com/gh/giantswarm/release-operator)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/giantswarm/release-operator/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/giantswarm/release-operator/tree/master)
 
 # release-operator
 
