@@ -14,7 +14,7 @@ require (
 	github.com/giantswarm/microerror v0.4.1
 	github.com/giantswarm/microkit v1.0.0
 	github.com/giantswarm/micrologger v1.1.1
-	github.com/giantswarm/operatorkit/v7 v7.2.0
+	github.com/giantswarm/operatorkit/v8 v8.0.0
 	github.com/google/go-cmp v0.6.0
 	github.com/prometheus/client_golang v1.17.0
 	github.com/spf13/viper v1.18.1
