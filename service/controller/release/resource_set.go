@@ -4,9 +4,9 @@ import (
 	"github.com/giantswarm/k8sclient/v7/pkg/k8sclient"
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
-	"github.com/giantswarm/operatorkit/v7/pkg/resource"
-	"github.com/giantswarm/operatorkit/v7/pkg/resource/wrapper/metricsresource"
-	"github.com/giantswarm/operatorkit/v7/pkg/resource/wrapper/retryresource"
+	"github.com/giantswarm/operatorkit/v8/pkg/resource"
+	"github.com/giantswarm/operatorkit/v8/pkg/resource/wrapper/metricsresource"
+	"github.com/giantswarm/operatorkit/v8/pkg/resource/wrapper/retryresource"
 
 	"github.com/giantswarm/release-operator/v4/service/controller/release/resource/apps"
 	"github.com/giantswarm/release-operator/v4/service/controller/release/resource/configs"
