@@ -28,8 +28,8 @@ github.com/giantswarm/apiextensions-application v0.6.1 h1:X1uzWBSrF4QsyyzaV46QkP
 github.com/giantswarm/apiextensions-application v0.6.1/go.mod h1:O6mg+EdXC9CyTLgi0d3rf6QTXrQX/79iw4kjMJRinig=
 github.com/giantswarm/backoff v1.0.0 h1:1oeTvyPsm1tJrHlSmfxbIWuoCNWPOkWJCb8kfLvE2T0=
 github.com/giantswarm/backoff v1.0.0/go.mod h1:l/WqbggvG5Ndxxws0LUgVEvP5E82Qj5/PF8SMip/1QM=
-github.com/giantswarm/config-controller v0.9.1 h1:0Wru9ijbcVMVJM3mWKLqyCxlMntdTSd1YCIuYA0bxpk=
-github.com/giantswarm/config-controller v0.9.1/go.mod h1:W6N1Ch8rtZyqemlB4KubBCVK7QXovr86Q1XmP2Ptyy8=
+github.com/giantswarm/config-controller v0.9.2 h1:nKuUERhsqjzfIHr+i2ge/DP+zT1oYU9hfQtT6V7II1w=
+github.com/giantswarm/config-controller v0.9.2/go.mod h1:WTXGSTV10Q3Soa7ffO9mNicG/dNFoW8SGNYvaEDoDWc=
 github.com/giantswarm/exporterkit v1.1.0 h1:It+tps930KykISVLtwrn9dKq4kVHLk0rnjaQvKHOV0o=
 github.com/giantswarm/exporterkit v1.1.0/go.mod h1:nzlgQdEZ29umzo6cY/ggVqSanQumkS0aLU1Kckv2ZSk=
 github.com/giantswarm/k8sclient/v7 v7.2.0 h1:twh4egNcuTJEH7R/hYVhs8nwEXPlr0u/o9CB1Kv9H9A=
