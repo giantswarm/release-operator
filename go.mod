@@ -120,7 +120,7 @@ replace (
 	github.com/hashicorp/vault/sdk v0.5.3 => github.com/hashicorp/vault/sdk v0.6.0
 	github.com/labstack/echo/v4 v4.1.11 => github.com/labstack/echo/v4 v4.9.0
 	github.com/microcosm-cc/bluemonday v1.0.2 => github.com/microcosm-cc/bluemonday v1.0.18
-	github.com/nats-io/jwt => github.com/nats-io/jwt/v2 v2.5.4
+	github.com/nats-io/jwt => github.com/nats-io/jwt/v2 v2.5.5
 	github.com/nats-io/nats-server/v2 v2.1.2 => github.com/nats-io/nats-server/v2 v2.8.4
 	github.com/nats-io/nats-server/v2 v2.5.0 => github.com/nats-io/nats-server/v2 v2.8.4
 	github.com/pkg/sftp v1.10.1 => github.com/pkg/sftp v1.13.4
