@@ -4,7 +4,7 @@ go 1.22.0
 
 toolchain go1.22.6
 
-require sigs.k8s.io/controller-tools v0.16.0
+require sigs.k8s.io/controller-tools v0.16.1
 
 require (
 	github.com/fatih/color v1.17.0 // indirect
