@@ -2,7 +2,7 @@ module github.com/giantswarm/release-operator/v4
 
 go 1.22.0
 
-toolchain go1.22.6
+toolchain go1.23.0
 
 require (
 	github.com/giantswarm/apiextensions-application v0.6.1
