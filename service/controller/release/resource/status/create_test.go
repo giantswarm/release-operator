@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/giantswarm/k8sclient/v7/pkg/k8sclienttest"
+	"github.com/giantswarm/k8sclient/v8/pkg/k8sclienttest"
 	"github.com/google/go-cmp/cmp"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
