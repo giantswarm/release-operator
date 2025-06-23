@@ -8,7 +8,7 @@ import (
 
 const (
 	kindRelease              = "Release"
-	releaseDocumentationLink = "https://docs.giantswarm.io/ui-api/management-api/crd/releases.release.giantswarm.io/"
+	releaseDocumentationLink = "https://docs.giantswarm.io/reference/platform-api/crd/releases.release.giantswarm.io/"
 	releaseNotesLink         = "https://docs.giantswarm.io/changes/workload-cluster-releases-aws/releases/aws-v11.2.0/"
 )
 
