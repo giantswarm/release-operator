@@ -16,9 +16,9 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/prometheus/client_golang v1.23.0
 	github.com/spf13/viper v1.20.1
-	k8s.io/api v0.33.3
-	k8s.io/apimachinery v0.33.3
-	k8s.io/client-go v0.33.3
+	k8s.io/api v0.33.4
+	k8s.io/apimachinery v0.33.4
+	k8s.io/client-go v0.33.4
 	sigs.k8s.io/controller-runtime v0.21.0
 	sigs.k8s.io/yaml v1.6.0
 )
