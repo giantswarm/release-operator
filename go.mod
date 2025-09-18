@@ -5,7 +5,7 @@ go 1.24.6
 require (
 	github.com/giantswarm/apiextensions-application v0.6.2
 	github.com/giantswarm/config-controller v0.10.1
-	github.com/giantswarm/exporterkit v1.2.0
+	github.com/giantswarm/exporterkit v1.3.0
 	github.com/giantswarm/k8sclient/v7 v7.2.0
 	github.com/giantswarm/k8smetadata v0.25.0
 	github.com/giantswarm/microendpoint v1.1.2
