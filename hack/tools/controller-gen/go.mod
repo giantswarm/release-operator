@@ -2,7 +2,7 @@ module github.com/giantswarm/apiextensions/hack/tools/code-generator
 
 go 1.24.6
 
-require sigs.k8s.io/controller-tools v0.18.0
+require sigs.k8s.io/controller-tools v0.20.0
 
 require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
