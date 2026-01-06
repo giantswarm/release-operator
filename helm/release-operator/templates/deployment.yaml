@@ -51,7 +51,7 @@ spec:
           {{- end }}
       containers:
       - name: release-operator
-        image: "{{ .Values.registry.domain }}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
+        image: "{{ .Values.registry.domain }}/{{ .Values.image.name }}:{{ include "image.tag" . }}"
         args:
         - daemon
         - --config.dirs=/var/run/release-operator/configmap/
