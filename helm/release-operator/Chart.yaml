@@ -2,7 +2,9 @@ apiVersion: v2
 name: release-operator
 description: Helm chart for release-operator.
 home: https://github.com/giantswarm/release-operator
-version: '[[ .Version ]]'
-appVersion: '[[ .AppVersion ]]'
+version: 4.2.2-dev
+appVersion: 4.2.2-dev
+icon: https://s.giantswarm.io/app-icons/giantswarm/1/dark.svg
 annotations:
+  application.giantswarm.io/team: honeybadger
   io.giantswarm.application.team: honeybadger
