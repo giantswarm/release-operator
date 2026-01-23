@@ -1,10 +1,6 @@
 image:
   name: "giantswarm/release-operator"
-  tag: "[[ .Version ]]"
-
-project:
-  branch: "[[ .Branch ]]"
-  commit: "[[ .SHA ]]"
+  tag: ""
 
 pod:
   user:
@@ -34,6 +30,7 @@ securityContext:
   capabilities:
     drop:
     - ALL
+  readOnlyRootFilesystem: true
 
 global:
   podSecurityStandards:
